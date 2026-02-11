@@ -81,7 +81,7 @@ function syncRepoSkills() {
 
 /**
  * Copy extensions from the repo into the OpenClaw workspace extensions directory.
- * OpenClaw discovers workspace extensions at: <workspace>/.openclaw/extensions/*/index.ts
+ * OpenClaw discovers workspace extensions at: <workspace>/.openclaw/extensions/<name>/index.ts
  * Our Dockerfile copies extensions to /app/extensions/ which isn't scanned,
  * so we mirror them into the workspace path on startup.
  */
