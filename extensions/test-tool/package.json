@@ -1,8 +1,0 @@
-{
-  "name": "openclaw-plugin-test-tool",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "main": "index.ts",
-  "description": "Throwaway OpenClaw plugin to discover the exact tool name format assigned by the runtime. DELETE after capturing the format."
-}

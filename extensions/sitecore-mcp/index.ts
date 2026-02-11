@@ -18,11 +18,15 @@
  * - sitecore-mcp-proxy service (must be running)
  *
  * @notes
+ * - MUST be a sync function (not async) — OpenClaw ignores async plugin returns
+ * - Uses .then() chains to do async fetch work after the sync function returns
+ * - The api object remains valid after the function returns, so registerTool()
+ *   calls inside .then() callbacks work correctly
  * - Uses the confirmed register(api) plugin pattern, NOT the old slot/init pattern
  * - Authenticates to proxy via x-mcp-token header (MCP_PROXY_TOKEN env var)
  * - Tool names are passed through as-is from marketer-mcp
  * - If the proxy is down at load time, plugin loads with zero tools (no crash)
- * - Execute signature is (toolCallId, params), return is { content: [...] }
+ * - Execute callbacks can be async since they're invoked later by OpenClaw
  */
 
 // Response shape from the proxy's GET /tools endpoint
@@ -54,7 +58,8 @@ interface OpenClawApi {
   }) => void;
 }
 
-export default async function (api: OpenClawApi) {
+// MUST be sync — OpenClaw ignores async plugin functions ("async registration is ignored")
+export default function (api: OpenClawApi) {
   // Read proxy URL from env var, fall back to Railway internal network address
   const proxyUrl =
     process.env.SITECORE_PROXY_URL ||
@@ -69,59 +74,67 @@ export default async function (api: OpenClawApi) {
     ...(token && { "x-mcp-token": token }),
   };
 
-  // Fetch available tools from the proxy
-  let tools: ProxyTool[];
-  try {
-    const res = await fetch(`${proxyUrl}/tools`, { headers });
-    if (!res.ok) throw new Error(`Proxy ${res.status}`);
-    const data: ProxyToolsResponse = await res.json();
-    tools = data.tools;
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    api.logger.error(`[sitecore-mcp] Failed to fetch tools: ${message}`);
-    // Plugin loads but with no tools — prevents OpenClaw from crashing
-    return;
-  }
+  // Kick off async tool fetch — runs in the event loop after this function returns
+  fetch(`${proxyUrl}/tools`, { headers })
+    .then((res) => {
+      if (!res.ok) throw new Error(`Proxy ${res.status}`);
+      return res.json() as Promise<ProxyToolsResponse>;
+    })
+    .then((data) => {
+      const tools = data.tools;
+      api.logger.info(
+        `[sitecore-mcp] Registering ${tools.length} tools from proxy`,
+      );
 
-  api.logger.info(
-    `[sitecore-mcp] Registering ${tools.length} tools from proxy`,
-  );
+      // Register each tool with OpenClaw
+      for (const tool of tools) {
+        api.registerTool({
+          name: tool.name,
+          description: tool.description,
+          parameters: tool.inputSchema, // JSON Schema — passed through from marketer-mcp
 
-  // Register each tool with OpenClaw
-  for (const tool of tools) {
-    api.registerTool({
-      name: tool.name,
-      description: tool.description,
-      parameters: tool.inputSchema, // JSON Schema — passed through from marketer-mcp
-      async execute(_toolCallId: string, params: Record<string, unknown>) {
-        try {
-          const res = await fetch(`${proxyUrl}/tools/${tool.name}`, {
-            method: "POST",
-            headers,
-            body: JSON.stringify(params),
-          });
+          // Execute callbacks CAN be async — they're invoked later when agent calls the tool
+          async execute(
+            _toolCallId: string,
+            params: Record<string, unknown>,
+          ) {
+            try {
+              const res = await fetch(`${proxyUrl}/tools/${tool.name}`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify(params),
+              });
 
-          if (!res.ok) {
-            const body = await res.text();
-            return {
-              content: [
-                { type: "text", text: `Proxy error (${res.status}): ${body}` },
-              ],
-            };
-          }
+              if (!res.ok) {
+                const body = await res.text();
+                return {
+                  content: [
+                    {
+                      type: "text",
+                      text: `Proxy error (${res.status}): ${body}`,
+                    },
+                  ],
+                };
+              }
 
-          const result = await res.json();
-          const text = JSON.stringify(result.content || result, null, 2);
-          return { content: [{ type: "text", text }] };
-        } catch (err: unknown) {
-          const message = err instanceof Error ? err.message : String(err);
-          return {
-            content: [
-              { type: "text", text: `Failed to reach proxy: ${message}` },
-            ],
-          };
-        }
-      },
+              const result = await res.json();
+              const text = JSON.stringify(result.content || result, null, 2);
+              return { content: [{ type: "text", text }] };
+            } catch (err: unknown) {
+              const message = err instanceof Error ? err.message : String(err);
+              return {
+                content: [
+                  { type: "text", text: `Failed to reach proxy: ${message}` },
+                ],
+              };
+            }
+          },
+        });
+      }
+    })
+    .catch((err: unknown) => {
+      // Proxy unreachable at startup — plugin loads with zero tools, no crash
+      const message = err instanceof Error ? err.message : String(err);
+      api.logger.error(`[sitecore-mcp] Failed to fetch tools: ${message}`);
     });
-  }
 }
