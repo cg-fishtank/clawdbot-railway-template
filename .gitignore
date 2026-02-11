@@ -16,3 +16,9 @@ tokens.json
 
 # OS
 .DS_Store
+
+# IDE
+.vscode/
+
+# AI reports (local only)
+.ai-reports/

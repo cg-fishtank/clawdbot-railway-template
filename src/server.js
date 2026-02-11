@@ -79,6 +79,91 @@ function syncRepoSkills() {
   }
 }
 
+/**
+ * Copy extensions from the repo into the OpenClaw workspace extensions directory.
+ * OpenClaw discovers workspace extensions at: <workspace>/.openclaw/extensions/*/index.ts
+ * Our Dockerfile copies extensions to /app/extensions/ which isn't scanned,
+ * so we mirror them into the workspace path on startup.
+ */
+function syncRepoExtensions() {
+  const repoExtDir = path.join(process.cwd(), "extensions");
+  const targetDir = path.join(WORKSPACE_DIR, ".openclaw", "extensions");
+
+  if (!fs.existsSync(repoExtDir)) {
+    console.log("[wrapper] no extensions/ in repo, skipping extension sync");
+    return;
+  }
+
+  try {
+    fs.mkdirSync(targetDir, { recursive: true });
+    const entries = fs.readdirSync(repoExtDir);
+    let synced = 0;
+    for (const name of entries) {
+      const src = path.join(repoExtDir, name);
+      if (fs.statSync(src).isDirectory()) {
+        const dest = path.join(targetDir, name);
+        fs.cpSync(src, dest, { recursive: true });
+        console.log(`[sync] Extension synced: ${name}`);
+        synced++;
+      }
+    }
+    console.log(`[wrapper] synced ${synced} extension(s) to workspace`);
+  } catch (err) {
+    console.error("[wrapper] failed to sync repo extensions:", err.message);
+  }
+}
+
+/**
+ * Sync workspace root .md files from the repo to their runtime destinations.
+ *
+ * Destination rules:
+ *   SOUL.md → STATE_DIR (/data/.openclaw/) — OpenClaw system-level identity
+ *   Everything else → WORKSPACE_DIR (/data/.openclaw/workspace/) — agent workspace
+ *
+ * MEMORY.md is "seed only" — copied on first deploy but never overwritten,
+ * because the agent maintains it at runtime with learned context.
+ */
+function syncWorkspaceFiles() {
+  const repoWorkspace = path.join(process.cwd(), "workspace");
+  if (!fs.existsSync(repoWorkspace)) {
+    console.log("[wrapper] no workspace/ in repo, skipping file sync");
+    return;
+  }
+
+  // SOUL.md is OpenClaw system-level, lives in STATE_DIR (not workspace)
+  const STATE_FILES = new Set(["SOUL.md"]);
+  // MEMORY.md is agent-maintained — only seed it, never overwrite
+  const SEED_ONLY = new Set(["MEMORY.md"]);
+
+  try {
+    fs.mkdirSync(STATE_DIR, { recursive: true });
+    fs.mkdirSync(WORKSPACE_DIR, { recursive: true });
+
+    const entries = fs.readdirSync(repoWorkspace);
+    let synced = 0;
+    for (const entry of entries) {
+      const src = path.join(repoWorkspace, entry);
+      if (!entry.endsWith(".md") || !fs.statSync(src).isFile()) continue;
+
+      const destDir = STATE_FILES.has(entry) ? STATE_DIR : WORKSPACE_DIR;
+      const dest = path.join(destDir, entry);
+
+      if (SEED_ONLY.has(entry) && fs.existsSync(dest)) {
+        console.log(`[sync] ${entry} exists, skipping (agent-maintained)`);
+        continue;
+      }
+
+      fs.cpSync(src, dest);
+      const label = destDir === STATE_DIR ? "state" : "workspace";
+      console.log(`[sync] ${entry} → ${label}`);
+      synced++;
+    }
+    console.log(`[wrapper] synced ${synced} workspace file(s)`);
+  } catch (err) {
+    console.error("[wrapper] failed to sync workspace files:", err.message);
+  }
+}
+
 // Protect /setup with a user-provided password.
 const SETUP_PASSWORD = process.env.SETUP_PASSWORD?.trim();
 
@@ -178,8 +263,10 @@ async function startGateway() {
   fs.mkdirSync(STATE_DIR, { recursive: true });
   fs.mkdirSync(WORKSPACE_DIR, { recursive: true });
 
-  // Sync workspace skills from repo before gateway starts
+  // Sync workspace skills, extensions, and config files from repo before gateway starts
   syncRepoSkills();
+  syncRepoExtensions();
+  syncWorkspaceFiles();
 
   const args = [
     "gateway",

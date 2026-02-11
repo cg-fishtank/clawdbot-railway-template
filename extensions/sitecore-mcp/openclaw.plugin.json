@@ -1,0 +1,10 @@
+{
+  "id": "sitecore-mcp",
+  "name": "Sitecore MCP",
+  "description": "Bridges OpenClaw to Sitecore marketer-mcp via HTTP proxy",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
