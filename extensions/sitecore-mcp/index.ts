@@ -41,6 +41,8 @@ interface ProxyToolsResponse {
 }
 
 // OpenClaw extension API surface used by this plugin
+// NOTE: execute signature uses rest args — OpenClaw's actual callback signature is unknown
+// and may differ from docs. See execute callback below for defensive handling.
 interface OpenClawApi {
   logger: {
     info: (msg: string) => void;
@@ -52,8 +54,7 @@ interface OpenClawApi {
     description: string;
     parameters: Record<string, unknown>;
     execute: (
-      toolCallId: string,
-      params: Record<string, unknown>,
+      ...args: unknown[]
     ) => Promise<{ content: Array<{ type: string; text: string }> }>;
   }) => void;
 }
@@ -94,10 +95,57 @@ export default function (api: OpenClawApi) {
           parameters: tool.inputSchema, // JSON Schema — passed through from marketer-mcp
 
           // Execute callbacks CAN be async — they're invoked later when agent calls the tool
-          async execute(
-            _toolCallId: string,
-            params: Record<string, unknown>,
-          ) {
+          // Uses rest args because OpenClaw's actual callback signature is unverified.
+          // Docs say execute(toolCallId, params) but runtime may differ.
+          async execute(...args: unknown[]) {
+            // DEBUG: Log raw args to discover OpenClaw's actual callback signature
+            const argSummary = args
+              .map(
+                (a, i) =>
+                  `arg${i}(${typeof a}${typeof a === "object" && a !== null ? ":" + Object.keys(a as Record<string, unknown>).join(",") : ""})`,
+              )
+              .join(" | ");
+            api.logger.info(
+              `[sitecore-mcp] ${tool.name} called — ${args.length} args — ${argSummary}`,
+            );
+
+            // Defensive param extraction — handle multiple possible signatures:
+            // 1. execute(toolCallId, params) — docs say this
+            // 2. execute(params) — single arg object
+            // 3. execute({ id, input/arguments }) — wrapper object
+            let params: Record<string, unknown> = {};
+            if (
+              args.length >= 2 &&
+              typeof args[1] === "object" &&
+              args[1] !== null
+            ) {
+              // Signature: execute(toolCallId, params)
+              params = args[1] as Record<string, unknown>;
+            } else if (
+              args.length >= 1 &&
+              typeof args[0] === "object" &&
+              args[0] !== null
+            ) {
+              const first = args[0] as Record<string, unknown>;
+              if ("input" in first && typeof first.input === "object") {
+                // Wrapper: execute({ id, input: {...} })
+                params = first.input as Record<string, unknown>;
+              } else if (
+                "arguments" in first &&
+                typeof first.arguments === "object"
+              ) {
+                // Wrapper: execute({ id, arguments: {...} })
+                params = first.arguments as Record<string, unknown>;
+              } else {
+                // Single arg: execute(params)
+                params = first;
+              }
+            }
+
+            api.logger.info(
+              `[sitecore-mcp] ${tool.name} resolved params: ${JSON.stringify(params)}`,
+            );
+
             try {
               const res = await fetch(`${proxyUrl}/tools/${tool.name}`, {
                 method: "POST",

@@ -114,6 +114,9 @@ app.post("/tools/:name", requireAuth, async (req, res) => {
   const toolName = req.params.name;
   const args = req.body || {};
 
+  // DEBUG: Log what the proxy actually receives from the extension
+  console.log(`[POST /tools/${toolName}] received args:`, JSON.stringify(args));
+
   try {
     const result = await manager.callTool(toolName, args);
     res.json(result);
