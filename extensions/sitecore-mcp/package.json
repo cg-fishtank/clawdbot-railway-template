@@ -1,0 +1,8 @@
+{
+  "name": "openclaw-plugin-sitecore-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "description": "OpenClaw tool plugin that bridges to Sitecore marketer-mcp via the sitecore-mcp-proxy service"
+}
