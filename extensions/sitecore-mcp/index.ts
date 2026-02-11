@@ -73,7 +73,12 @@ export default {
   }),
 
   init: async (config: { proxyUrl: string; proxyToken: string }) => {
-    const { proxyUrl } = config;
+    // Read proxy URL from: plugin config → env var → hardcoded default
+    // Set SITECORE_PROXY_URL env var on the OpenClaw Railway service to override
+    const proxyUrl =
+      config.proxyUrl ||
+      process.env.SITECORE_PROXY_URL ||
+      "http://sitecore-mcp-proxy.railway.internal:3001";
     // Read token from plugin config OR environment (same env var on both services)
     const token = config.proxyToken || process.env.MCP_PROXY_TOKEN || "";
 

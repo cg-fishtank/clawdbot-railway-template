@@ -302,8 +302,15 @@ export class McpClientManager {
    */
   async connect() {
     if (!this.tokenProvider.hasTokens()) {
-      this.lastError = "No tokens loaded. Run scripts/auth.js first.";
-      throw new Error(this.lastError);
+      // If client_credentials are available, auto-request a token on startup
+      // This eliminates the need to upload tokens.json to the Railway volume
+      if (this.config.clientSecret) {
+        console.log("[mcp] No tokens found. Auto-requesting via client_credentials...");
+        await this.tokenProvider._clientCredentialsGrant();
+      } else {
+        this.lastError = "No tokens loaded. Run scripts/auth.js first.";
+        throw new Error(this.lastError);
+      }
     }
 
     try {
