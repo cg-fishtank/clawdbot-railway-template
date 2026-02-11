@@ -54,6 +54,31 @@ const WORKSPACE_DIR =
   getEnvWithShim("OPENCLAW_WORKSPACE_DIR", "CLAWDBOT_WORKSPACE_DIR") ||
   path.join(STATE_DIR, "workspace");
 
+/**
+ * Copy workspace skills from the repo into the runtime workspace.
+ * This makes skills deployable via git push — repo is source of truth.
+ * Only syncs skills/ to avoid clobbering SOUL.md, MEMORY.md, etc.
+ */
+function syncRepoSkills() {
+  const repoSkillsDir = path.join(__dirname, "..", "workspace", "skills");
+  const destSkillsDir = path.join(WORKSPACE_DIR, "skills");
+
+  if (!fs.existsSync(repoSkillsDir)) {
+    console.log("[wrapper] no workspace/skills/ in repo, skipping sync");
+    return;
+  }
+
+  try {
+    fs.cpSync(repoSkillsDir, destSkillsDir, { recursive: true, force: true });
+    const skills = fs.readdirSync(destSkillsDir).filter(
+      (f) => fs.statSync(path.join(destSkillsDir, f)).isDirectory()
+    );
+    console.log(`[wrapper] synced ${skills.length} skill(s) from repo: ${skills.join(", ")}`);
+  } catch (err) {
+    console.error("[wrapper] failed to sync repo skills:", err.message);
+  }
+}
+
 // Protect /setup with a user-provided password.
 const SETUP_PASSWORD = process.env.SETUP_PASSWORD?.trim();
 
@@ -152,6 +177,9 @@ async function startGateway() {
 
   fs.mkdirSync(STATE_DIR, { recursive: true });
   fs.mkdirSync(WORKSPACE_DIR, { recursive: true });
+
+  // Sync workspace skills from repo before gateway starts
+  syncRepoSkills();
 
   const args = [
     "gateway",
