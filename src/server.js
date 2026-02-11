@@ -96,17 +96,31 @@ function syncRepoExtensions() {
 
   try {
     fs.mkdirSync(targetDir, { recursive: true });
-    const entries = fs.readdirSync(repoExtDir);
+
+    // Build set of repo extensions (source of truth)
+    const repoEntries = fs.readdirSync(repoExtDir);
+    const repoNames = new Set();
     let synced = 0;
-    for (const name of entries) {
+    for (const name of repoEntries) {
       const src = path.join(repoExtDir, name);
       if (fs.statSync(src).isDirectory()) {
+        repoNames.add(name);
         const dest = path.join(targetDir, name);
         fs.cpSync(src, dest, { recursive: true });
         console.log(`[sync] Extension synced: ${name}`);
         synced++;
       }
     }
+
+    // Remove stale extensions from volume that no longer exist in repo
+    for (const name of fs.readdirSync(targetDir)) {
+      const dest = path.join(targetDir, name);
+      if (fs.statSync(dest).isDirectory() && !repoNames.has(name)) {
+        fs.rmSync(dest, { recursive: true });
+        console.log(`[sync] Removed stale extension: ${name}`);
+      }
+    }
+
     console.log(`[wrapper] synced ${synced} extension(s) to workspace`);
   } catch (err) {
     console.error("[wrapper] failed to sync repo extensions:", err.message);
