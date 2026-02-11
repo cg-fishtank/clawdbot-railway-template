@@ -60,7 +60,7 @@ const WORKSPACE_DIR =
  * Only syncs skills/ to avoid clobbering SOUL.md, MEMORY.md, etc.
  */
 function syncRepoSkills() {
-  const repoSkillsDir = path.join(__dirname, "..", "workspace", "skills");
+  const repoSkillsDir = path.join(process.cwd(), "workspace", "skills");
   const destSkillsDir = path.join(WORKSPACE_DIR, "skills");
 
   if (!fs.existsSync(repoSkillsDir)) {
