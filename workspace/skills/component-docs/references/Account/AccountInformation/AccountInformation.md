@@ -144,14 +144,14 @@ The AccountInformation component reads the `heading` field from the **page route
 
 ```javascript
 // Search for existing account page
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Account"
 });
 const pageId = pageSearch.results[0].itemId;
 
 // Or get page by path
-const page = await mcp__marketer__get_content_item_by_path({
+const page = await mcp__marketer-mcp__get_content_item_by_path({
   itemPath: "/sitecore/content/Site/Home/Account"
 });
 ```
@@ -159,7 +159,7 @@ const page = await mcp__marketer__get_content_item_by_path({
 ### Step 2: Add AccountInformation Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "account-information-rendering-id",
   placeholderPath: "headless-main",
@@ -174,7 +174,7 @@ const result = await mcp__marketer__add_component_on_page({
 Since `heading` is a page-level field, update it on the page item:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID, not a datasource
   language: "en",
@@ -190,7 +190,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the account page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Account"
 });
@@ -199,7 +199,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add AccountInformation component to the page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "account-information-rendering-id",
   placeholderPath: "headless-main",
@@ -211,7 +211,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update the heading field on the page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -235,7 +235,7 @@ await mcp__marketer__update_content({
 
 Before authoring AccountInformation via MCP, verify:
 
-- [ ] Have account page ID (from `mcp__marketer__search_site`)
+- [ ] Have account page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have AccountInformation rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Update goes to page item, not datasource

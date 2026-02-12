@@ -461,7 +461,7 @@ This section provides instructions for programmatically authoring the WhereToBuy
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the WhereToBuy rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 4. Ensure BusinessProfile items exist under Settings/Component Settings/Business Profiles/
@@ -469,7 +469,7 @@ Before authoring this component via MCP:
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Where To Buy"
 });
@@ -479,7 +479,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add WhereToBuy Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "wheretobuy-rendering-id",  // Or wheretobuy-hidemap for list-only
   placeholderPath: "headless-main",
@@ -507,7 +507,7 @@ const datasourceId = result.datasourceId;
 ### Step 3: Update Fields (if needed)
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -524,17 +524,17 @@ Business profiles are separate content items that the WhereToBuy component fetch
 
 ```javascript
 // 1. Find Business Profiles folder
-const folderSearch = await mcp__marketer__search_site({
+const folderSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Business Profiles"
 });
 const businessProfilesFolderId = folderSearch.results[0].itemId;
 
 // 2. Create a Business Profile item
-await mcp__marketer__create_content_item({
+await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentId: businessProfilesFolderId,
-  itemName: "ABC-Equipment-Chicago",
+  name: "ABC-Equipment-Chicago",
   templateId: "business-profile-template-id",
   language: "en",
   fields: {
@@ -574,7 +574,7 @@ await mcp__marketer__create_content_item({
 
 Before authoring WhereToBuy via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have WhereToBuy rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `WhereToBuy_1`)

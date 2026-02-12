@@ -88,10 +88,22 @@ If the user pastes an image directly:
 
 ```
 mcp__marketer-mcp__upload_asset({
-  file_path: "/path/to/hero.jpg",
-  asset_name: "hero-banner-desktop"
+  filePath: "/path/to/hero.jpg",
+  name: "hero-banner-desktop",
+  itemPath: "/sitecore/media library/Project/main/Images",
+  language: "en",
+  extension: "jpg",
+  siteName: "main"
 })
 ```
+
+**All 6 parameters are REQUIRED:**
+- `filePath`: Local file path or URL to the image
+- `name`: Asset name in Media Library
+- `itemPath`: Media Library folder path (e.g., `/sitecore/media library/Project/main/Images`)
+- `language`: Language code (e.g., `"en"`)
+- `extension`: File extension without dot (e.g., `"jpg"`, `"png"`, `"webp"`)
+- `siteName`: Site name (e.g., `"main"`)
 
 **Capture the response** -- the returned asset ID is needed for:
 - Updating metadata (Step 4)
@@ -104,13 +116,24 @@ After a successful upload, immediately update the asset's metadata (alt text, de
 ```
 mcp__marketer-mcp__update_asset({
   asset_id: "<returned-asset-id>",
-  alt_text: "Aerial view of convention center at sunset",
-  description: "Main hero banner image for the home page, 1920x1080px",
-  tags: ["hero", "banner", "homepage"]
+  fields: {
+    "Description": "Main hero banner image for the home page, 1920x1080px"
+  },
+  language: "en",
+  altText: "Aerial view of convention center at sunset"
 })
 ```
 
-**Why update separately?** The `upload_asset` tool handles the file upload. Metadata (alt text, description, tags) is applied via `update_asset` after the upload completes.
+**Required parameters:**
+- `asset_id`: The asset GUID from the upload response
+- `fields`: Object with field name/value pairs (e.g., `Description`, custom metadata fields)
+- `language`: Language code (e.g., `"en"`)
+
+**Optional parameters:**
+- `altText`: Alt text for the asset (accessibility)
+- `name`: Rename the asset
+
+**Why update separately?** The `upload_asset` tool handles the file upload. Metadata (alt text, description) is applied via `update_asset` after the upload completes.
 
 ### Step 5: Verify the Upload
 
@@ -204,9 +227,9 @@ When the user wants to update alt text, description, or tags on an asset that al
    ```
    mcp__marketer-mcp__update_asset({
      asset_id: "<asset-id>",
-     alt_text: "Updated alt text",
-     description: "Updated description",
-     tags: ["updated", "tags"]
+     fields: { "Description": "Updated description" },
+     language: "en",
+     altText: "Updated alt text"
    })
    ```
 4. Verify with `get_asset_information` to confirm changes applied

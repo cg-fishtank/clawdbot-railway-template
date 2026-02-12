@@ -138,14 +138,14 @@ This section provides instructions for programmatically authoring the CommonRich
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the CommonRichtext rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "About Page"
 });
@@ -155,7 +155,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add CommonRichtext to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "commonrichtext-rendering-id",
   placeholderPath: "headless-main",
@@ -173,7 +173,7 @@ const result = await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Services"
 });
@@ -182,7 +182,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add CommonRichtext component
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "commonrichtext-rendering-id",
   placeholderPath: "headless-main",
@@ -219,7 +219,7 @@ await mcp__marketer__add_component_on_page({
 
 Before authoring CommonRichtext via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have CommonRichtext rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `CommonRichtext_1`)

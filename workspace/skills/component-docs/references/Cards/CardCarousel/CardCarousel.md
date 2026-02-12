@@ -147,7 +147,7 @@ This section provides instructions for programmatically authoring the CardCarous
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page Name"
 });
@@ -157,7 +157,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add CardCarousel to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-carousel-rendering-id",
   placeholderPath: "headless-main",
@@ -179,7 +179,7 @@ const dynamicPlaceholderId = result.placeholderId;  // Needed for adding child c
 const cardPlaceholder = `headless-main/cardcarousel-{${dynamicPlaceholderId}}`;
 
 // Card 1
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -192,7 +192,7 @@ await mcp__marketer__add_component_on_page({
 });
 
 // Card 2
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -213,7 +213,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Blog Page"
 });
@@ -222,7 +222,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add CardCarousel component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-carousel-rendering-id",
   placeholderPath: "headless-main",
@@ -241,7 +241,7 @@ const cardPlaceholder = `headless-main/cardcarousel-{${dynamicId}}`;
 // ═══════════════════════════════════════════════════════════════
 
 // Card 1
-const card1 = await mcp__marketer__add_component_on_page({
+const card1 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -254,7 +254,7 @@ const card1 = await mcp__marketer__add_component_on_page({
 });
 
 // Update Card 1 image
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card1.datasourceId,
   language: "en",
@@ -264,7 +264,7 @@ await mcp__marketer__update_content({
 });
 
 // Card 2
-const card2 = await mcp__marketer__add_component_on_page({
+const card2 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -276,7 +276,7 @@ const card2 = await mcp__marketer__add_component_on_page({
   }
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card2.datasourceId,
   language: "en",
@@ -286,7 +286,7 @@ await mcp__marketer__update_content({
 });
 
 // Card 3
-const card3 = await mcp__marketer__add_component_on_page({
+const card3 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -298,7 +298,7 @@ const card3 = await mcp__marketer__add_component_on_page({
   }
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card3.datasourceId,
   language: "en",
@@ -308,7 +308,7 @@ await mcp__marketer__update_content({
 });
 
 // Card 4
-const card4 = await mcp__marketer__add_component_on_page({
+const card4 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -320,7 +320,7 @@ const card4 = await mcp__marketer__add_component_on_page({
   }
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card4.datasourceId,
   language: "en",
@@ -353,7 +353,7 @@ The `DYNAMIC_PLACEHOLDER_ID` is returned when you add the CardCarousel component
 
 Before authoring CardCarousel via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have CardCarousel rendering ID (from component manifest)
 - [ ] Have Card rendering ID (for child cards)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)

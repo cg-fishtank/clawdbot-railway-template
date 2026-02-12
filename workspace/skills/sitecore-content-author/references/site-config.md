@@ -49,6 +49,6 @@ https://xmc-4qlgtraf1kmzc2kz5jkd33-eh.sitecorecloud.io/api/editing/render?sc_ite
 
 ## Usage Notes
 
-- **No MCP needed**: Use this file instead of `marketer_search_site` for Home page ID
+- **No MCP needed**: Use this file instead of `mcp__marketer-mcp__search_site` for Home page ID
 - **Token savings**: ~1.2k tokens per lookup
 - **Pages Editor**: All pages can be edited via Sitecore Pages at the preview URL

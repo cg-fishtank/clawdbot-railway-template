@@ -261,14 +261,14 @@ The ProductHeader component reads all fields from the **page route context**, no
 
 ```javascript
 // Search for existing product page
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 System"
 });
 const pageId = pageSearch.results[0].itemId;
 
 // Or create a new product page
-const newPage = await mcp__marketer__create_page({
+const newPage = await mcp__marketer-mcp__create_page({
   siteName: "main",
   pageName: "Industrial Water Purification System X500",
   parentItemId: "{PRODUCTS-FOLDER-GUID}",
@@ -280,7 +280,7 @@ const newPage = await mcp__marketer__create_page({
 ### Step 2: Add ProductHeader Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-header-rendering-id",
   placeholderPath: "headless-main",
@@ -293,7 +293,7 @@ const result = await mcp__marketer__add_component_on_page({
 ### Step 3: Update Page-Level Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID, not a datasource
   language: "en",
@@ -309,7 +309,7 @@ await mcp__marketer__update_content({
 ### Step 4: Update Image Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -322,7 +322,7 @@ await mcp__marketer__update_content({
 ### Step 5: Update Link Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -336,7 +336,7 @@ await mcp__marketer__update_content({
 ### Step 6: Set SxaTags (Optional)
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -352,7 +352,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find or create the product page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 Water Purification"
 });
@@ -361,7 +361,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ProductHeader component
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-header-rendering-id",
   placeholderPath: "headless-main",
@@ -373,7 +373,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update text fields on page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -388,7 +388,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Update image
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -400,7 +400,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 5: Update CTA links
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -413,7 +413,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 6: Set product tags
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -444,7 +444,7 @@ await mcp__marketer__update_content({
 
 Before authoring ProductHeader via MCP, verify:
 
-- [ ] Have Product Page ID (from `mcp__marketer__search_site`)
+- [ ] Have Product Page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ProductHeader rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] productName field has content (required)

@@ -157,20 +157,18 @@ All component item names must be **unique** within the page. Use this convention
 
 ```
 mcp__marketer-mcp__create_page({
-  siteName: "main",
-  pageName: "About Us",
-  parentItemPath: "/sitecore/content/sites/main/home",
   templateId: "300f3d1b-52ef-4734-8eab-ae2e2a422759",
+  parentId: "b132d115-7893-49aa-a06f-f1719a8704e3",
+  name: "About Us",
   language: "en"
 })
 ```
 
 **Parameters:**
-- `siteName`: Always `"main"` (see site-config.md)
-- `pageName`: The display name of the page (use Title Case)
-- `parentItemPath`: Where in the content tree this page lives. Default is under Home.
-- `templateId`: From the template selection in Phase 1
-- `language`: Default `"en"`
+- `templateId`: From the template selection in Phase 1 (required)
+- `parentId`: Parent page GUID — use Home page ID from site-config.md, NOT a path (required)
+- `name`: The display name of the page, use Title Case (required)
+- `language`: Default `"en"` (optional)
 
 **Result:** Returns the new page's item ID. Store this for all subsequent operations.
 
@@ -356,7 +354,7 @@ Confirm:
 ### Step 5.2: Get Preview URL
 
 ```
-mcp__marketer-mcp__get_page_preview_url({ pageId: "{page-id}" })
+mcp__marketer-mcp__get_page_preview_url({ pageId: "{page-id}", language: "en" })
 ```
 
 ### Step 5.3: Present Build Summary
@@ -476,10 +474,9 @@ When populating image fields, use this XML format:
 
 // PHASE 2: Create the page
 mcp__marketer-mcp__create_page({
-  siteName: "main",
-  pageName: "About Us",
-  parentItemPath: "/sitecore/content/sites/main/home",
   templateId: "300f3d1b-52ef-4734-8eab-ae2e2a422759",
+  parentId: "b132d115-7893-49aa-a06f-f1719a8704e3",
+  name: "About Us",
   language: "en"
 })
 // -> Returns pageId: "aaa-bbb-ccc-..."
@@ -569,7 +566,7 @@ mcp__marketer-mcp__add_component_on_page({
 
 // PHASE 5: Verify
 mcp__marketer-mcp__get_components_on_page({ pageId: "aaa-bbb-ccc-..." })
-mcp__marketer-mcp__get_page_preview_url({ pageId: "aaa-bbb-ccc-..." })
+mcp__marketer-mcp__get_page_preview_url({ pageId: "aaa-bbb-ccc-...", language: "en" })
 ```
 
 ---

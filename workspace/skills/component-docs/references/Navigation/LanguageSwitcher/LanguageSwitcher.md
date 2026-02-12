@@ -117,7 +117,7 @@ For the language switcher to work properly:
 Since this component has no datasource:
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "language-switcher-rendering-id",
   placeholderPath: "tertiarynav-{dynamic-id}",  // Or tertiarynavcomponents
@@ -133,7 +133,7 @@ To support the language switcher, create content in multiple languages:
 
 ```javascript
 // Update page content in French
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "fr",  // French version

@@ -189,7 +189,7 @@ The grid's theme affects child IconFeatureCard components through smart theming:
 ### Step 1: Add IconFeatureCardGrid to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "icon-feature-card-grid-rendering-id",
   placeholderPath: "headless-main",
@@ -208,16 +208,16 @@ const gridDatasourceId = result.datasourceId;
 
 ```javascript
 // Create card datasource
-const card1 = await mcp__marketer__create_content_item({
+const card1 = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home/Data/Feature Cards",
   templatePath: "/sitecore/templates/Project/Site/Feature Cards/Icon Feature Card",
-  itemName: "Support Card",
+  name: "Support Card",
   language: "en"
 });
 
 // Set card fields
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card1.itemId,
   language: "en",
@@ -229,7 +229,7 @@ await mcp__marketer__update_content({
 });
 
 // Add card to grid placeholder
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "icon-feature-card-rendering-id",
   placeholderPath: "iconfeaturecardgrid-{dynamic-placeholder-id}",

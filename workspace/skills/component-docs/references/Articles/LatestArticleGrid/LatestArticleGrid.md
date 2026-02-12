@@ -210,7 +210,7 @@ This section provides instructions for programmatically authoring the LatestArti
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the LatestArticleGrid rendering ID from the component manifest
 3. Know the target placeholder:
    - Root level: `"headless-main"`
@@ -220,7 +220,7 @@ Before authoring this component via MCP:
 
 ```javascript
 // Search for the page where LatestArticleGrid will be added
-await mcp__marketer__search_site({
+await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Homepage"
 });
@@ -230,7 +230,7 @@ await mcp__marketer__search_site({
 ### Step 2: Add LatestArticleGrid to Page (Root Level)
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "latest-article-grid-rendering-id",
   placeholderPath: "headless-main",  // Root level = NO leading slash
@@ -254,7 +254,7 @@ When placing inside a ColumnSplitter, use the dynamic placeholder path:
 
 ```javascript
 // First, add ColumnSplitter to the page
-const columnSplitterResult = await mcp__marketer__add_component_on_page({
+const columnSplitterResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "column-splitter-rendering-id",
   placeholderPath: "headless-main",
@@ -265,7 +265,7 @@ const columnSplitterResult = await mcp__marketer__add_component_on_page({
 
 // Then add LatestArticleGrid to the left column
 // Placeholder format: headless-main/column-splitter-{uid}-left
-const latestGridResult = await mcp__marketer__add_component_on_page({
+const latestGridResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "latest-article-grid-vertical-list-rendering-id",
   placeholderPath: "headless-main/column-splitter-{uid}-left",  // Replace {uid} with actual UID
@@ -283,7 +283,7 @@ const latestGridResult = await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Insights Landing"
 });
@@ -292,7 +292,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add LatestArticleGrid component (Insights variant)
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "latest-article-grid-insights-rendering-id",
   placeholderPath: "headless-main",
@@ -343,7 +343,7 @@ To use a specific variant, use the corresponding rendering ID:
 
 Before authoring LatestArticleGrid via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have LatestArticleGrid rendering ID (from component manifest)
 - [ ] Correct placeholder path for placement location
 - [ ] Component item name is unique (e.g., `LatestArticles_1`)

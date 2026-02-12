@@ -259,7 +259,7 @@ Card components are typically placed inside container components (CardGrid, Card
 
 ```javascript
 // Search for the page
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page with CardGrid"
 });
@@ -269,7 +269,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add Card to Container Placeholder
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: "headless-main/cardgrid-{dynamicId}",  // Dynamic placeholder path
@@ -287,7 +287,7 @@ const datasourceId = result.datasourceId;
 ### Step 3: Update Image Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -301,7 +301,7 @@ await mcp__marketer__update_content({
 ### Step 4: Update Link Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -317,7 +317,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page with CardGrid
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Solutions Page"
 });
@@ -326,7 +326,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add Card component to CardGrid placeholder
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: "headless-main/cardgrid-{dynamic-id}",
@@ -344,7 +344,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update image fields
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -356,7 +356,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Update link field
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",

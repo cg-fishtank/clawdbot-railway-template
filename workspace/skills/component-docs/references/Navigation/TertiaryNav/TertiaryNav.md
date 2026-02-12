@@ -249,11 +249,11 @@ type TertiaryNavProps = ComponentProps &
 ### Step 1: Create TertiaryNav Datasource
 
 ```javascript
-const tertiaryNavDatasource = await mcp__marketer__create_content_item({
+const tertiaryNavDatasource = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home/Data/Navigation",
   templatePath: "/sitecore/templates/Project/Site/Navigation/Tertiary Navigation",
-  itemName: "Tertiary Navigation",
+  name: "Tertiary Navigation",
   language: "en"
 });
 ```
@@ -262,15 +262,15 @@ const tertiaryNavDatasource = await mcp__marketer__create_content_item({
 
 ```javascript
 // Create Contact Sales link
-const contactLink = await mcp__marketer__create_content_item({
+const contactLink = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: tertiaryNavDatasource.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Navigation/Header Child",
-  itemName: "Contact Sales",
+  name: "Contact Sales",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: contactLink.itemId,
   language: "en",
@@ -280,15 +280,15 @@ await mcp__marketer__update_content({
 });
 
 // Create Support link
-const supportLink = await mcp__marketer__create_content_item({
+const supportLink = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: tertiaryNavDatasource.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Navigation/Header Child",
-  itemName: "Support",
+  name: "Support",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: supportLink.itemId,
   language: "en",
@@ -303,7 +303,7 @@ await mcp__marketer__update_content({
 TertiaryNav is typically added to the Header's `tertiarynav` placeholder:
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tertiary-nav-rendering-id",
   placeholderPath: "tertiarynav-{header-dynamic-id}",
@@ -319,7 +319,7 @@ Add LanguageSwitcher and Login to the TertiaryNav's placeholder:
 
 ```javascript
 // Add LanguageSwitcher
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "language-switcher-rendering-id",
   placeholderPath: "tertiarynavcomponents-{tertiarynav-dynamic-id}",
@@ -329,7 +329,7 @@ await mcp__marketer__add_component_on_page({
 });
 
 // Add Login
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "login-rendering-id",
   placeholderPath: "tertiarynavcomponents-{tertiarynav-dynamic-id}",

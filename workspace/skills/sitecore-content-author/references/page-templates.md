@@ -49,7 +49,7 @@ Source: Marketer MCP `list_available_insertoptions`
 
 ## Usage Notes
 
-- **No MCP needed**: Use this file instead of `marketer_list_available_insertoptions`
+- **No MCP needed**: Use this file instead of `mcp__marketer-mcp__list_available_insertoptions`
 - **Token savings**: ~600 tokens per lookup
 - **Default choice**: Use Landing Page for most new pages
 - **Parent context**: These templates are available under `/sitecore/content/sites/main/home`

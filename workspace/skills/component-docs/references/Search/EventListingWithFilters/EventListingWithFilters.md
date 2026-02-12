@@ -239,7 +239,7 @@ Users can filter events by a custom date range:
 
 Before authoring this component via MCP:
 
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the EventListingWithFilters rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"`)
 4. Have a valid Sitecore Search widget ID for events
@@ -247,7 +247,7 @@ Before authoring this component via MCP:
 ### Step 1: Add Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "event-listing-with-filters-rendering-id",
   placeholderPath: "headless-main",
@@ -265,7 +265,7 @@ const result = await mcp__marketer__add_component_on_page({
 ### Step 2: Update Configuration (Optional)
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",

@@ -163,7 +163,7 @@ This section provides instructions for programmatically authoring the CardGrid c
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page Name"
 });
@@ -173,7 +173,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add CardGrid to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-grid-rendering-id",  // Or variant-specific ID
   placeholderPath: "headless-main",
@@ -195,7 +195,7 @@ const dynamicPlaceholderId = result.placeholderId;  // Needed for adding child c
 const cardPlaceholder = `headless-main/cardgrid-{${dynamicPlaceholderId}}`;
 
 // Card 1
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -216,7 +216,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Solutions Page"
 });
@@ -225,7 +225,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add CardGrid component (ContentCentered variant)
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-grid-content-centered-rendering-id",
   placeholderPath: "headless-main",
@@ -244,7 +244,7 @@ const cardPlaceholder = `headless-main/cardgrid-{${dynamicId}}`;
 // ═══════════════════════════════════════════════════════════════
 
 // Card 1
-const card1 = await mcp__marketer__add_component_on_page({
+const card1 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -256,7 +256,7 @@ const card1 = await mcp__marketer__add_component_on_page({
   }
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card1.datasourceId,
   language: "en",
@@ -267,7 +267,7 @@ await mcp__marketer__update_content({
 });
 
 // Card 2
-const card2 = await mcp__marketer__add_component_on_page({
+const card2 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -279,7 +279,7 @@ const card2 = await mcp__marketer__add_component_on_page({
   }
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card2.datasourceId,
   language: "en",
@@ -290,7 +290,7 @@ await mcp__marketer__update_content({
 });
 
 // Card 3
-const card3 = await mcp__marketer__add_component_on_page({
+const card3 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -302,7 +302,7 @@ const card3 = await mcp__marketer__add_component_on_page({
   }
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: card3.datasourceId,
   language: "en",
@@ -346,7 +346,7 @@ The `DYNAMIC_PLACEHOLDER_ID` is returned when you add the CardGrid component.
 
 Before authoring CardGrid via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have CardGrid rendering ID (correct variant from component manifest)
 - [ ] Have Card rendering ID (for child cards)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)

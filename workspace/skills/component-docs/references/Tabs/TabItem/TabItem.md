@@ -183,7 +183,7 @@ This section provides instructions for programmatically authoring the TabItem co
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the parent page ID (use `mcp__marketer__search_site`)
+1. Have the parent page ID (use `mcp__marketer-mcp__search_site`)
 2. Have a TabsContainer already added to the page (see TabsContainer docs)
 3. Have the TabsContainer's UID for placeholder path construction
 4. Have the TabItem rendering ID from the component manifest
@@ -200,7 +200,7 @@ TabItem is a **child component** that must be placed inside a TabsContainer's pl
 
 ```javascript
 // If TabsContainer doesn't exist, add it first
-const tabsResult = await mcp__marketer__add_component_on_page({
+const tabsResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "tabscontainer-rendering-id",
   placeholderPath: "headless-main",
@@ -222,7 +222,7 @@ const tabsPlaceholderPath = `headless-main/tabscontainer-${tabsContainerUid}`;
 ### Step 3: Add TabItem to TabsContainer
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholderPath,  // Nested placeholder
@@ -244,7 +244,7 @@ const result = await mcp__marketer__add_component_on_page({
 ### Step 4: Update TabItem Fields (if needed)
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,  // From Step 3
   language: "en",
@@ -261,7 +261,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Product Page"
 });
@@ -270,7 +270,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add TabsContainer (if not already present)
 // ═══════════════════════════════════════════════════════════════
-const tabsResult = await mcp__marketer__add_component_on_page({
+const tabsResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabscontainer-rendering-id",
   placeholderPath: "headless-main",
@@ -285,7 +285,7 @@ const tabsPlaceholder = `headless-main/tabscontainer-${tabsContainerUid}`;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Add TabItem - Overview
 // ═══════════════════════════════════════════════════════════════
-const tab1 = await mcp__marketer__add_component_on_page({
+const tab1 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholder,
@@ -300,7 +300,7 @@ const tab1 = await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Add TabItem - Features
 // ═══════════════════════════════════════════════════════════════
-const tab2 = await mcp__marketer__add_component_on_page({
+const tab2 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholder,
@@ -315,7 +315,7 @@ const tab2 = await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 5: Add TabItem - Specifications
 // ═══════════════════════════════════════════════════════════════
-const tab3 = await mcp__marketer__add_component_on_page({
+const tab3 = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholder,
@@ -362,7 +362,7 @@ const tab3 = await mcp__marketer__add_component_on_page({
 
 Before authoring TabItem via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] TabsContainer already exists on the page
 - [ ] Have TabsContainer's UID for placeholder construction
 - [ ] Placeholder path follows pattern: `{parent}/tabscontainer-{uid}`

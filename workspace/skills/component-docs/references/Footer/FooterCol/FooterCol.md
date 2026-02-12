@@ -235,11 +235,11 @@ Before authoring FooterCol via MCP:
 
 ```javascript
 // Create the Footer Column datasource item
-const datasource = await mcp__marketer__create_content_item({
+const datasource = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home/Data/Footer",
   templatePath: "/sitecore/templates/Project/Site/Footer/Footer Column",
-  itemName: "Resources Column",
+  name: "Resources Column",
   language: "en"
 });
 ```
@@ -247,7 +247,7 @@ const datasource = await mcp__marketer__create_content_item({
 ### Step 2: Set Heading Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasource.itemId,
   language: "en",
@@ -261,16 +261,16 @@ await mcp__marketer__update_content({
 
 ```javascript
 // Create first link
-await mcp__marketer__create_content_item({
+await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: datasource.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Footer/Footer Link",
-  itemName: "Documentation Link",
+  name: "Documentation Link",
   language: "en"
 });
 
 // Set link field using General Link format
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: linkItemId,
   language: "en",
@@ -283,7 +283,7 @@ await mcp__marketer__update_content({
 ### Step 4: Add Component to Page
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: footerMenuPageId,
   componentRenderingId: "footer-col-rendering-id",
   placeholderPath: "footermenu",

@@ -161,7 +161,7 @@ This section provides instructions for programmatically authoring the AlertBanne
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the AlertBanner rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 
@@ -169,7 +169,7 @@ Before authoring this component via MCP:
 
 ```javascript
 // Search for the page where AlertBanner will be added
-await mcp__marketer__search_site({
+await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page Name"
 });
@@ -179,7 +179,7 @@ await mcp__marketer__search_site({
 ### Step 2: Add AlertBanner to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "alert-banner-rendering-id",
   placeholderPath: "headless-main",
@@ -205,7 +205,7 @@ const result = await mcp__marketer__add_component_on_page({
 
 Before authoring AlertBanner via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have AlertBanner rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `AlertBanner_1`)

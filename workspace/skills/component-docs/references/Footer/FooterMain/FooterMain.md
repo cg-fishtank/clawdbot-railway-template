@@ -234,7 +234,7 @@ type FooterMainProps = ComponentProps & {
 ### Step 1: Add FooterMain Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "footer-main-rendering-id",
   placeholderPath: "headless-footer",  // Or appropriate footer placeholder
@@ -252,7 +252,7 @@ const datasourceId = result.datasourceId;
 ### Step 2: Update Image Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -265,7 +265,7 @@ await mcp__marketer__update_content({
 ### Step 3: Update Link Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",

@@ -95,10 +95,27 @@ This returns:
 With the condition template data in hand, create the variant:
 
 ```
-mcp__marketer-mcp__create_personalization_version
-  → pageId: [PAGE_ID]
-  → (condition parameters from the template schema)
+mcp__marketer-mcp__create_personalization_version({
+  pageId: "[PAGE_ID]",
+  name: "Mobile Visitors Variant",
+  variantName: "mobile-variant",
+  audienceName: "Mobile Users",
+  conditionTemplateId: "[TEMPLATE_ID_FROM_STEP_2]",
+  language: "en",
+  conditionParams: { ... }
+})
 ```
+
+**Required parameters:**
+- `pageId`: The page to add personalization to
+- `name`: Display name for this personalization version
+- `variantName`: Machine-friendly variant identifier
+- `audienceName`: Human-readable audience label
+- `conditionTemplateId`: GUID of the condition template (from Step 2)
+
+**Optional parameters:**
+- `language`: Language code (default: `"en"`)
+- `conditionParams`: Additional parameters specific to the condition template (from Step 3 schema)
 
 After creation, confirm success by calling `get_personalization_versions_by_page` again to verify the new variant appears.
 

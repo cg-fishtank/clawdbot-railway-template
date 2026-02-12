@@ -156,14 +156,14 @@ This section provides instructions for programmatically authoring the Callout co
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the Callout rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "About Page"
 });
@@ -173,7 +173,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add Callout to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "callout-rendering-id",
   placeholderPath: "headless-main",
@@ -191,7 +191,7 @@ const datasourceId = result.datasourceId;
 ### Step 3: Update Link Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -207,7 +207,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Policies"
 });
@@ -216,7 +216,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add Callout component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "callout-rendering-id",
   placeholderPath: "headless-main",
@@ -233,7 +233,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update link field
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -259,7 +259,7 @@ await mcp__marketer__update_content({
 
 Before authoring Callout via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have Callout rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `Callout_1`)

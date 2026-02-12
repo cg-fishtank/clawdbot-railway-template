@@ -268,7 +268,7 @@ Before authoring this component via MCP:
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Article Page Name"
 });
@@ -278,7 +278,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add ArticleFooter to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "article-footer-rendering-id",
   placeholderPath: "headless-main",
@@ -297,7 +297,7 @@ const datasourceId = result.datasourceId;
 Since `profiles` and `SxaTags` are page-level fields:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID, not datasource
   language: "en",
@@ -315,7 +315,7 @@ await mcp__marketer__update_content({
 If you need to update `tagsLabel` after initial creation:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,  // The component datasource
   language: "en",
@@ -331,14 +331,14 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page and profile items
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Healthcare Innovation Article"
 });
 const pageId = pageSearch.results[0].itemId;
 
 // Find profile items
-const profileSearch = await mcp__marketer__search_site({
+const profileSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Jane Smith Profile"
 });
@@ -347,7 +347,7 @@ const profileId = profileSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ArticleFooter component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "article-footer-rendering-id",
   placeholderPath: "headless-main",
@@ -361,7 +361,7 @@ const addResult = await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update page-level fields
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -382,7 +382,7 @@ If profiles don't exist, create them first:
 
 ```javascript
 // Create a new profile item
-const profile = await mcp__marketer__create_content_item({
+const profile = await mcp__marketer-mcp__create_content_item({
   name: "Jane Smith",
   templateId: "profile-template-id",
   parentId: "profiles-folder-id",
@@ -396,7 +396,7 @@ const profile = await mcp__marketer__create_content_item({
 });
 
 // Update profile image
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: profile.itemId,
   language: "en",
@@ -427,7 +427,7 @@ await mcp__marketer__update_content({
 
 Before authoring ArticleFooter via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ArticleFooter rendering ID (from component manifest)
 - [ ] Have Profile item GUIDs for authors to assign
 - [ ] Have SXA Tag GUIDs for categorization

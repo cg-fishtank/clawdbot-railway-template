@@ -204,7 +204,7 @@ ColumnSplitter does not create a datasource - it's purely a structural component
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page Name"
 });
@@ -214,7 +214,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add ColumnSplitter to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "column-splitter-rendering-id",
   placeholderPath: "headless-main",
@@ -231,7 +231,7 @@ const dynamicPlaceholderId = result.placeholderId;
 
 ```javascript
 // Add component to column 1
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "text-component-rendering-id",
   placeholderPath: `headless-main/column-1-{${dynamicPlaceholderId}}`,
@@ -243,7 +243,7 @@ await mcp__marketer__add_component_on_page({
 });
 
 // Add component to column 2
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "image-component-rendering-id",
   placeholderPath: `headless-main/column-2-{${dynamicPlaceholderId}}`,
@@ -259,7 +259,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "About Us Page"
 });
@@ -268,7 +268,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ColumnSplitter component (two-column layout)
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "column-splitter-rendering-id",
   placeholderPath: "headless-main",
@@ -282,7 +282,7 @@ const dynamicId = addResult.placeholderId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Add content to column 1 (left side - text content)
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "rich-text-rendering-id",
   placeholderPath: `headless-main/column-1-{${dynamicId}}`,
@@ -296,7 +296,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Add content to column 2 (right side - image)
 // ═══════════════════════════════════════════════════════════════
-const imageResult = await mcp__marketer__add_component_on_page({
+const imageResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "image-rendering-id",
   placeholderPath: `headless-main/column-2-{${dynamicId}}`,
@@ -305,7 +305,7 @@ const imageResult = await mcp__marketer__add_component_on_page({
   fields: {}
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: imageResult.datasourceId,
   language: "en",
@@ -347,7 +347,7 @@ Many implementations include pre-configured ColumnSplitter renderings with commo
 
 Before authoring ColumnSplitter via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ColumnSplitter rendering ID (or variant from component manifest)
 - [ ] Know which column placeholders are enabled by the rendering
 - [ ] Have rendering IDs for child components

@@ -308,14 +308,14 @@ The EventDetails component:
 
 ```javascript
 // Search for existing event page
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Technology Summit"
 });
 const pageId = pageSearch.results[0].itemId;
 
 // Or get by path
-const page = await mcp__marketer__get_content_item_by_path({
+const page = await mcp__marketer-mcp__get_content_item_by_path({
   itemPath: "/sitecore/content/Site/Home/Events/technology-summit-2024"
 });
 ```
@@ -323,7 +323,7 @@ const page = await mcp__marketer__get_content_item_by_path({
 ### Step 2: Add EventDetails Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "event-details-rendering-id",
   placeholderPath: "headless-main",
@@ -338,7 +338,7 @@ const datasourceId = result.datasourceId;
 ### Step 3: Update Page-Level Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID
   language: "en",
@@ -357,7 +357,7 @@ await mcp__marketer__update_content({
 ### Step 4: Update Image Field on Page
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -370,7 +370,7 @@ await mcp__marketer__update_content({
 ### Step 5: Set Location, Profiles, Sponsors References
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -385,7 +385,7 @@ await mcp__marketer__update_content({
 ### Step 6: Update CTA Link on Datasource
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,  // The component datasource
   language: "en",
@@ -401,7 +401,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the event page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Technology Summit 2024"
 });
@@ -410,7 +410,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add EventDetails component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "event-details-rendering-id",
   placeholderPath: "headless-main",
@@ -424,7 +424,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update page fields (event content)
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -442,7 +442,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Update image
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -454,7 +454,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 5: Set references (location, speakers, sponsors)
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -468,7 +468,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 6: Set CTA link on datasource
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -503,7 +503,7 @@ await mcp__marketer__update_content({
 
 Before authoring EventDetails via MCP, verify:
 
-- [ ] Have Event Page ID (from `mcp__marketer__search_site`)
+- [ ] Have Event Page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have EventDetails rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] heading field has content (required for H1)

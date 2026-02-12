@@ -163,14 +163,14 @@ The ArticleBody component reads the `body` field from the **page route context**
 
 ```javascript
 // Search for existing article page
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Article Title"
 });
 const pageId = pageSearch.results[0].itemId;
 
 // Or get page by path
-const page = await mcp__marketer__get_content_item_by_path({
+const page = await mcp__marketer-mcp__get_content_item_by_path({
   itemPath: "/sitecore/content/Site/Home/Articles/my-article"
 });
 ```
@@ -178,7 +178,7 @@ const page = await mcp__marketer__get_content_item_by_path({
 ### Step 2: Add ArticleBody Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "article-body-rendering-id",
   placeholderPath: "headless-main",
@@ -193,7 +193,7 @@ const result = await mcp__marketer__add_component_on_page({
 Since `body` is a page-level field, update it on the page item:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID, not a datasource
   language: "en",
@@ -209,7 +209,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the article page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Digital Transformation Guide"
 });
@@ -218,7 +218,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ArticleBody component to the page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "article-body-rendering-id",
   placeholderPath: "headless-main",
@@ -230,7 +230,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update the body field on the page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -273,7 +273,7 @@ To use a specific variant, use the corresponding rendering ID:
 
 Before authoring ArticleBody via MCP, verify:
 
-- [ ] Have article page ID (from `mcp__marketer__search_site`)
+- [ ] Have article page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ArticleBody rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Body content is valid HTML

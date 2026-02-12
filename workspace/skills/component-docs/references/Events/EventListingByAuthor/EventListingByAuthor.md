@@ -195,7 +195,7 @@ The EventListingByAuthor component:
 ### Step 1: Find Author Profile Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "John Smith"  // Author name
 });
@@ -205,7 +205,7 @@ const authorPageId = pageSearch.results[0].itemId;
 ### Step 2: Add EventListingByAuthor Component
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: authorPageId,
   componentRenderingId: "event-listing-by-author-rendering-id",
   placeholderPath: "headless-main",
@@ -222,7 +222,7 @@ const datasourceId = result.datasourceId;
 ### Step 3: Configure Settings (Optional)
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -237,7 +237,7 @@ await mcp__marketer__update_content({
 For events to appear in the listing, update each Event Page's `profiles` field:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: "{EVENT-PAGE-GUID}",
   language: "en",
@@ -253,7 +253,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the author profile page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "John Smith"
 });
@@ -262,7 +262,7 @@ const authorPageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add EventListingByAuthor component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: authorPageId,
   componentRenderingId: "event-listing-by-author-rendering-id",
   placeholderPath: "headless-main",
@@ -278,7 +278,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Configure no results message
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -291,12 +291,12 @@ await mcp__marketer__update_content({
 // STEP 4: Ensure events reference this author
 // ═══════════════════════════════════════════════════════════════
 // Get the author's profile item GUID
-const authorProfile = await mcp__marketer__get_content_item_by_path({
+const authorProfile = await mcp__marketer-mcp__get_content_item_by_path({
   itemPath: "/sitecore/content/Site/Data/Profiles/John Smith"
 });
 
 // Update event pages to include this author as speaker
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: "{EVENT-PAGE-GUID}",
   language: "en",
@@ -331,7 +331,7 @@ For events to appear in the author's listing:
 
 Before authoring EventListingByAuthor via MCP, verify:
 
-- [ ] Have Author Profile page ID (from `mcp__marketer__search_site`)
+- [ ] Have Author Profile page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have EventListingByAuthor rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] heading field has content (required)

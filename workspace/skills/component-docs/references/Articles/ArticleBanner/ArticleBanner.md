@@ -271,7 +271,7 @@ This section provides instructions for programmatically authoring the ArticleBan
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the ArticleBanner rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 4. Have media IDs for any images to be used
@@ -280,7 +280,7 @@ Before authoring this component via MCP:
 
 ```javascript
 // Search for the page where ArticleBanner will be added
-await mcp__marketer__search_site({
+await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Article Page Name"
 });
@@ -290,7 +290,7 @@ await mcp__marketer__search_site({
 ### Step 2: Add ArticleBanner to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "article-banner-rendering-id",
   placeholderPath: "headless-main",  // Root level = NO leading slash
@@ -320,7 +320,7 @@ Image fields require XML format with specific syntax:
 // Format: <image mediaid='{GUID}' />
 // CRITICAL: Use single quotes, braces around GUID, UPPERCASE GUID
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,  // From Step 2
   language: "en",
@@ -340,7 +340,7 @@ await mcp__marketer__update_content({
 ### Step 4: Update Text/RichText Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -358,7 +358,7 @@ await mcp__marketer__update_content({
 The pageCategory field references taxonomy items. Set it using the item GUID:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -375,7 +375,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Healthcare Innovation"
 });
@@ -384,7 +384,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ArticleBanner component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "article-banner-rendering-id",
   placeholderPath: "headless-main",
@@ -401,7 +401,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update image fields
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -414,7 +414,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Set page category (optional)
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -455,7 +455,7 @@ To use a specific variant (Default, Contained, Careers, Insights, News), use the
 
 Before authoring ArticleBanner via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ArticleBanner rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `ArticleBanner_1`)

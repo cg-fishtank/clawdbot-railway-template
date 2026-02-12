@@ -33,7 +33,9 @@ Take a screenshot of a page and analyze it for visual issues.
    - If user provides a page ID -> use directly
    - If user provides a live URL -> use `mcp__marketer-mcp__get_page_path_by_live_url` to resolve the page first
    - For the Home page -> ID is `b132d115-7893-49aa-a06f-f1719a8704e3`
-2. Call `mcp__marketer-mcp__get_page_screenshot` with the page ID
+2. Call `mcp__marketer-mcp__get_page_screenshot` with the page ID and version number
+   - **Required params:** `pageId` (string), `version` (number, use `1` for latest published)
+   - **Optional params:** `language` (default "en"), `width` (default 1200), `height` (default 800)
    - Returns a base64-encoded image of the rendered page
 3. Analyze the screenshot for:
    - Layout issues (overlapping elements, broken grids, misaligned sections)
@@ -88,7 +90,9 @@ Preview URL: [URL]
 Retrieve and analyze the rendered HTML of a page.
 
 1. Identify the page (same resolution steps as Visual QA)
-2. Call `mcp__marketer-mcp__get_page_html` with the page ID
+2. Call `mcp__marketer-mcp__get_page_html` with the page ID and language
+   - **Required params:** `pageId` (string), `language` (string, e.g., `"en"`)
+   - **Optional params:** `version` (number)
 3. Analyze the HTML for the requested audit type (see sub-workflows below)
 
 ### Accessibility Audit
@@ -243,7 +247,8 @@ Shared fields:
 Generate a shareable preview URL for stakeholder review.
 
 1. Identify the page (same resolution steps as above)
-2. Call `mcp__marketer-mcp__get_page_preview_url` with the page ID
+2. Call `mcp__marketer-mcp__get_page_preview_url` with the page ID and language
+   - **Required params:** `pageId` (string), `language` (string, e.g., `"en"`)
 3. Return the URL with context:
 
 ```
@@ -295,11 +300,11 @@ This is useful when:
 
 | User says | Action |
 |:----------|:-------|
-| "Screenshot the home page" | `get_page_screenshot` with Home page ID `b132d115-7893-49aa-a06f-f1719a8704e3` |
-| "What fields does this template have?" | `get_page_template_by_id` with the page or template ID |
-| "Check the SEO on this page" | `get_page_html` then run SEO audit analysis |
-| "Is this page accessible?" | `get_page_html` then run accessibility audit analysis |
-| "Get me a preview link" | `get_page_preview_url` with page ID |
+| "Screenshot the home page" | `get_page_screenshot` with pageId + `version: 1` (version is REQUIRED) |
+| "What fields does this template have?" | `get_page_template_by_id` with the template ID |
+| "Check the SEO on this page" | `get_page_html` with pageId + `language: "en"` (language is REQUIRED) |
+| "Is this page accessible?" | `get_page_html` with pageId + `language: "en"` (language is REQUIRED) |
+| "Get me a preview link" | `get_page_preview_url` with pageId + `language: "en"` (language is REQUIRED) |
 | "Find this page in Sitecore" + live URL | `get_page_path_by_live_url` with the URL |
 | "Does this page look right?" | `get_page_screenshot` + visual analysis |
 | "What's the HTML structure?" | `get_page_html` + structure inspection |

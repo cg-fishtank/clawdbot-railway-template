@@ -151,7 +151,7 @@ This section provides instructions for programmatically authoring the TabsContai
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the TabsContainer rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 4. Plan the TabItem children to add after creating the container
@@ -160,7 +160,7 @@ Before authoring this component via MCP:
 
 ```javascript
 // Search for the page where TabsContainer will be added
-await mcp__marketer__search_site({
+await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page Name"
 });
@@ -170,7 +170,7 @@ await mcp__marketer__search_site({
 ### Step 2: Add TabsContainer to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "tabscontainer-rendering-id",  // Use variant-specific ID
   placeholderPath: "headless-main",
@@ -196,7 +196,7 @@ After adding TabsContainer, add TabItem components to its placeholder:
 // The placeholder path for TabItem children uses the TabsContainer's UID
 const tabsPlaceholderPath = "headless-main/tabscontainer-{TABSCONTAINER-UID}";
 
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholderPath,
@@ -225,7 +225,7 @@ To use a specific layout variant, use the corresponding rendering ID:
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Product Details"
 });
@@ -234,7 +234,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add TabsContainer component
 // ═══════════════════════════════════════════════════════════════
-const tabsResult = await mcp__marketer__add_component_on_page({
+const tabsResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabscontainer-rendering-id",
   placeholderPath: "headless-main",
@@ -249,7 +249,7 @@ const tabsPlaceholder = `headless-main/tabscontainer-${tabsContainerUid}`;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Add first TabItem
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholder,
@@ -264,7 +264,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Add second TabItem
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholder,
@@ -279,7 +279,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 5: Add third TabItem
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "tabitem-rendering-id",
   placeholderPath: tabsPlaceholder,
@@ -300,7 +300,7 @@ await mcp__marketer__add_component_on_page({
 
 Before authoring TabsContainer via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have TabsContainer rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `TabsContainer_1`)

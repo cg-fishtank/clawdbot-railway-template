@@ -160,7 +160,7 @@ headless-main/[parent-component-uid]-buttons
 ### Step 2: Add Button to Parent Component
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "button-rendering-id",
   placeholderPath: "headless-main/contentblock-123-buttons",
@@ -177,7 +177,7 @@ const datasourceId = result.datasourceId;
 Link fields require XML format:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -206,7 +206,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page with parent component
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Products Page"
 });
@@ -215,7 +215,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add Button to parent component's placeholder
 // ═══════════════════════════════════════════════════════════════
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "button-rendering-id",
   placeholderPath: "headless-main/ctablock-abc123-buttons",
@@ -229,7 +229,7 @@ const datasourceId = result.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update link field
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",

@@ -243,13 +243,13 @@ To populate EventCard content, you author the **Event Page** that the component 
 
 ```javascript
 // Search for existing event page
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Annual Technology Conference"
 });
 
 // Or create a new event page
-const newPage = await mcp__marketer__create_page({
+const newPage = await mcp__marketer-mcp__create_page({
   siteName: "main",
   pageName: "Annual Technology Conference 2024",
   parentItemId: "{EVENTS-FOLDER-GUID}",
@@ -261,7 +261,7 @@ const newPage = await mcp__marketer__create_page({
 ### Step 2: Update Event Page Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: eventPageId,
   language: "en",
@@ -277,7 +277,7 @@ await mcp__marketer__update_content({
 ### Step 3: Set Location Reference
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: eventPageId,
   language: "en",
@@ -290,7 +290,7 @@ await mcp__marketer__update_content({
 ### Step 4: Set Page Category
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: eventPageId,
   language: "en",

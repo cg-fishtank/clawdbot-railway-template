@@ -167,7 +167,7 @@ type ContentTreeSideNavProps = ComponentProps & {
 Since this component has no datasource, simply add it to the page:
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "content-tree-side-nav-rendering-id",
   placeholderPath: "headless-main",
@@ -182,7 +182,7 @@ await mcp__marketer__add_component_on_page({
 Update page display names for better navigation labels:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -198,7 +198,7 @@ Create child pages to build navigation hierarchy:
 
 ```javascript
 // Create parent section
-const parentPage = await mcp__marketer__create_page({
+const parentPage = await mcp__marketer-mcp__create_page({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home",
   pageName: "Documentation",
@@ -207,7 +207,7 @@ const parentPage = await mcp__marketer__create_page({
 });
 
 // Create child pages
-await mcp__marketer__create_page({
+await mcp__marketer-mcp__create_page({
   siteName: "main",
   parentPath: parentPage.path,
   pageName: "Getting Started",

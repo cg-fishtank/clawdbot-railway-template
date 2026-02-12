@@ -15,9 +15,9 @@ No manual invocation is needed.
 ### Automatic Activation Triggers
 
 Claude MUST activate this skill when:
-- Calling `marketer_add_component_on_page`
-- Calling `marketer_create_component_datasource`
-- Calling `marketer_set_component_datasource`
+- Calling `mcp__marketer-mcp__add_component_on_page`
+- Calling `mcp__marketer-mcp__create_component_datasource`
+- Calling `mcp__marketer-mcp__set_component_datasource`
 - Any workflow that adds or configures a component
 
 ---
@@ -34,13 +34,13 @@ Identify the component from:
 
 ### Step 2: Search for Component Documentation
 ```
-Glob: .claude/skills/component-docs/**/{ComponentName}/{ComponentName}.md
+Glob: skills/component-docs/**/{ComponentName}/{ComponentName}.md
 ```
 
 Example searches:
-- ArticleBanner → `.claude/skills/component-docs/**/ArticleBanner/ArticleBanner.md`
-- HeroBanner → `.claude/skills/component-docs/**/HeroBanner/HeroBanner.md`
-- CardGrid → `.claude/skills/component-docs/**/CardGrid/CardGrid.md`
+- ArticleBanner → `skills/component-docs/**/ArticleBanner/ArticleBanner.md`
+- HeroBanner → `skills/component-docs/**/HeroBanner/HeroBanner.md`
+- CardGrid → `skills/component-docs/**/CardGrid/CardGrid.md`
 
 ### Step 3: Read and Apply Documentation
 
@@ -52,7 +52,7 @@ Example searches:
 5. Use correct field types (Image XML, Link XML, RichText format)
 
 **If component documentation NOT found:**
-1. Proceed with `.claude/data/component-registry.md` field definitions
+1. Proceed with `sitecore-content-author/references/component-registry.md` field definitions
 2. Use standard field type formats from sitecore-author skills
 
 ---
@@ -75,7 +75,7 @@ When component documentation exists, it contains:
 
 All component docs are stored in this skill's folder:
 ```
-.claude/skills/component-docs/references/{Category}/{ComponentName}/{ComponentName}.md
+skills/component-docs/references/{Category}/{ComponentName}/{ComponentName}.md
 ```
 
 Categories: Account, Articles, Authors, Banners, Cards, Containers, Events, Footer, IconFeatureCards, Navigation, Page Content, Products, Search, Tabs, WhereToBuy
@@ -102,8 +102,8 @@ Categories: Account, Articles, Authors, Banners, Cards, Containers, Events, Foot
 
 **Claude (internal process):**
 1. Detected: ArticleBanner component authoring
-2. Glob search: `.claude/skills/component-docs/**/ArticleBanner/ArticleBanner.md`
-3. Found: `.claude/skills/component-docs/references/Articles/ArticleBanner/ArticleBanner.md`
+2. Glob search: `skills/component-docs/**/ArticleBanner/ArticleBanner.md`
+3. Found: `skills/component-docs/references/Articles/ArticleBanner/ArticleBanner.md`
 4. Read documentation
 5. Apply MCP authoring format:
    ```json

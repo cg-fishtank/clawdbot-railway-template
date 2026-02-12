@@ -142,7 +142,7 @@ The component renders:
 ### Step 1: Add FooterMenu Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "footer-menu-rendering-id",
   placeholderPath: "headless-footer",  // Or appropriate footer placeholder
@@ -158,7 +158,7 @@ After adding FooterMenu, add FooterCol components to its placeholder:
 
 ```javascript
 // First FooterCol
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "footer-col-rendering-id",
   placeholderPath: "footermenu-{FooterMenu_1_dynamic_id}",
@@ -168,7 +168,7 @@ await mcp__marketer__add_component_on_page({
 });
 
 // Second FooterCol
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "footer-col-rendering-id",
   placeholderPath: "footermenu-{FooterMenu_1_dynamic_id}",

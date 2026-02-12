@@ -149,7 +149,7 @@ For URL `/products/software/enterprise`:
 Since Breadcrumbs has no datasource, simply add the component:
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "breadcrumbs-rendering-id",
   placeholderPath: "headless-main",
@@ -165,7 +165,7 @@ To change breadcrumb labels, update page display names:
 
 ```javascript
 // Update a parent page's display name
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: parentPageId,
   language: "en",

@@ -223,7 +223,7 @@ This section provides instructions for programmatically authoring the ContentBlo
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the ContentBlock rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 4. Have media IDs for any images
@@ -231,7 +231,7 @@ Before authoring this component via MCP:
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Features Page"
 });
@@ -241,7 +241,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add ContentBlock to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "contentblock-rendering-id",
   placeholderPath: "headless-main",
@@ -259,7 +259,7 @@ const datasourceId = result.datasourceId;
 ### Step 3: Update Image Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -274,7 +274,7 @@ await mcp__marketer__update_content({
 
 ```javascript
 // Get the ContentBlock's UID from page layout first
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "button-rendering-id",
   placeholderPath: "headless-main/contentblock-{UID}-buttons",
@@ -290,7 +290,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Features"
 });
@@ -299,7 +299,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ContentBlock component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "contentblock-rendering-id",
   placeholderPath: "headless-main",
@@ -316,7 +316,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update image fields
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -328,7 +328,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Add button to placeholder
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "button-rendering-id",
   placeholderPath: "headless-main/contentblock-abc123-buttons",
@@ -360,7 +360,7 @@ To use the ImageLeft variant, use the corresponding rendering ID:
 
 Before authoring ContentBlock via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ContentBlock rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `ContentBlock_1`)

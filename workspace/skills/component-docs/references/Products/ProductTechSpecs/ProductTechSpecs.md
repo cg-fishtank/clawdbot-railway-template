@@ -226,7 +226,7 @@ The ProductTechSpecs component reads all fields from the **page route context**,
 ### Step 1: Find the Product Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 Water System"
 });
@@ -236,7 +236,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add ProductTechSpecs Component to Page
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-tech-specs-rendering-id",
   placeholderPath: "headless-main",
@@ -249,7 +249,7 @@ await mcp__marketer__add_component_on_page({
 ### Step 3: Update Page-Level Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID, not a datasource
   language: "en",
@@ -289,7 +289,7 @@ const techSpecsString = Object.entries(specs)
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the product page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 Water Purification"
 });
@@ -298,7 +298,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ProductTechSpecs component
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-tech-specs-rendering-id",
   placeholderPath: "headless-main",
@@ -329,7 +329,7 @@ const techSpecsString = Object.entries(specs)
   .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
   .join('&');
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -365,7 +365,7 @@ Standard parameter names to use consistently:
 
 Before authoring ProductTechSpecs via MCP, verify:
 
-- [ ] Have Product Page ID (from `mcp__marketer__search_site`)
+- [ ] Have Product Page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ProductTechSpecs rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] productTechnicalSpecs field has valid key=value&key=value format

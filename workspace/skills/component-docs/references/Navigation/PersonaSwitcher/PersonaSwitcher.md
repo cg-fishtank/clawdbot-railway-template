@@ -114,7 +114,7 @@ To leverage the PersonaSwitcher effectively:
 Since this component has no datasource:
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "persona-switcher-rendering-id",
   placeholderPath: "tertiarynavcomponents-{dynamic-id}",

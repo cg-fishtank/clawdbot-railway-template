@@ -315,14 +315,14 @@ The AuthorProfile component reads profile data from the **page route context** v
 
 ```javascript
 // Search for existing profile page
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "John Smith"
 });
 const pageId = pageSearch.results[0].itemId;
 
 // Or get page by path
-const page = await mcp__marketer__get_content_item_by_path({
+const page = await mcp__marketer-mcp__get_content_item_by_path({
   itemPath: "/sitecore/content/Site/Home/Team/John-Smith"
 });
 ```
@@ -330,7 +330,7 @@ const page = await mcp__marketer__get_content_item_by_path({
 ### Step 2: Add AuthorProfile Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "author-profile-rendering-id",
   placeholderPath: "headless-main",
@@ -345,7 +345,7 @@ const result = await mcp__marketer__add_component_on_page({
 Since profile fields are page-level, update them on the page item:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -363,7 +363,7 @@ await mcp__marketer__update_content({
 ### Step 4: Update Image Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -377,7 +377,7 @@ await mcp__marketer__update_content({
 ### Step 5: Update Link Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -394,7 +394,7 @@ Create child items for achievements, education, and involvements:
 
 ```javascript
 // Create Achievements folder (if it doesn't exist)
-await mcp__marketer__create_content_item({
+await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentId: pageId,
   name: "Achievements",
@@ -402,7 +402,7 @@ await mcp__marketer__create_content_item({
 });
 
 // Create achievement item
-await mcp__marketer__create_content_item({
+await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentId: "achievements-folder-id",
   name: "AWS Certification",
@@ -419,7 +419,7 @@ await mcp__marketer__create_content_item({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the profile page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "John Smith Team"
 });
@@ -428,7 +428,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add AuthorProfile component to the page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "author-profile-rendering-id",
   placeholderPath: "headless-main",
@@ -440,7 +440,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update text fields on the page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -457,7 +457,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Update image fields
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -469,7 +469,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 5: Update link fields
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -504,7 +504,7 @@ await mcp__marketer__update_content({
 
 Before authoring AuthorProfile via MCP, verify:
 
-- [ ] Have profile page ID (from `mcp__marketer__search_site`)
+- [ ] Have profile page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have AuthorProfile rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Update goes to page item, not datasource

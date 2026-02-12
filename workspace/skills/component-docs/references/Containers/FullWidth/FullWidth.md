@@ -202,7 +202,7 @@ This section provides instructions for programmatically authoring the FullWidth 
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page Name"
 });
@@ -212,7 +212,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add FullWidth to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "fullwidth-rendering-id",
   placeholderPath: "headless-main",
@@ -228,7 +228,7 @@ const dynamicPlaceholderId = result.placeholderId;
 ### Step 3: Update Background Image Fields (Optional)
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -243,7 +243,7 @@ await mcp__marketer__update_content({
 
 ```javascript
 // Add components to the FullWidth's placeholder
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "hero-banner-rendering-id",
   placeholderPath: `headless-main/fullwidth-{${dynamicPlaceholderId}}`,
@@ -262,7 +262,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Homepage"
 });
@@ -271,7 +271,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add FullWidth container component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "fullwidth-rendering-id",
   placeholderPath: "headless-main",
@@ -286,7 +286,7 @@ const dynamicId = addResult.placeholderId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Add background image
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -299,7 +299,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Add hero content inside FullWidth
 // ═══════════════════════════════════════════════════════════════
-const heroResult = await mcp__marketer__add_component_on_page({
+const heroResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "hero-banner-rendering-id",
   placeholderPath: `headless-main/fullwidth-{${dynamicId}}`,
@@ -336,7 +336,7 @@ The `DYNAMIC_PLACEHOLDER_ID` is returned when you add the FullWidth component.
 
 Before authoring FullWidth via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have FullWidth rendering ID (from component manifest)
 - [ ] Have rendering IDs for child components
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)

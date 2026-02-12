@@ -209,7 +209,7 @@ This section provides instructions for programmatically authoring the ArticleLis
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target Author Profile page ID (use `mcp__marketer__search_site`)
+1. Have the target Author Profile page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the ArticleListingByAuthor rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 4. Ensure the page provides author context
@@ -218,7 +218,7 @@ Before authoring this component via MCP:
 
 ```javascript
 // Search for the author profile page
-await mcp__marketer__search_site({
+await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "John Smith"  // Author name
 });
@@ -228,7 +228,7 @@ await mcp__marketer__search_site({
 ### Step 2: Add ArticleListingByAuthor to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "author-page-guid",
   componentRenderingId: "article-listing-by-author-rendering-id",
   placeholderPath: "headless-main",  // Root level = NO leading slash
@@ -251,7 +251,7 @@ const result = await mcp__marketer__add_component_on_page({
 To change the heading after initial creation:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,  // From Step 2
   language: "en",
@@ -267,7 +267,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the author profile page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Sarah Johnson"
 });
@@ -276,7 +276,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ArticleListingByAuthor component (Insights variant)
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "article-listing-by-author-insights-rendering-id",
   placeholderPath: "headless-main",
@@ -329,7 +329,7 @@ To use a specific variant, use the corresponding rendering ID:
 Before authoring ArticleListingByAuthor via MCP, verify:
 
 - [ ] Target page is an Author Profile page (has author context)
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ArticleListingByAuthor rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `ArticlesByAuthor_1`)

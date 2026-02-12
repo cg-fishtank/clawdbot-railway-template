@@ -269,16 +269,16 @@ type SideNavGroupDataType = {
 ### Step 1: Create SideNav Datasource
 
 ```javascript
-const sideNavDatasource = await mcp__marketer__create_content_item({
+const sideNavDatasource = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home/Data/Navigation",
   templatePath: "/sitecore/templates/Project/Site/Navigation/Side Navigation",
-  itemName: "Documentation SideNav",
+  name: "Documentation SideNav",
   language: "en"
 });
 
 // Set main heading
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: sideNavDatasource.itemId,
   language: "en",
@@ -291,15 +291,15 @@ await mcp__marketer__update_content({
 ### Step 2: Create Navigation Groups
 
 ```javascript
-const gettingStartedGroup = await mcp__marketer__create_content_item({
+const gettingStartedGroup = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: sideNavDatasource.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Navigation/SideNavGroups",
-  itemName: "Getting Started",
+  name: "Getting Started",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: gettingStartedGroup.itemId,
   language: "en",
@@ -312,15 +312,15 @@ await mcp__marketer__update_content({
 ### Step 3: Create Navigation Links
 
 ```javascript
-const installationLink = await mcp__marketer__create_content_item({
+const installationLink = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: gettingStartedGroup.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Navigation/SideNavLinks",
-  itemName: "Installation",
+  name: "Installation",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: installationLink.itemId,
   language: "en",
@@ -333,7 +333,7 @@ await mcp__marketer__update_content({
 ### Step 4: Add SideNav to Page
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "sidenav-rendering-id",
   placeholderPath: "headless-main",

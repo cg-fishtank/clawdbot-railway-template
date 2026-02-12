@@ -331,11 +331,11 @@ type FooterLegalProps = ComponentProps &
 ### Step 1: Create or Find Footer Legal Datasource
 
 ```javascript
-const datasource = await mcp__marketer__create_content_item({
+const datasource = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home/Data/Footer",
   templatePath: "/sitecore/templates/Project/Site/Footer/Footer Legal",
-  itemName: "Footer Legal",
+  name: "Footer Legal",
   language: "en"
 });
 ```
@@ -343,7 +343,7 @@ const datasource = await mcp__marketer__create_content_item({
 ### Step 2: Set Main Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasource.itemId,
   language: "en",
@@ -361,15 +361,15 @@ await mcp__marketer__update_content({
 
 ```javascript
 // Create LinkedIn social link
-const linkedinItem = await mcp__marketer__create_content_item({
+const linkedinItem = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: datasource.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Footer/Footer Social Link",
-  itemName: "LinkedIn",
+  name: "LinkedIn",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: linkedinItem.itemId,
   language: "en",

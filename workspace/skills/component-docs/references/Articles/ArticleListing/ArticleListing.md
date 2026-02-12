@@ -208,7 +208,7 @@ This section provides instructions for programmatically authoring the ArticleLis
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the ArticleListing rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 
@@ -216,7 +216,7 @@ Before authoring this component via MCP:
 
 ```javascript
 // Search for the page where ArticleListing will be added
-await mcp__marketer__search_site({
+await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Articles Index Page"
 });
@@ -226,7 +226,7 @@ await mcp__marketer__search_site({
 ### Step 2: Add ArticleListing to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "article-listing-rendering-id",
   placeholderPath: "headless-main",  // Root level = NO leading slash
@@ -251,7 +251,7 @@ const result = await mcp__marketer__add_component_on_page({
 To enable tag-based filtering, update the datasource with checkbox field:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,  // From Step 2
   language: "en",
@@ -264,7 +264,7 @@ await mcp__marketer__update_content({
 ### Step 4: Configure Filter Messages (Optional)
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -281,7 +281,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Insights Landing Page"
 });
@@ -290,7 +290,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ArticleListing component (Insights variant)
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "article-listing-insights-rendering-id",
   placeholderPath: "headless-main",
@@ -306,7 +306,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Enable tag filtering with custom messages
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -346,7 +346,7 @@ To use a specific variant, use the corresponding rendering ID:
 
 Before authoring ArticleListing via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ArticleListing rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `ArticleListing_1`)

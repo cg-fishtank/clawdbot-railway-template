@@ -224,11 +224,11 @@ type IconFieldType = {
 ### Step 1: Create IconFeatureCard Datasource
 
 ```javascript
-const datasource = await mcp__marketer__create_content_item({
+const datasource = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home/Data/Feature Cards",
   templatePath: "/sitecore/templates/Project/Site/Feature Cards/Icon Feature Card",
-  itemName: "Support Card",
+  name: "Support Card",
   language: "en"
 });
 ```
@@ -236,7 +236,7 @@ const datasource = await mcp__marketer__create_content_item({
 ### Step 2: Set Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasource.itemId,
   language: "en",
@@ -252,7 +252,7 @@ await mcp__marketer__update_content({
 ### Step 3: Add to IconFeatureCardGrid Placeholder
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "icon-feature-card-rendering-id",
   placeholderPath: "iconfeaturecardgrid-{dynamic-id}",

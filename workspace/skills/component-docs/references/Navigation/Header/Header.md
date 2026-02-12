@@ -287,11 +287,11 @@ type HeaderProps = ComponentProps &
 ### Step 1: Create Header Datasource
 
 ```javascript
-const headerDatasource = await mcp__marketer__create_content_item({
+const headerDatasource = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: "/sitecore/content/Site/Home/Data/Navigation",
   templatePath: "/sitecore/templates/Project/Site/Navigation/Header",
-  itemName: "Main Header",
+  name: "Main Header",
   language: "en"
 });
 ```
@@ -299,7 +299,7 @@ const headerDatasource = await mcp__marketer__create_content_item({
 ### Step 2: Set Logo Field
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: headerDatasource.itemId,
   language: "en",
@@ -313,15 +313,15 @@ await mcp__marketer__update_content({
 
 ```javascript
 // Create top-level nav item
-const productsNav = await mcp__marketer__create_content_item({
+const productsNav = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: headerDatasource.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Navigation/Header Child",
-  itemName: "Products",
+  name: "Products",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: productsNav.itemId,
   language: "en",
@@ -331,11 +331,11 @@ await mcp__marketer__update_content({
 });
 
 // Create link group under Products
-const softwareGroup = await mcp__marketer__create_content_item({
+const softwareGroup = await mcp__marketer-mcp__create_content_item({
   siteName: "main",
   parentPath: productsNav.itemPath,
   templatePath: "/sitecore/templates/Project/Site/Navigation/Header Link Group",
-  itemName: "Software",
+  name: "Software",
   language: "en"
 });
 ```
@@ -343,7 +343,7 @@ const softwareGroup = await mcp__marketer__create_content_item({
 ### Step 4: Add Header to Page
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "header-rendering-id",
   placeholderPath: "headless-header",

@@ -206,7 +206,7 @@ This section provides instructions for programmatically authoring the CardBanner
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Page Name"
 });
@@ -216,7 +216,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add CardBanner to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-banner-rendering-id",
   placeholderPath: "headless-main",
@@ -235,7 +235,7 @@ const dynamicPlaceholderId = result.placeholderId;  // Needed for adding child c
 ### Step 3: Update Background Image Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -250,7 +250,7 @@ await mcp__marketer__update_content({
 
 ```javascript
 // Add cards to the CardBanner's placeholder
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: `headless-main/cards-{${dynamicPlaceholderId}}`,
@@ -269,7 +269,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Services Page"
 });
@@ -278,7 +278,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add CardBanner component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-banner-rendering-id",
   placeholderPath: "headless-main",
@@ -296,7 +296,7 @@ const dynamicId = addResult.placeholderId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update background image
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -311,7 +311,7 @@ await mcp__marketer__update_content({
 const cardPlaceholder = `headless-main/cards-{${dynamicId}}`;
 
 // Card 1
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -324,7 +324,7 @@ await mcp__marketer__add_component_on_page({
 });
 
 // Card 2
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "card-rendering-id",
   placeholderPath: cardPlaceholder,
@@ -363,7 +363,7 @@ The `DYNAMIC_PLACEHOLDER_ID` is returned when you add the CardBanner component.
 
 Before authoring CardBanner via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have CardBanner rendering ID (from component manifest)
 - [ ] Have Card rendering ID (for child cards)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)

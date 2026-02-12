@@ -236,7 +236,7 @@ This section provides instructions for programmatically authoring the VideoBanne
 
 Before authoring this component via MCP:
 
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the VideoBanner rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 4. Have media IDs for video and fallback images
@@ -245,7 +245,7 @@ Before authoring this component via MCP:
 
 ```javascript
 // Search for the page where VideoBanner will be added
-await mcp__marketer__search_site({
+await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Home Page"
 });
@@ -255,7 +255,7 @@ await mcp__marketer__search_site({
 ### Step 2: Add VideoBanner to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "video-banner-rendering-id",
   placeholderPath: "headless-main",
@@ -280,7 +280,7 @@ const result = await mcp__marketer__add_component_on_page({
 Video and image fields require XML format with specific syntax:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,  // From Step 2
   language: "en",
@@ -305,7 +305,7 @@ await mcp__marketer__update_content({
 Add buttons to the buttons placeholder:
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "button-rendering-id",
   placeholderPath: "headless-main/buttons-{VIDEO-BANNER-UID}",
@@ -324,7 +324,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Home"
 });
@@ -333,7 +333,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add VideoBanner component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "video-banner-rendering-id",
   placeholderPath: "headless-main",
@@ -349,7 +349,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update video and image fields
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -378,7 +378,7 @@ await mcp__marketer__update_content({
 
 Before authoring VideoBanner via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have VideoBanner rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `VideoBanner_1`)

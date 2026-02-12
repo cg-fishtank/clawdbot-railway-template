@@ -251,16 +251,15 @@ First, create the Resource items that will be linked:
 
 ```javascript
 // Create a Resource item
-const resource1 = await mcp__marketer__create_content_item({
-  siteName: "main",
-  itemName: "X500 Installation Guide",
-  parentItemPath: "/sitecore/content/Site/Data/Resources",
+const resource1 = await mcp__marketer-mcp__create_content_item({
+  name: "X500 Installation Guide",
+  parentId: "{RESOURCES-FOLDER-GUID}",
   templateId: "{RESOURCE-TEMPLATE-GUID}",
   language: "en"
 });
 
 // Update Resource item fields
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: resource1.itemId,
   language: "en",
@@ -275,7 +274,7 @@ await mcp__marketer__update_content({
 ### Step 2: Find the Product Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 Water System"
 });
@@ -285,7 +284,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 3: Add ProductResources Component to Page
 
 ```javascript
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-resources-rendering-id",
   placeholderPath: "headless-main",
@@ -298,7 +297,7 @@ await mcp__marketer__add_component_on_page({
 ### Step 4: Link Resources to Product Page
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID
   language: "en",
@@ -315,15 +314,14 @@ await mcp__marketer__update_content({
 // STEP 1: Create Resource items
 // ═══════════════════════════════════════════════════════════════
 // Create Installation Guide resource
-const resource1 = await mcp__marketer__create_content_item({
-  siteName: "main",
-  itemName: "X500 Installation Guide",
-  parentItemPath: "/sitecore/content/Site/Data/Resources",
+const resource1 = await mcp__marketer-mcp__create_content_item({
+  name: "X500 Installation Guide",
+  parentId: "{RESOURCES-FOLDER-GUID}",
   templateId: "{RESOURCE-TEMPLATE-GUID}",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: resource1.itemId,
   language: "en",
@@ -335,15 +333,14 @@ await mcp__marketer__update_content({
 });
 
 // Create Tech Specs resource
-const resource2 = await mcp__marketer__create_content_item({
-  siteName: "main",
-  itemName: "X500 Technical Specifications",
-  parentItemPath: "/sitecore/content/Site/Data/Resources",
+const resource2 = await mcp__marketer-mcp__create_content_item({
+  name: "X500 Technical Specifications",
+  parentId: "{RESOURCES-FOLDER-GUID}",
   templateId: "{RESOURCE-TEMPLATE-GUID}",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: resource2.itemId,
   language: "en",
@@ -355,15 +352,14 @@ await mcp__marketer__update_content({
 });
 
 // Create Application Note resource
-const resource3 = await mcp__marketer__create_content_item({
-  siteName: "main",
-  itemName: "X500 Application Note Food Processing",
-  parentItemPath: "/sitecore/content/Site/Data/Resources",
+const resource3 = await mcp__marketer-mcp__create_content_item({
+  name: "X500 Application Note Food Processing",
+  parentId: "{RESOURCES-FOLDER-GUID}",
   templateId: "{RESOURCE-TEMPLATE-GUID}",
   language: "en"
 });
 
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: resource3.itemId,
   language: "en",
@@ -377,7 +373,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Find the product page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 Water Purification"
 });
@@ -386,7 +382,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Add ProductResources component
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-resources-rendering-id",
   placeholderPath: "headless-main",
@@ -398,7 +394,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Link resources to product page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -430,7 +426,7 @@ await mcp__marketer__update_content({
 
 Before authoring ProductResources via MCP, verify:
 
-- [ ] Have Product Page ID (from `mcp__marketer__search_site`)
+- [ ] Have Product Page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ProductResources rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Resource items exist in Data/Resources folder

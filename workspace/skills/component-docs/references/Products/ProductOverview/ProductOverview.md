@@ -221,7 +221,7 @@ The ProductOverview component reads all fields from the **page route context**, 
 ### Step 1: Find the Product Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 Water System"
 });
@@ -231,7 +231,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add ProductOverview Component to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-overview-rendering-id",
   placeholderPath: "headless-main",
@@ -244,7 +244,7 @@ const result = await mcp__marketer__add_component_on_page({
 ### Step 3: Update Page-Level Fields
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,  // The page ID, not a datasource
   language: "en",
@@ -262,7 +262,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find the product page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "X500 Water Purification"
 });
@@ -271,7 +271,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Add ProductOverview component
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__add_component_on_page({
+await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "product-overview-rendering-id",
   placeholderPath: "headless-main",
@@ -283,7 +283,7 @@ await mcp__marketer__add_component_on_page({
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Update overview fields on page
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: pageId,
   language: "en",
@@ -324,7 +324,7 @@ For best display, use unordered lists:
 
 Before authoring ProductOverview via MCP, verify:
 
-- [ ] Have Product Page ID (from `mcp__marketer__search_site`)
+- [ ] Have Product Page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have ProductOverview rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] At least one of the three fields has content

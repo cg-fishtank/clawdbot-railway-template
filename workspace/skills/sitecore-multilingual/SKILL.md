@@ -137,7 +137,7 @@ Use `mcp__marketer-mcp__add_language_to_page` to create the new language version
 ```
 mcp__marketer-mcp__add_language_to_page({
   pageId: "page-guid",
-  language: "fr-CA"
+  language_request: { language: "fr-CA" }
 })
 ```
 
@@ -297,7 +297,7 @@ mcp__marketer-mcp__get_content_item_by_id({
 // STEP 3: Add French language version
 mcp__marketer-mcp__add_language_to_page({
   pageId: "b132d115-7893-49aa-a06f-f1719a8704e3",
-  language: "fr-CA"
+  language_request: { language: "fr-CA" }
 })
 
 // STEP 4: Populate translated fields

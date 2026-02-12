@@ -233,7 +233,7 @@ This section provides instructions for programmatically authoring the SimplePage
 ### Prerequisites
 
 Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer__search_site`)
+1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
 2. Have the SimplePageListing rendering ID from the component manifest
 3. Know the target placeholder (typically `"headless-main"` for root placement)
 4. Have the selectedPage item ID if specifying a parent page
@@ -241,7 +241,7 @@ Before authoring this component via MCP:
 ### Step 1: Find the Target Page
 
 ```javascript
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Resources Hub"
 });
@@ -251,7 +251,7 @@ const pageId = pageSearch.results[0].itemId;
 ### Step 2: Add SimplePageListing to Page
 
 ```javascript
-const result = await mcp__marketer__add_component_on_page({
+const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
   componentRenderingId: "simplepagelisting-rendering-id",
   placeholderPath: "headless-main",
@@ -271,7 +271,7 @@ const datasourceId = result.datasourceId;
 If you need to specify a parent page different from the current page:
 
 ```javascript
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -287,7 +287,7 @@ await mcp__marketer__update_content({
 // ═══════════════════════════════════════════════════════════════
 // STEP 1: Find target page
 // ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer__search_site({
+const pageSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Resource Center"
 });
@@ -296,7 +296,7 @@ const pageId = pageSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 2: Find the parent page for listing
 // ═══════════════════════════════════════════════════════════════
-const parentSearch = await mcp__marketer__search_site({
+const parentSearch = await mcp__marketer-mcp__search_site({
   site_name: "main",
   search_query: "Whitepapers"
 });
@@ -305,7 +305,7 @@ const parentPageId = parentSearch.results[0].itemId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 3: Add SimplePageListing component
 // ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer__add_component_on_page({
+const addResult = await mcp__marketer-mcp__add_component_on_page({
   pageId: pageId,
   componentRenderingId: "simplepagelisting-rendering-id",
   placeholderPath: "headless-main",
@@ -324,7 +324,7 @@ const datasourceId = addResult.datasourceId;
 // ═══════════════════════════════════════════════════════════════
 // STEP 4: Set the selectedPage reference
 // ═══════════════════════════════════════════════════════════════
-await mcp__marketer__update_content({
+await mcp__marketer-mcp__update_content({
   siteName: "main",
   itemId: datasourceId,
   language: "en",
@@ -352,7 +352,7 @@ await mcp__marketer__update_content({
 
 Before authoring SimplePageListing via MCP, verify:
 
-- [ ] Have page ID (from `mcp__marketer__search_site`)
+- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
 - [ ] Have SimplePageListing rendering ID (from component manifest)
 - [ ] Placeholder path is `"headless-main"` (no leading slash for root)
 - [ ] Component item name is unique (e.g., `SimplePageListing_1`)
