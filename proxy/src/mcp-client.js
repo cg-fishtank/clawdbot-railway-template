@@ -342,12 +342,16 @@ export class McpClientManager {
 
       console.log(`[mcp] Connected to ${this.config.mcpUrl}`);
       console.log(`[mcp] ${this.toolCache.length} tools available.`);
+
+      // Start proactive token refresh so we never hit expiry
+      this.startTokenRefreshTimer();
     } catch (err) {
       this.connected = false;
       this.lastError = err.message;
 
       // If auth-related, try manual refresh and retry once
-      if (err.message.includes("401") || err.message.includes("Unauthorized")) {
+      // Catch both direct 401s AND the SDK's interactive OAuth fallback
+      if (err.message.includes("401") || err.message.includes("Unauthorized") || err.message.includes("Interactive OAuth")) {
         console.warn("[mcp] Auth error. Attempting manual token refresh...");
         try {
           await this.tokenProvider.refreshManually();
@@ -406,13 +410,73 @@ export class McpClientManager {
       return result;
     } catch (err) {
       // If auth error during call, refresh and retry once
-      if (err.message.includes("401") || err.message.includes("Unauthorized")) {
+      // Catch both direct 401s AND the SDK's interactive OAuth fallback
+      if (err.message.includes("401") || err.message.includes("Unauthorized") || err.message.includes("Interactive OAuth")) {
         console.warn(`[mcp] Auth error calling ${name}. Refreshing tokens...`);
         await this.tokenProvider.refreshManually();
         await this.reconnect();
         return this.client.callTool({ name, arguments: args });
       }
       throw err;
+    }
+  }
+
+  // --- Proactive token refresh ---
+
+  /**
+   * Start a background timer that refreshes the token before it expires.
+   * Refreshes at 80% of the token's TTL to avoid expiry-triggered failures.
+   * Safe to call multiple times — previous timer is cleared.
+   */
+  startTokenRefreshTimer() {
+    this.stopTokenRefreshTimer();
+
+    const expiresStr = this.tokenProvider.getTokenExpires();
+    if (!expiresStr) {
+      console.warn("[refresh-timer] No token expiry known. Skipping timer setup.");
+      return;
+    }
+
+    const expiresAt = new Date(expiresStr).getTime();
+    const now = Date.now();
+    const ttlMs = expiresAt - now;
+
+    if (ttlMs <= 0) {
+      // Already expired — refresh immediately
+      console.log("[refresh-timer] Token already expired. Refreshing now...");
+      this._doProactiveRefresh();
+      return;
+    }
+
+    // Refresh at 80% of TTL (e.g. 24h token → refresh after ~19.2h)
+    const refreshInMs = Math.max(ttlMs * 0.8, 30_000); // minimum 30s
+    console.log(`[refresh-timer] Token expires in ${Math.round(ttlMs / 60_000)}m. Will refresh in ${Math.round(refreshInMs / 60_000)}m.`);
+
+    this._refreshTimer = setTimeout(() => this._doProactiveRefresh(), refreshInMs);
+    // Prevent the timer from keeping the process alive
+    if (this._refreshTimer.unref) this._refreshTimer.unref();
+  }
+
+  stopTokenRefreshTimer() {
+    if (this._refreshTimer) {
+      clearTimeout(this._refreshTimer);
+      this._refreshTimer = null;
+    }
+  }
+
+  async _doProactiveRefresh() {
+    try {
+      console.log("[refresh-timer] Proactively refreshing token...");
+      await this.tokenProvider.refreshManually();
+      await this.reconnect();
+      console.log("[refresh-timer] Proactive refresh complete.");
+      // Schedule the next refresh based on the new token's expiry
+      this.startTokenRefreshTimer();
+    } catch (err) {
+      console.error("[refresh-timer] Proactive refresh failed:", err.message);
+      // Retry in 5 minutes
+      this._refreshTimer = setTimeout(() => this._doProactiveRefresh(), 5 * 60_000);
+      if (this._refreshTimer.unref) this._refreshTimer.unref();
     }
   }
 
