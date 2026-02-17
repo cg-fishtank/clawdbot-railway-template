@@ -1,6 +1,7 @@
 ---
 name: sitecore-component-docs
 description: Discover and provide Sitecore Component documentation when authoring components via MCP. This skill MUST be used every time a component is authored.
+always: true
 ---
 
 # Sitecore Component Docs (Automatic)

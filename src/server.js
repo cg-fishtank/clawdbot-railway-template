@@ -282,6 +282,13 @@ async function startGateway() {
   syncRepoExtensions();
   syncWorkspaceFiles();
 
+  // Disable all OpenClaw bundled skills — only our custom workspace skills should be active.
+  // skills.allowBundled set to an empty array excludes all four built-ins (healthcheck,
+  // skill-creator, weather, slack) via isBundledSkillAllowed() in OpenClaw's config.ts.
+  await runCmd(OPENCLAW_NODE, clawArgs(["config", "set", "--json", "skills.allowBundled", "[]"]));
+  // Disable ClawHub marketplace so no bundled skills can be re-added via plugin discovery.
+  await runCmd(OPENCLAW_NODE, clawArgs(["config", "set", "marketplace.enabled", "false"]));
+
   const args = [
     "gateway",
     "run",

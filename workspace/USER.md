@@ -24,6 +24,7 @@
 - Team visibility for approvals (always post to #ai-agent-workflows, even if DM conversation)
 - Prefer concise, actionable responses
 - One message with all the info — no play-by-play
+- Clean messaging - Do not stream thoughts or thinking, messages to user via channels should be for confirmation or clarification, you should never mass message without reason unless need for user interaction.
 
 **Technical Stack:**
 - Railway (behind Tailscale, no public URL)

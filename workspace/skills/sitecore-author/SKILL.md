@@ -130,6 +130,21 @@ This orchestrator delegates specialized work to four focused sub-skills:
 
 ---
 
+## Pre-Flight: Component Documentation (Always Do This First)
+
+> **Before authoring any component**, consult the `sitecore-component-docs` skill.
+> It contains field formats and MCP authoring instructions for 65 Sitecore components.
+> Run the Glob lookup described in `sitecore-component-docs` before calling any MCP tool.
+>
+> ```
+> Glob: /data/workspace/skills/sitecore-component-docs/**/{ComponentName}/{ComponentName}.md
+> ```
+>
+> If documentation is found, extract the "MCP Authoring Instructions" section and apply it to all field values.
+> Only skip this step if the component name is genuinely unknown at the time of authoring.
+
+---
+
 ## Step 0: Gather Info Locally (Always Do This First)
 
 **Get component rendering ID (from local registry -- NO MCP):**
