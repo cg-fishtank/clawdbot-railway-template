@@ -34,13 +34,13 @@ Identify the component from:
 
 ### Step 2: Search for Component Documentation
 ```
-Glob: skills/component-docs/**/{ComponentName}/{ComponentName}.md
+Glob: /data/workspace/skills/component-docs/**/{ComponentName}/{ComponentName}.md
 ```
 
 Example searches:
-- ArticleBanner → `skills/component-docs/**/ArticleBanner/ArticleBanner.md`
-- HeroBanner → `skills/component-docs/**/HeroBanner/HeroBanner.md`
-- CardGrid → `skills/component-docs/**/CardGrid/CardGrid.md`
+- ArticleBanner → `/data/workspace/skills/component-docs/**/ArticleBanner/ArticleBanner.md`
+- HeroBanner → `/data/workspace/skills/component-docs/**/HeroBanner/HeroBanner.md`
+- CardGrid → `/data/workspace/skills/component-docs/**/CardGrid/CardGrid.md`
 
 ### Step 3: Read and Apply Documentation
 
@@ -75,7 +75,7 @@ When component documentation exists, it contains:
 
 All component docs are stored in this skill's folder:
 ```
-skills/component-docs/references/{Category}/{ComponentName}/{ComponentName}.md
+/data/workspace/skills/component-docs/references/{Category}/{ComponentName}/{ComponentName}.md
 ```
 
 Categories: Account, Articles, Authors, Banners, Cards, Containers, Events, Footer, IconFeatureCards, Navigation, Page Content, Products, Search, Tabs, WhereToBuy
@@ -102,8 +102,8 @@ Categories: Account, Articles, Authors, Banners, Cards, Containers, Events, Foot
 
 **Claude (internal process):**
 1. Detected: ArticleBanner component authoring
-2. Glob search: `skills/component-docs/**/ArticleBanner/ArticleBanner.md`
-3. Found: `skills/component-docs/references/Articles/ArticleBanner/ArticleBanner.md`
+2. Glob search: `/data/workspace/skills/component-docs/**/ArticleBanner/ArticleBanner.md`
+3. Found: `/data/workspace/skills/component-docs/references/Articles/ArticleBanner/ArticleBanner.md`
 4. Read documentation
 5. Apply MCP authoring format:
    ```json

@@ -16,7 +16,7 @@
 
 **Active Project:**
 - SitecoreAI content POC using marketer-mcp bridge (42 tools)
-- 15 specialized skills covering the full content lifecycle
+- Specialized skills covering the full content lifecycle
 - Railway deployment behind Tailscale (internal only)
 
 **Working Style:**

@@ -83,10 +83,10 @@ These files save thousands of tokens per session. **Check them before making MCP
 
 | File | Replaces | Savings |
 |:-----|:---------|:--------|
-| `skills/*/references/component-registry.md` | `list_components` | ~13k tokens |
-| `skills/*/references/site-config.md` | `search_site` | ~1.2k tokens |
-| `skills/*/references/page-templates.md` | `list_available_insertoptions` | ~600 tokens |
-| `skills/*/references/placeholder-patterns.md` | Manual lookup | Reference |
+| `/data/workspace/skills/*/references/component-registry.md` | `list_components` | ~13k tokens |
+| `/data/workspace/skills/*/references/site-config.md` | `search_site` | ~1.2k tokens |
+| `/data/workspace/skills/*/references/page-templates.md` | `list_available_insertoptions` | ~600 tokens |
+| `/data/workspace/skills/*/references/placeholder-patterns.md` | Manual lookup | Reference |
 
 ## Slack
 
