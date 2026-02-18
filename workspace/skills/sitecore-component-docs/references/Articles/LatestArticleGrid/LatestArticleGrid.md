@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The LatestArticleGrid component displays a fixed grid of the most recently published articles (maximum 6), automatically sorted by publication date descending. It supports multiple rendering variants (Default, VerticalList) and content variants (Careers, Insights, News), with intelligent layout adaptation when placed inside ColumnSplitter containers. The component uses server-side GraphQL data fetching with a 5-minute in-memory cache for optimal performance.
+The LatestArticleGrid component displays a fixed grid of the most recently published articles (maximum 6), automatically sorted by publication date descending. It supports multiple rendering variants (Default, VerticalList) and content variants (Insights, News), with intelligent layout adaptation when placed inside ColumnSplitter containers. The component uses server-side GraphQL data fetching with a 5-minute in-memory cache for optimal performance.
 
 ## Sitecore Template Requirements
 
@@ -21,11 +21,11 @@ The LatestArticleGrid component displays a fixed grid of the most recently publi
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text tag="h2" field={fields?.heading} className="heading-4xl" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text tag="h2" field={fields?.heading} className="heading-4xl" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
-The LatestArticleGrid exports 5 rendering variants:
+The LatestArticleGrid exports 4 rendering variants:
 
 ### Rendering Variants (Layout)
 
@@ -39,7 +39,6 @@ The LatestArticleGrid exports 5 rendering variants:
 | Variant | Export Name | Article Template | Use Case |
 |---------|-------------|------------------|----------|
 | Default | `Default` | Article | General articles, blog posts |
-| Careers | `Careers` | Careers Article | Job postings, career-related content |
 | Insights | `Insights` | Insights Article | Research, whitepapers, industry insights |
 | News | `News` | News Article | News articles, press releases |
 
@@ -82,8 +81,8 @@ The component implements a 5-minute in-memory cache:
 ## Component Props Interface
 
 ```typescript
-import { ComponentRendering, Field } from '@sitecore-jss/sitecore-jss-nextjs';
-import { ComponentWithContextProps } from 'lib/component-props';
+import { ComponentRendering, Field } from '@sitecore-content-sdk/nextjs';
+import { ComponentProps } from 'lib/component-props';
 import { ArticleDataType } from 'lib/types';
 import { ArticleVariant } from 'lib/helpers/article-variants';
 
@@ -97,7 +96,7 @@ type ArticleListingRenderingType = {
   };
 };
 
-export type LatestArticleGridProps = ComponentWithContextProps &
+export type LatestArticleGridProps = ComponentProps &
   ArticleListingRenderingType & {
     className?: string;
     fields: LatestArticleGridFields;
@@ -105,7 +104,7 @@ export type LatestArticleGridProps = ComponentWithContextProps &
     variant?: ArticleVariant;
   };
 
-// ArticleVariant = 'default' | 'careers' | 'insights' | 'news'
+// ArticleVariant = 'default' | 'insights' | 'news'
 ```
 
 ## Example Content Entry
@@ -151,7 +150,6 @@ In Experience Editor or Content Editor:
 3. Choose from available variants:
    - Default (3-column grid, general articles)
    - VerticalList (single column, general articles)
-   - Careers (3-column grid, careers articles)
    - Insights (3-column grid, insights articles)
    - News (3-column grid, news articles)
 
@@ -166,7 +164,7 @@ The component detects its container context using `useContainer()`:
 
 ### Server-Side Data Fetching
 
-The component uses `getStaticProps` / `getServerSideProps` to:
+The component uses `getComponentServerProps` to:
 1. Determine variant from rendering parameters
 2. Fetch latest 6 articles via GraphQL (variant-specific query)
 3. Sort by `datePublished` descending
@@ -179,7 +177,6 @@ The component uses `getStaticProps` / `getServerSideProps` to:
 
 2. **Wrong variant for content type:** Match the component variant to your article templates:
    - General articles → Default or VerticalList variant
-   - Job postings → Careers variant
    - Research/whitepapers → Insights variant
    - Press releases → News variant
 
@@ -191,7 +188,7 @@ The component uses `getStaticProps` / `getServerSideProps` to:
    - Default variant shows 4 articles max (not 6)
    - VerticalList variant removes wrapper for proper spacing
 
-6. **Mixing rendering and content variants:** The Default/VerticalList variants are layout choices. Careers/Insights/News are content type choices. You cannot combine them (e.g., no "VerticalList-Careers" - use VerticalList for layout with general articles, or Careers for careers content with grid layout).
+6. **Mixing rendering and content variants:** The Default/VerticalList variants are layout choices. Insights/News are content type choices. You cannot combine them (e.g., no "VerticalList-Insights" - use VerticalList for layout with general articles, or Insights for insights content with grid layout).
 
 ## Related Components
 
@@ -319,7 +316,6 @@ To use a specific variant, use the corresponding rendering ID:
 |---------|----------------|--------|--------------|
 | Default | `LatestArticleGrid` | 3-col grid | General articles |
 | VerticalList | `LatestArticleGrid-VerticalList` | 1-col stack | General articles |
-| Careers | `LatestArticleGrid-Careers` | 3-col grid | Careers articles |
 | Insights | `LatestArticleGrid-Insights` | 3-col grid | Insights articles |
 | News | `LatestArticleGrid-News` | 3-col grid | News articles |
 

@@ -28,8 +28,8 @@ The IconFeatureCardGrid component serves as a container for displaying a collect
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} tag="h2" className="heading-4xl mb-6 leading-none" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading | `<RichText field={fields?.subheading} className="richtext copy-lg leading-none" />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text field={fields?.heading} tag="h2" className="heading-4xl mb-6 leading-none" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading | `<RichText field={fields?.subheading} className="richtext copy-lg leading-none" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 
 ## Content Authoring Instructions
 

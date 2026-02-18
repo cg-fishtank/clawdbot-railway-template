@@ -43,10 +43,10 @@ The EventDetails component displays the complete detail view for an event page, 
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text className="heading-3xl lg:heading-4xl" field={heading} tag="h1" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading | `<RichText className="richtext text-base" field={subheading} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| body | `<RichText field={body} className="richtext richtext-h1-4xl w-full" />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| image | `<NextImage field={image} fill className="object-cover" />` | `import { NextImage } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text className="heading-3xl lg:heading-4xl" field={heading} tag="h1" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading | `<RichText className="richtext text-base" field={subheading} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| body | `<RichText field={body} className="richtext richtext-h1-4xl w-full" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| image | `<NextImage field={image} fill className="object-cover" />` | `import { NextImage } from '@sitecore-content-sdk/nextjs'` |
 | link | Via `Button` component | `import Button from 'component-children/Shared/Button/Button'` |
 
 ## Component Variants
@@ -148,7 +148,7 @@ The EventDetails exports a single default variant:
 ## Component Props Interface
 
 ```typescript
-import { Field, LinkField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field, LinkField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { EventRouteFieldsType, ProfileType, SponsorType } from 'lib/types';
 
@@ -162,7 +162,7 @@ type EventDetailsProps = ComponentProps & {
   fields: EventDetailsFields;
 };
 
-// Route fields (from useSitecoreContext):
+// Route fields (from useSitecore):
 // EventRouteFieldsType includes:
 // - heading: Field<string>
 // - subheading: Field<string>

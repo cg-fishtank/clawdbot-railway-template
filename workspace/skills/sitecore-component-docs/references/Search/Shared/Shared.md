@@ -38,7 +38,7 @@ type NoWidgetIdErrorProps = {
 
 ```typescript
 export const NoWidgetIdError: React.FC<NoWidgetIdErrorProps> = ({ params }) => {
-  const { sitecoreContext } = useSitecoreContext();
+  const { sitecoreContext } = useSitecore();
 
   if (!sitecoreContext.pageEditing) return null;
 
@@ -74,7 +74,7 @@ By showing the error only in editing mode:
 ## Related Files
 
 - `lib/component-props.ts` - ComponentProps type definition
-- `@sitecore-jss/sitecore-jss-nextjs` - useSitecoreContext hook
+- `@sitecore-content-sdk/nextjs` - useSitecore hook
 - `component-children/Shared/Frame/Frame` - Wrapper component for styling
 
 ## Troubleshooting
@@ -82,7 +82,7 @@ By showing the error only in editing mode:
 | Issue | Solution |
 |-------|----------|
 | Error message visible on published site | Check `sitecoreContext.pageEditing` logic |
-| Error not showing in Experience Editor | Verify useSitecoreContext is returning correct state |
+| Error not showing in Experience Editor | Verify useSitecore is returning correct state |
 | Styling not applied | Ensure Tailwind CSS is processing the component |
 
 ## Best Practices

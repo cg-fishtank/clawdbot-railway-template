@@ -157,7 +157,7 @@ type WhereToBuyFields = {
 
 type WhereToBuyProps = ComponentProps & {
   rendering: ComponentRendering & {
-    data: LocationData[];  // Populated via getStaticProps/getServerSideProps
+    data: LocationData[];  // Populated via getComponentServerProps
   };
   fields: WhereToBuyFields;
   isMapHidden?: boolean;  // Set by variant

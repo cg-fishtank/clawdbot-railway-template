@@ -108,14 +108,14 @@ Controls the maximum width of inner content:
 ## Component Props Interface
 
 ```typescript
-import { ComponentWithContextProps } from 'lib/component-props';
+import { ComponentProps } from 'lib/component-props';
 import { BackgroundImageProps } from 'lib/hooks/useBackgroundImage';
 
 type FullWidthFieldsType = {
   fields: BackgroundImageProps;
 };
 
-type FullWidthProps = ComponentWithContextProps & FullWidthFieldsType;
+type FullWidthProps = ComponentProps & FullWidthFieldsType;
 
 // BackgroundImageProps includes:
 // - backgroundImage: ImageField

@@ -33,8 +33,8 @@ The HeroBanner component displays a full-width hero section with a background im
 
 | Sitecore Field        | JSS Component                                                  | Import                                                  |
 | --------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
-| heading               | `<Text field={fields?.heading} tag="h1" className="..." />`    | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading            | `<RichText field={fields?.subheading} className="..." />`      | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading               | `<Text field={fields?.heading} tag="h1" className="..." />`    | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading            | `<RichText field={fields?.subheading} className="..." />`      | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 | backgroundImage       | `<BackgroundImage fields={fields} />`                          | Custom component using `useBackgroundImage` hook        |
 | backgroundImageMobile | `<BackgroundImage fields={fields} />`                          | Falls back to backgroundImage if not provided           |
 
@@ -100,7 +100,7 @@ The HeroBanner exports 1 rendering variant:
 ## Component Props Interface
 
 ```typescript
-import { Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field } from '@sitecore-content-sdk/nextjs';
 import { BackgroundImageProps } from 'lib/hooks/useBackgroundImage';
 import { ComponentProps } from 'lib/component-props';
 

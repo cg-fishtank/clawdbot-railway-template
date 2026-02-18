@@ -95,7 +95,7 @@ query GetHeaderNavigation(
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| logo | `<Image className="h-6 w-auto invert lg:h-8" field={fields?.logo} />` | `import { Image } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| logo | `<Image className="h-6 w-auto invert lg:h-8" field={fields?.logo} />` | `import { Image } from '@sitecore-content-sdk/nextjs'` |
 
 ## Content Authoring Instructions
 

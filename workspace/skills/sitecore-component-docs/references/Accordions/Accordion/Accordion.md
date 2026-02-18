@@ -38,8 +38,8 @@ The Accordion component provides a collapsible content section with a heading, s
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} tag="h2" className="heading-3xl leading-none" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading | `<RichText field={fields?.subheading} className="richtext copy-xl leading-none" />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text field={fields?.heading} tag="h2" className="heading-3xl leading-none" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading | `<RichText field={fields?.subheading} className="richtext copy-xl leading-none" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 | link | `<Button variant="button" color={buttonColor} link={fields?.link} />` | Internal Button child component |
 
 ## Component Variants
@@ -91,7 +91,7 @@ The Accordion component provides a collapsible content section with a heading, s
 ## Component Props Interface
 
 ```typescript
-import { Field, LinkField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field, LinkField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 type AccordionFields = {

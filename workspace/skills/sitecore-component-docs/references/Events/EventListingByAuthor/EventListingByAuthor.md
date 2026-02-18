@@ -37,9 +37,9 @@ This component uses a **datasource** for configuration fields and performs clien
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
@@ -91,8 +91,8 @@ The EventListingByAuthor exports a single default variant:
 ## Component Props Interface
 
 ```typescript
-import { ComponentWithContextProps } from 'lib/component-props';
-import { Field, ComponentRendering } from '@sitecore-jss/sitecore-jss-nextjs';
+import { ComponentProps } from 'lib/component-props';
+import { Field, ComponentRendering } from '@sitecore-content-sdk/nextjs';
 import { EventDataType } from 'lib/types';
 
 type EventListingFields = {
@@ -108,7 +108,7 @@ type EventListingRenderingType = {
   };
 };
 
-export type EventListingProps = ComponentWithContextProps &
+export type EventListingProps = ComponentProps &
   EventListingRenderingType & {
     fields: EventListingFields;
   };

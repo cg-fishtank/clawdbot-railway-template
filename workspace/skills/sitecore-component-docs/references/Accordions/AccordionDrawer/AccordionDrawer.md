@@ -30,8 +30,8 @@ The AccordionDrawer component represents an individual collapsible panel within 
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} tag="h3" className="heading-base text-start text-content" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| body | `<RichText className="richtext" field={fields?.body} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text field={fields?.heading} tag="h3" className="heading-base text-start text-content" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| body | `<RichText className="richtext" field={fields?.body} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
@@ -81,7 +81,7 @@ The AccordionDrawer component represents an individual collapsible panel within 
 ## Component Props Interface
 
 ```typescript
-import { Field, RichTextField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field, RichTextField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 type AccordionDrawerFields = {

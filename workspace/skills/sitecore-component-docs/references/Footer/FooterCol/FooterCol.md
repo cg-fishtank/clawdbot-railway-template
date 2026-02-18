@@ -33,7 +33,7 @@ The FooterCol component displays a single column within the footer navigation, f
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text tag="h3" className="heading-sm text-content" field={fields?.heading} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text tag="h3" className="heading-sm text-content" field={fields?.heading} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 | link (child items) | `<Button link={link?.jsonValue} variant="link" />` | Custom Button component |
 
 ## GraphQL Query

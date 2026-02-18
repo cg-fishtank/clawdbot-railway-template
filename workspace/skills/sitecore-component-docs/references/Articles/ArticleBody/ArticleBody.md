@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The ArticleBody component renders the main content body of article pages using a Rich Text field. It displays the full article content within a contained wrapper, centered on the page with responsive layout. The component supports multiple variants (Default, Careers, Insights, News) to match different article types while maintaining consistent styling.
+The ArticleBody component renders the main content body of article pages using a Rich Text field. It displays the full article content within a contained wrapper, centered on the page with responsive layout. The component supports multiple variants (Default, Insights, News) to match different article types while maintaining consistent styling.
 
 ## Sitecore Template Requirements
 
@@ -25,16 +25,15 @@ The ArticleBody component renders the main content body of article pages using a
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| body | `<RichText field={body} className="richtext richtext-h1-4xl w-full" />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| body | `<RichText field={body} className="richtext richtext-h1-4xl w-full" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
-The ArticleBody exports 4 rendering variants with identical functionality but different data attributes for styling/tracking:
+The ArticleBody exports 3 rendering variants with identical functionality but different data attributes for styling/tracking:
 
 | Variant | Export Name | Use Case |
 |---------|-------------|----------|
 | Default | `Default` | General articles, blog posts |
-| Careers | `Careers` | Job postings, career-related content |
 | Insights | `Insights` | Research, whitepapers, industry insights |
 | News | `News` | News articles, press releases |
 
@@ -122,7 +121,7 @@ type ArticleBodyProps = ComponentProps & {
 In Experience Editor or Content Editor:
 1. Select the ArticleBody component
 2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default, Careers, Insights, or News
+3. Choose variant from dropdown: Default, Insights, or News
 
 ## Common Mistakes to Avoid
 
@@ -259,7 +258,6 @@ To use a specific variant, use the corresponding rendering ID:
 | Variant | Rendering Name |
 |---------|----------------|
 | Default | `ArticleBody` |
-| Careers | `ArticleBody-Careers` |
 | Insights | `ArticleBody-Insights` |
 | News | `ArticleBody-News` |
 

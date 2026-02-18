@@ -1,7 +1,7 @@
 # ArticleBanner Component
 
 ## Purpose
-The ArticleBanner component displays a prominent banner section for article pages, featuring a headline, subheading, category badge, and hero image. It supports multiple visual variants (Default, Contained, Careers, Insights, News) with different badge themes and button styles. The component is typically used at the top of article detail pages to create visual hierarchy and introduce content.
+The ArticleBanner component displays a prominent banner section for article pages, featuring a headline, subheading, category badge, and hero image. It supports multiple visual variants (Default, Contained, Insights, News) with different badge themes and button styles. The component is typically used at the top of article detail pages to create visual hierarchy and introduce content.
 
 ## Sitecore Template Requirements
 
@@ -36,20 +36,19 @@ The ArticleBanner component displays a prominent banner section for article page
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} tag="h2" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading | `<RichText field={fields?.subheading} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| image | `<NextImage field={image} />` | `import { NextImage } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| pageCategory | `<Text field={category} editable={false} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text field={fields?.heading} tag="h2" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading | `<RichText field={fields?.subheading} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| image | `<NextImage field={image} />` | `import { NextImage } from '@sitecore-content-sdk/nextjs'` |
+| pageCategory | `<Text field={category} editable={false} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
-The ArticleBanner exports 5 rendering variants, each with different visual styling:
+The ArticleBanner exports 4 rendering variants, each with different visual styling:
 
 | Variant | Export Name | Badge Theme | Button Style | Use Case |
 |---------|-------------|-------------|--------------|----------|
 | Default | `Default` | Primary (blue) | Link style | General articles, blog posts |
 | Contained | `Contained` | Primary (blue) | Link style | Articles needing max-width constraint |
-| Careers | `Careers` | Tertiary (green/accent) | Solid button | Job postings, career-related content |
 | Insights | `Insights` | Secondary (gray) | Outline button | Research, whitepapers, industry insights |
 | News | `News` | Secondary (gray) | Outline button | News articles, press releases |
 
@@ -103,7 +102,7 @@ The ArticleBanner exports 5 rendering variants, each with different visual styli
 
 ```typescript
 // From lib/types/components/Articles/article-banner.ts
-import { ComponentRendering } from '@sitecore-jss/sitecore-jss-nextjs';
+import { ComponentRendering } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { ArticleRouteFieldsType } from 'lib/types';
 
@@ -198,7 +197,7 @@ export type ArticleBannerProps = ComponentProps & {
 In Experience Editor or Content Editor:
 1. Select the ArticleBanner component
 2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default, Contained, Careers, Insights, or News
+3. Choose variant from dropdown: Default, Contained, Insights, or News
 
 ### Personalization Opportunities
 - **heading/subheading:** Personalize messaging based on visitor segments
@@ -218,7 +217,6 @@ In Experience Editor or Content Editor:
 5. **Missing alt text:** Always provide meaningful alt text for accessibility compliance and SEO.
 
 6. **Wrong variant for content type:** Match the variant to your content:
-   - Job postings → Careers variant
    - Industry analysis → Insights variant
    - Press releases → News variant
    - General articles → Default variant
@@ -430,13 +428,12 @@ await mcp__marketer-mcp__update_content({
 
 ### Variant Selection via Rendering
 
-To use a specific variant (Default, Contained, Careers, Insights, News), use the corresponding rendering ID:
+To use a specific variant (Default, Contained, Insights, News), use the corresponding rendering ID:
 
 | Variant | Rendering Name |
 |---------|----------------|
 | Default | `ArticleBanner` |
 | Contained | `ArticleBanner-Contained` |
-| Careers | `ArticleBanner-Careers` |
 | Insights | `ArticleBanner-Insights` |
 | News | `ArticleBanner-News` |
 

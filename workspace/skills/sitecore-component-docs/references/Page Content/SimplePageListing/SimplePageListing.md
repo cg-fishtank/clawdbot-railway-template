@@ -209,7 +209,7 @@ query SimplePageListing(
 
 ### Data Fetching
 
-This component uses `getStaticProps`/`getServerSideProps` to fetch page data at build/request time. The data is fetched via the `getPageListingWithDetails` helper function.
+This component uses `getComponentServerProps` to fetch page data at build/request time. The data is fetched via the `getPageListingWithDetails` helper function.
 
 ### Tag Filtering
 

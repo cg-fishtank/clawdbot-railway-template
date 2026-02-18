@@ -87,8 +87,8 @@ query GetSideNavigation(
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading (main) | `<Text field={props.fields?.heading} tag="h2" className="heading-xl mb-6" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| heading (group) | `<Text field={heading} tag="span" className="heading-base" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading (main) | `<Text field={props.fields?.heading} tag="h2" className="heading-xl mb-6" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| heading (group) | `<Text field={heading} tag="span" className="heading-base" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 | link | `<Button link={link?.jsonValue} variant="link" />` | Custom Button component |
 
 ## Content Authoring Instructions

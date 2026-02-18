@@ -36,9 +36,9 @@ The SplitBanner component displays a side-by-side layout with an image on one si
 
 | Sitecore Field | JSS Component                                               | Import                                                  |
 | -------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
-| heading        | `<Text field={fields?.heading} tag="h2" className="..." />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading     | `<RichText field={fields?.subheading} className="..." />`   | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| body           | `<RichText field={fields?.body} className="..." />`         | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading        | `<Text field={fields?.heading} tag="h2" className="..." />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading     | `<RichText field={fields?.subheading} className="..." />`   | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| body           | `<RichText field={fields?.body} className="..." />`         | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 | image          | `<HalfWidthImage image={imageSrc} />`                       | Custom component using `useImage` hook                  |
 | imageMobile    | `<HalfWidthImage image={imageSrc} />`                       | Falls back to image if not provided                     |
 
@@ -111,7 +111,7 @@ The SplitBanner exports 2 rendering variants:
 ## Component Props Interface
 
 ```typescript
-import { Field, LinkField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field, LinkField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { ImageProps } from 'lib/hooks/useImage';
 

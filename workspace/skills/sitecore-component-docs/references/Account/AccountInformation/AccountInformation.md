@@ -25,7 +25,7 @@ The AccountInformation component displays the authenticated user's profile infor
 
 | Sitecore Field | JSS Component                                        | Import                                                |
 | -------------- | ---------------------------------------------------- | ----------------------------------------------------- |
-| heading        | `<Text tag="h2" field={heading} className="..." />`  | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading        | `<Text tag="h2" field={heading} className="..." />`  | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 

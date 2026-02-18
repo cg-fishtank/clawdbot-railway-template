@@ -33,7 +33,7 @@ The VideoBanner component displays a full-width banner section with an autoplayi
 
 | Sitecore Field  | JSS Component                                               | Import                                                  |
 | --------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
-| heading         | `<Text field={fields?.heading} tag="h1" className="..." />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading         | `<Text field={fields?.heading} tag="h1" className="..." />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 | backgroundVideo | Native `<video>` with `<source src={...} type="video/mp4">` | N/A - uses native HTML5 video element                   |
 
 ## Placeholders
@@ -102,7 +102,7 @@ The VideoBanner exports 1 rendering variant:
 ## Component Props Interface
 
 ```typescript
-import { Field, ImageField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field, ImageField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { BackgroundImageProps } from 'lib/hooks/useBackgroundImage';
 

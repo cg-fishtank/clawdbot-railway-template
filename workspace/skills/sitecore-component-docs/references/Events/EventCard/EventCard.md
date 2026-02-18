@@ -41,7 +41,7 @@ This component uses a **datasource** that references an Event Page item. The dat
 | heading | Via `EventCardHeader` child component | Custom component |
 | startDate | Via `EventCardDateBlock` child component | Custom component |
 | endDate | Via `EventCardDetails` child component | Custom component |
-| pageCategory | `<Text field={category} editable={false} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| pageCategory | `<Text field={category} editable={false} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
@@ -108,7 +108,7 @@ The EventCard exports a single default variant:
 ## Component Props Interface
 
 ```typescript
-import { ComponentRendering, Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { ComponentRendering, Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { EventRouteFieldsType } from 'lib/types';
 

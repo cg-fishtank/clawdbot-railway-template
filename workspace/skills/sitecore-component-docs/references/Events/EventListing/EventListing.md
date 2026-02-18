@@ -37,9 +37,9 @@ This component uses a **datasource** for configuration fields (heading, filter s
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg mb-6" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg mb-6" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
@@ -92,8 +92,8 @@ The EventListing exports a single default variant:
 ## Component Props Interface
 
 ```typescript
-import { ComponentWithContextProps } from 'lib/component-props';
-import { Field, ComponentRendering } from '@sitecore-jss/sitecore-jss-nextjs';
+import { ComponentProps } from 'lib/component-props';
+import { Field, ComponentRendering } from '@sitecore-content-sdk/nextjs';
 import { EventDataType } from 'lib/types';
 
 type EventListingFields = {
@@ -109,7 +109,7 @@ type EventListingRenderingType = {
   };
 };
 
-export type EventListingProps = ComponentWithContextProps &
+export type EventListingProps = ComponentProps &
   EventListingRenderingType & {
     fields: EventListingFields;
   };
@@ -158,7 +158,7 @@ export type EventListingProps = ComponentWithContextProps &
 
 ### Data Fetching
 
-The component uses `getStaticProps` / `getServerSideProps` to:
+The component uses `getComponentServerProps` to:
 1. Fetch site content root via `fetchSiteRootInfo`
 2. Query all Event Pages under the content root
 3. Pass event data to the rendering via `rendering.data`

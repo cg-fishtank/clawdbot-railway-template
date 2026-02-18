@@ -32,10 +32,10 @@ The ProductHeader component displays the header section of product detail pages,
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| productName | `<Text className="lg:heading-4xl heading-3xl" field={fields?.productName} tag="p" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| productDescription | `<RichText className="copy-lg" field={fields?.productDescription} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| productSku | `<Text className="copy-base" field={fields?.productSku} tag="span" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| image | `<NextImage field={fields?.image} width={500} height={500} />` | `import { NextImage } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| productName | `<Text className="lg:heading-4xl heading-3xl" field={fields?.productName} tag="p" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| productDescription | `<RichText className="copy-lg" field={fields?.productDescription} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| productSku | `<Text className="copy-base" field={fields?.productSku} tag="span" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| image | `<NextImage field={fields?.image} width={500} height={500} />` | `import { NextImage } from '@sitecore-content-sdk/nextjs'` |
 | link | Via `Button` component | `import { Button } from 'component-children/Shared/Button/Button'` |
 | link2 | Via `Button` component (outline variant) | `import { Button } from 'component-children/Shared/Button/Button'` |
 | SxaTags | Via `Tag` component | `import Tag from 'component-children/Shared/Tag/Tag'` |
@@ -130,7 +130,7 @@ The component supports theme customization via rendering parameters:
 ## Component Props Interface
 
 ```typescript
-import { Field, LinkField, RichTextField, ImageField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field, LinkField, RichTextField, ImageField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { TagType } from 'lib/types/page/metadata';
 

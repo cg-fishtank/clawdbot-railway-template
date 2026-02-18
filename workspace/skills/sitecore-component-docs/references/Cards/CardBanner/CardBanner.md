@@ -40,8 +40,8 @@ The CardBanner exposes a placeholder for child components:
 
 | Sitecore Field        | JSS Component                              | Import                                              |
 | --------------------- | ------------------------------------------ | --------------------------------------------------- |
-| heading               | `<Text field={fields.heading} tag="h2" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading            | `<RichText field={fields.subheading} />`   | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading               | `<Text field={fields.heading} tag="h2" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading            | `<RichText field={fields.subheading} />`   | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 | backgroundImage       | `<BackgroundImage fields={fields} />`      | Custom BackgroundImage component                    |
 
 ## Component Variants
@@ -100,7 +100,7 @@ The CardBanner component exports a single Default variant:
 ## Component Props Interface
 
 ```typescript
-import { Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { BackgroundImageProps } from 'lib/hooks/useBackgroundImage';
 

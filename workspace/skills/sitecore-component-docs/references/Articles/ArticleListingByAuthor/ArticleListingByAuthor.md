@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The ArticleListingByAuthor component displays a list of articles filtered by the current author context. It automatically detects the author from the page context (typically on Author Profile pages) and filters articles to show only those written by that author. The component supports a `${name}` template variable in the heading for dynamic author name insertion and provides multiple content variants (Default, Careers, Insights, News).
+The ArticleListingByAuthor component displays a list of articles filtered by the current author context. It automatically detects the author from the page context (typically on Author Profile pages) and filters articles to show only those written by that author. The component supports a `${name}` template variable in the heading for dynamic author name insertion and provides multiple content variants (Default, Insights, News).
 
 ## Sitecore Template Requirements
 
@@ -36,12 +36,11 @@ The heading field supports a special template variable `${name}` that gets repla
 
 ## Component Variants
 
-The ArticleListingByAuthor exports 4 rendering variants, each fetching content from different article templates:
+The ArticleListingByAuthor exports 3 rendering variants, each fetching content from different article templates:
 
 | Variant | Export Name | Article Template | Use Case |
 |---------|-------------|------------------|----------|
 | Default | `Default` | Article | General articles, blog posts |
-| Careers | `Careers` | Careers Article | Job postings, career-related content |
 | Insights | `Insights` | Insights Article | Research, whitepapers, industry insights |
 | News | `News` | News Article | News articles, press releases |
 
@@ -92,8 +91,8 @@ const filtered = allResults.filter((article) => {
 ## Component Props Interface
 
 ```typescript
-import { ComponentRendering, Field } from '@sitecore-jss/sitecore-jss-nextjs';
-import { ComponentWithContextProps } from 'lib/component-props';
+import { ComponentRendering, Field } from '@sitecore-content-sdk/nextjs';
+import { ComponentProps } from 'lib/component-props';
 import { ArticleDataType } from 'lib/types';
 import { ProfileGQL } from 'lib/types/page/profile';
 import { ArticleVariant } from 'lib/helpers/article-variants';
@@ -108,7 +107,7 @@ type ArticleListingRenderingType = {
   };
 };
 
-export type ArticleListingProps = ComponentWithContextProps &
+export type ArticleListingProps = ComponentProps &
   ArticleListingRenderingType & {
     fields: ArticleListingFields;
     authorContext?: ProfileGQL | null;
@@ -163,7 +162,7 @@ export type ArticleListingProps = ComponentWithContextProps &
 In Experience Editor or Content Editor:
 1. Select the ArticleListingByAuthor component
 2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default, Careers, Insights, or News
+3. Choose variant from dropdown: Default, Insights, or News
 
 ### Page Placement Requirements
 
@@ -302,7 +301,6 @@ To use a specific variant, use the corresponding rendering ID:
 | Variant | Rendering Name |
 |---------|----------------|
 | Default | `ArticleListingByAuthor` |
-| Careers | `ArticleListingByAuthor-Careers` |
 | Insights | `ArticleListingByAuthor-Insights` |
 | News | `ArticleListingByAuthor-News` |
 

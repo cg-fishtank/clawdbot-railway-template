@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The ArticleHeader component displays the header section of article pages, featuring the article title (heading), subheading, category badge, publication date, and social sharing buttons. It includes structured data metadata output for SEO (via variant-specific metadata components). The component supports multiple variants (Default, Careers, Insights, News) with different date formatting and metadata schemas. It is typically placed at the top of article detail pages, after any banner components.
+The ArticleHeader component displays the header section of article pages, featuring the article title (heading), subheading, category badge, publication date, and social sharing buttons. It includes structured data metadata output for SEO (via variant-specific metadata components). The component supports multiple variants (Default, Insights, News) with different date formatting and metadata schemas. It is typically placed at the top of article detail pages, after any banner components.
 
 ## Sitecore Template Requirements
 
@@ -29,25 +29,24 @@ The ArticleHeader component displays the header section of article pages, featur
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text className="heading-4xl" field={heading} tag="h1" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading | `<RichText className="richtext" field={subheading} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| pageCategory | `<Text editable={false} field={category} tag="p" className="heading-base uppercase" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text className="heading-4xl" field={heading} tag="h1" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading | `<RichText className="richtext" field={subheading} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| pageCategory | `<Text editable={false} field={category} tag="p" className="heading-base uppercase" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 | datePublished | Formatted via `getLocalizedFormattedDate()` helper | Custom date formatting |
 
 ## Component Variants
 
-The ArticleHeader exports 4 rendering variants with different metadata schemas and date display:
+The ArticleHeader exports 3 rendering variants with different metadata schemas and date display:
 
 | Variant | Export Name | Metadata Schema | Date Display | Use Case |
 |---------|-------------|-----------------|--------------|----------|
 | Default | `Default` | ArticleMetadata | Date only | General articles, blog posts |
-| Careers | `Careers` | CareersMetadata | Date only | Job postings, career-related content |
 | Insights | `Insights` | InsightsMetadata | Date only | Research, whitepapers, industry insights |
 | News | `News` | NewsMetadata | Date + Time | News articles, press releases |
 
 ### Date Display Behavior
 
-- **Default/Careers/Insights:** Shows date in localized format (e.g., "January 15, 2024")
+- **Default/Insights:** Shows date in localized format (e.g., "January 15, 2024")
 - **News:** Shows date and time; uses `displayDateTime` if set, falls back to `datePublished`
 
 ## Content Authoring Instructions
@@ -100,7 +99,7 @@ The ArticleHeader exports 4 rendering variants with different metadata schemas a
 ## Component Props Interface
 
 ```typescript
-import { Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { ArticleVariant } from 'lib/helpers/article-variants';
 
@@ -108,9 +107,9 @@ type ArticleHeaderProps = ComponentProps & {
   variant?: ArticleVariant;
 };
 
-// ArticleVariant = 'default' | 'careers' | 'insights' | 'news'
+// ArticleVariant = 'default' | 'insights' | 'news'
 
-// Route fields accessed via useSitecoreContext():
+// Route fields accessed via useSitecore():
 // ArticleRouteFieldsType includes:
 // - heading: Field<string>
 // - subheading: Field<string>
@@ -186,13 +185,12 @@ type ArticleHeaderProps = ComponentProps & {
 In Experience Editor or Content Editor:
 1. Select the ArticleHeader component
 2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default, Careers, Insights, or News
+3. Choose variant from dropdown: Default, Insights, or News
 
 ### SEO Metadata Output
 
 Each variant outputs specific structured data:
 - **ArticleMetadata:** Standard Article schema
-- **CareersMetadata:** JobPosting schema
 - **InsightsMetadata:** Report/Article schema
 - **NewsMetadata:** NewsArticle schema with datePublished/dateModified
 
@@ -201,7 +199,6 @@ Each variant outputs specific structured data:
 1. **Missing heading:** The heading field is the H1 and critical for SEO. Never leave it empty.
 
 2. **Wrong variant for content type:** Match the variant to your content for correct metadata schema:
-   - Job postings → Careers variant
    - Industry analysis → Insights variant
    - Press releases → News variant
    - General articles → Default variant
@@ -222,7 +219,7 @@ Each variant outputs specific structured data:
 - `ArticleBody` - Main article content section
 - `ArticleFooter` - Author profiles and tags section
 - `SocialShare` - Child component rendered within ArticleHeader
-- `ArticleMetadata` / `NewsMetadata` / `InsightsMetadata` / `CareersMetadata` - SEO metadata components
+- `ArticleMetadata` / `NewsMetadata` / `InsightsMetadata` - SEO metadata components
 
 ---
 
@@ -376,7 +373,6 @@ To use a specific variant, use the corresponding rendering ID:
 | Variant | Rendering Name | Metadata Schema |
 |---------|----------------|-----------------|
 | Default | `ArticleHeader` | Article |
-| Careers | `ArticleHeader-Careers` | JobPosting |
 | Insights | `ArticleHeader-Insights` | Report |
 | News | `ArticleHeader-News` | NewsArticle |
 

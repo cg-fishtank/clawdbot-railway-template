@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The ArticleListing component displays a paginated, filterable list of articles from the site's content repository. It supports tag-based filtering via page context, multiple content variants (Default, Careers, Insights, News), and uses server-side GraphQL data fetching for optimal performance. The component is typically used on article index pages or category landing pages to present browsable article collections.
+The ArticleListing component displays a paginated, filterable list of articles from the site's content repository. It supports tag-based filtering via page context, multiple content variants (Default, Insights, News), and uses server-side GraphQL data fetching for optimal performance. The component is typically used on article index pages or category landing pages to present browsable article collections.
 
 ## Sitecore Template Requirements
 
@@ -24,19 +24,18 @@ The ArticleListing component displays a paginated, filterable list of articles f
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg mb-6" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg mb-6" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 | filterByTags | Read via `rendering.fields.filterByTags.value` | N/A (boolean check) |
-| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
-The ArticleListing exports 4 rendering variants, each fetching content from different article templates:
+The ArticleListing exports 3 rendering variants, each fetching content from different article templates:
 
 | Variant | Export Name | Article Template | Use Case |
 |---------|-------------|------------------|----------|
 | Default | `Default` | Article | General articles, blog posts |
-| Careers | `Careers` | Careers Article | Job postings, career-related content |
 | Insights | `Insights` | Insights Article | Research, whitepapers, industry insights |
 | News | `News` | News Article | News articles, press releases |
 
@@ -94,8 +93,8 @@ When `filterByTags` is enabled:
 ## Component Props Interface
 
 ```typescript
-import { ComponentRendering, Field } from '@sitecore-jss/sitecore-jss-nextjs';
-import { ComponentWithContextProps } from 'lib/component-props';
+import { ComponentRendering, Field } from '@sitecore-content-sdk/nextjs';
+import { ComponentProps } from 'lib/component-props';
 import { ArticleDataType } from 'lib/types';
 import { ArticleVariant } from 'lib/helpers/article-variants';
 
@@ -112,13 +111,13 @@ type ArticleListingRenderingType = {
   };
 };
 
-export type ArticleListingProps = ComponentWithContextProps &
+export type ArticleListingProps = ComponentProps &
   ArticleListingRenderingType & {
     fields: ArticleListingFields;
     variant?: ArticleVariant;
   };
 
-// ArticleVariant = 'default' | 'careers' | 'insights' | 'news'
+// ArticleVariant = 'default' | 'insights' | 'news'
 ```
 
 ## Example Content Entry
@@ -164,11 +163,11 @@ export type ArticleListingProps = ComponentWithContextProps &
 In Experience Editor or Content Editor:
 1. Select the ArticleListing component
 2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default, Careers, Insights, or News
+3. Choose variant from dropdown: Default, Insights, or News
 
 ### Server-Side Data Fetching
 
-The component uses `getStaticProps` / `getServerSideProps` to:
+The component uses `getComponentServerProps` to:
 1. Fetch all articles of the selected variant type via GraphQL
 2. Process and normalize tag data for filtering
 3. Sort articles by publication date (newest first)
@@ -180,7 +179,6 @@ The component uses `getStaticProps` / `getServerSideProps` to:
 
 2. **Wrong variant for content type:** Match the component variant to your article templates:
    - General articles → Default variant
-   - Job postings → Careers variant
    - Research/whitepapers → Insights variant
    - Press releases → News variant
 
@@ -188,7 +186,7 @@ The component uses `getStaticProps` / `getServerSideProps` to:
 
 4. **Expecting instant filtering:** Tag filtering happens on page load based on page context - it's not interactive/real-time filtering.
 
-5. **Mixing article types:** Each variant only displays articles from its corresponding template. Don't expect a Careers listing to show general articles.
+5. **Mixing article types:** Each variant only displays articles from its corresponding template. Don't expect an Insights listing to show general articles.
 
 6. **Forgetting noResultsText:** If using tag filtering, always configure `noResultsText` to provide meaningful feedback when no matches are found.
 
@@ -329,7 +327,6 @@ To use a specific variant, use the corresponding rendering ID:
 | Variant | Rendering Name |
 |---------|----------------|
 | Default | `ArticleListing` |
-| Careers | `ArticleListing-Careers` |
 | Insights | `ArticleListing-Insights` |
 | News | `ArticleListing-News` |
 

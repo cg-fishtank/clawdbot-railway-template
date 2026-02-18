@@ -104,7 +104,7 @@ Capacity=10000 gallons/day&Flow Rate=7 GPM&Power Requirements=220V/60Hz&Operatin
 ## Component Props Interface
 
 ```typescript
-import { Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 export type ProductTechSpecsFields = {

@@ -40,7 +40,7 @@ This component primarily uses Sitecore Search widget for display. Fields are con
 ## Component Props Interface
 
 ```typescript
-import { Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 export type GlobalSearchFields = {

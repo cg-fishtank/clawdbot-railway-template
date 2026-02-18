@@ -33,11 +33,11 @@ The Card component displays a content card featuring an image, heading, body tex
 
 | Sitecore Field | JSS Component                                    | Import                                              |
 | -------------- | ------------------------------------------------ | --------------------------------------------------- |
-| heading        | `<Text field={fields.heading} tag="h3" />`       | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| body           | `<RichText field={fields.body} />`               | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| link           | `<Link field={fields.link} />` / `<Button />`    | `import { Link } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| image          | `<NextImage field={imageSrc} />`                 | `import { NextImage } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| badge          | `<Text field={badge} />`                         | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading        | `<Text field={fields.heading} tag="h3" />`       | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| body           | `<RichText field={fields.body} />`               | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| link           | `<Link field={fields.link} />` / `<Button />`    | `import { Link } from '@sitecore-content-sdk/nextjs'` |
+| image          | `<NextImage field={imageSrc} />`                 | `import { NextImage } from '@sitecore-content-sdk/nextjs'` |
+| badge          | `<Text field={badge} />`                         | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
@@ -120,7 +120,7 @@ import {
   Field,
   LinkField,
   RichTextField,
-} from '@sitecore-jss/sitecore-jss-nextjs';
+} from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { ImageProps } from 'lib/hooks/useImage';
 

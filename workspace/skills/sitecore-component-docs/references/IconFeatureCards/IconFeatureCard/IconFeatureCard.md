@@ -24,8 +24,8 @@ The IconFeatureCard component displays a single feature card with an icon, headi
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text field={fields.heading} tag="h3" className="heading-2xl" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| subheading | `<RichText field={fields.subheading} className="richtext copy-lg" />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text field={fields.heading} tag="h3" className="heading-2xl" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| subheading | `<RichText field={fields.subheading} className="richtext copy-lg" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 | imageIcon | `<IconFas icon={fields.imageIcon?.name} />` | Custom Icon component |
 | link | `<Button link={link} variant="button" />` or wrapper `<Link>` | Custom Button / Next.js Link |
 

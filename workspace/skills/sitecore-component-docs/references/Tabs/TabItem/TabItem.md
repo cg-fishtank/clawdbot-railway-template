@@ -22,13 +22,13 @@ The TabItem component represents an individual tab panel within a TabsContainer.
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| body | `<RichText field={fields?.body} className="richtext" />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading | `<Text field={fields?.heading} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| body | `<RichText field={fields?.body} className="richtext" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Props Interface
 
 ```typescript
-import { ComponentRendering, Field, RichTextField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { ComponentRendering, Field, RichTextField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 export type TabItemProps = ComponentProps & {

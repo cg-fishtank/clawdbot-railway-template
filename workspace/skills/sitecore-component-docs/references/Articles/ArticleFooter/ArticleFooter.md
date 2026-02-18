@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The ArticleFooter component displays article metadata at the bottom of article pages, including a tags section with configurable label and author profile cards. It renders author information with images, roles, and descriptions, along with SXA taxonomy tags. The component supports multiple variants (Default, Careers, Insights, News) and is typically placed after the ArticleBody component.
+The ArticleFooter component displays article metadata at the bottom of article pages, including a tags section with configurable label and author profile cards. It renders author information with images, roles, and descriptions, along with SXA taxonomy tags. The component supports multiple variants (Default, Insights, News) and is typically placed after the ArticleBody component.
 
 ## Sitecore Template Requirements
 
@@ -55,20 +55,19 @@ This component uses a **hybrid approach**:
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| tagsLabel | `<Text className="heading-xl text-black" field={tagsLabel} tag="h3" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| profiles[].fields.image | `<NextImage width={320} height={180} field={author.fields.image} />` | `import { NextImage } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| profiles[].fields.role | `<Text className="copy-base text-black" field={author.fields?.role} tag="p" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| profiles[].fields.description | `<RichText className="richtext line-clamp-4 pt-2 leading-relaxed md:pt-4" field={author.fields?.description} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| tagsLabel | `<Text className="heading-xl text-black" field={tagsLabel} tag="h3" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| profiles[].fields.image | `<NextImage width={320} height={180} field={author.fields.image} />` | `import { NextImage } from '@sitecore-content-sdk/nextjs'` |
+| profiles[].fields.role | `<Text className="copy-base text-black" field={author.fields?.role} tag="p" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| profiles[].fields.description | `<RichText className="richtext line-clamp-4 pt-2 leading-relaxed md:pt-4" field={author.fields?.description} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 | SxaTags | Rendered via `<Tag theme="secondary">` component | Custom Tag component |
 
 ## Component Variants
 
-The ArticleFooter exports 4 rendering variants:
+The ArticleFooter exports 3 rendering variants:
 
 | Variant | Export Name | Use Case |
 |---------|-------------|----------|
 | Default | `Default` | General articles, blog posts |
-| Careers | `Careers` | Job postings, career-related content |
 | Insights | `Insights` | Research, whitepapers, industry insights |
 | News | `News` | News articles, press releases |
 
@@ -120,7 +119,7 @@ When creating/editing Profile items for authors:
 ## Component Props Interface
 
 ```typescript
-import { Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 type ArticleFooterProps = ComponentProps & {
@@ -130,7 +129,7 @@ type ArticleFooterProps = ComponentProps & {
   variant?: string;
 };
 
-// Route fields accessed via useSitecoreContext():
+// Route fields accessed via useSitecore():
 // - profiles: ProfileData[] (from RouteFields)
 // - SxaTags: TagType[] (from RouteFields)
 
@@ -221,7 +220,7 @@ interface ProfileData {
 In Experience Editor or Content Editor:
 1. Select the ArticleFooter component
 2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default, Careers, Insights, or News
+3. Choose variant from dropdown: Default, Insights, or News
 
 ## Common Mistakes to Avoid
 
@@ -411,7 +410,6 @@ await mcp__marketer-mcp__update_content({
 | Variant | Rendering Name |
 |---------|----------------|
 | Default | `ArticleFooter` |
-| Careers | `ArticleFooter-Careers` |
 | Insights | `ArticleFooter-Insights` |
 | News | `ArticleFooter-News` |
 

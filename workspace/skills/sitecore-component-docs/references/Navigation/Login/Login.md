@@ -35,13 +35,26 @@ The actual authentication logic is implemented in:
 ## Component Props Interface
 
 ```typescript
-// No props required - component uses authentication context
-const LoginDefault: React.FC = () => {
+import { GetComponentServerProps } from '@sitecore-content-sdk/nextjs';
+import { fetchAuthConfig, AuthConfig } from 'lib/helpers/site-config-helpers';
+
+type LoginDefaultProps = {
+  authConfig?: AuthConfig | null;
+};
+
+const LoginDefault: React.FC<LoginDefaultProps> = ({ authConfig }) => {
   if (!isAuthEnabled()) {
     console.error('Auth is not enabled...');
     return null;
   }
-  return <Login />;
+  return <Login authConfig={authConfig} />;
+};
+
+// Server-side props: fetches auth config by site name
+export const getComponentServerProps: GetComponentServerProps = async (_, layoutData) => {
+  const siteName = layoutData.sitecore?.context?.site?.name;
+  const authConfig = siteName ? await fetchAuthConfig(siteName) : null;
+  return { authConfig };
 };
 ```
 

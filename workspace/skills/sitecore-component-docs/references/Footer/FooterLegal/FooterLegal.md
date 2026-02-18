@@ -38,11 +38,11 @@ The FooterLegal component displays the legal section of the footer, featuring pr
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| copyright | `<Text className="copy-sm" field={copyright} />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| copyright | `<Text className="copy-sm" field={copyright} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 | privacyPolicyLink | `<Button link={privacyPolicyLink} variant="link" />` | Custom Button component |
 | tosLink | `<Button link={tosLink} variant="link" />` | Custom Button component |
 | cookiePolicyLink | `<Button link={cookiePolicyLink} variant="link" />` | Custom Button component |
-| landAcknowledgement | `<Text field={fields?.landAcknowledgement} tag="p" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| landAcknowledgement | `<Text field={fields?.landAcknowledgement} tag="p" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## GraphQL Query
 

@@ -33,9 +33,9 @@ The FooterMain component includes a placeholder for footer navigation:
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| logo | `<Image className="h-5 w-auto invert lg:h-8" field={fields?.logo} />` | `import { Image } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| newsletterHeading | `<Text field={fields?.newsletterHeading} tag="h3" className="heading-base text-center" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| newsletterBody | `<RichText field={fields?.newsletterBody} className="richtext text-center" />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| logo | `<Image className="h-5 w-auto invert lg:h-8" field={fields?.logo} />` | `import { Image } from '@sitecore-content-sdk/nextjs'` |
+| newsletterHeading | `<Text field={fields?.newsletterHeading} tag="h3" className="heading-base text-center" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| newsletterBody | `<RichText field={fields?.newsletterBody} className="richtext text-center" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 | newsletterLink | `<Button link={fields?.newsletterLink} variant="button" color="tertiary" />` | Custom Button component |
 
 ## Content Authoring Instructions

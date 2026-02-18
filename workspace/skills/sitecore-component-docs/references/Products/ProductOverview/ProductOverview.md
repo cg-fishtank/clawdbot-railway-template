@@ -29,9 +29,9 @@ The ProductOverview component displays a section with three content cards highli
 
 | Sitecore Field | JSS Component | Import |
 |----------------|---------------|--------|
-| productKeyBenefits | `<RichText field={field} className={richtextClasses} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| productFeatures | `<RichText field={field} className={richtextClasses} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| productApplications | `<RichText field={field} className={richtextClasses} />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| productKeyBenefits | `<RichText field={field} className={richtextClasses} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| productFeatures | `<RichText field={field} className={richtextClasses} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| productApplications | `<RichText field={field} className={richtextClasses} />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
@@ -121,7 +121,7 @@ The component adapts bullet point colors based on theme:
 ## Component Props Interface
 
 ```typescript
-import { RichTextField } from '@sitecore-jss/sitecore-jss-nextjs';
+import { RichTextField } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 export type ProductOverviewFields = {

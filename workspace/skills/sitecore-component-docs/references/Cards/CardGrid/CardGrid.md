@@ -39,7 +39,7 @@ The CardGrid exposes a placeholder for child components:
 
 | Sitecore Field | JSS Component                              | Import                                              |
 | -------------- | ------------------------------------------ | --------------------------------------------------- |
-| heading        | `<Text field={fields.heading} tag="h2" />` | `import { Text } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| heading        | `<Text field={fields.heading} tag="h2" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
@@ -90,7 +90,7 @@ The CardGrid component exports three rendering variants:
 ## Component Props Interface
 
 ```typescript
-import { Field } from '@sitecore-jss/sitecore-jss-nextjs';
+import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
 type CardGridFields = {

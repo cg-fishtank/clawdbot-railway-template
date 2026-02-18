@@ -69,8 +69,8 @@ The profile item can have child folders containing additional content:
 | Sitecore Field | JSS Component                                               | Import                                                  |
 | -------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
 | firstName, lastName | Direct value access: `profile.firstName?.value`       | Via `useAuthor()` hook                                  |
-| description    | `<RichText field={profile.description} className="..." />` | `import { RichText } from '@sitecore-jss/sitecore-jss-nextjs'` |
-| image          | `<Image field={profile.image?.jsonValue} className="..." />`| `import { Image } from '@sitecore-jss/sitecore-jss-nextjs'` |
+| description    | `<RichText field={profile.description} className="..." />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| image          | `<Image field={profile.image?.jsonValue} className="..." />`| `import { Image } from '@sitecore-content-sdk/nextjs'` |
 | imageMobile    | `<Image field={profile.imageMobile?.jsonValue} />`          | Displays on mobile only                                 |
 | role           | Direct value: `profile.role?.value`                          | Plain text rendering                                    |
 | email, phone   | Links: `<a href="mailto:...">` / `<a href="tel:...">`       | Native anchor elements                                  |
