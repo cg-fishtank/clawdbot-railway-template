@@ -1,379 +1,178 @@
 ---
 name: sitecore-upload-media
-description: Upload and manage media assets in Sitecore XM Cloud via marketer-mcp. Upload images, search for existing assets before duplicating, update metadata (alt text, description, tags), and retrieve asset details. Use when the user wants to add new media to the Media Library or manage existing assets.
-allowed-tools:
-  - mcp__marketer-mcp__upload_asset
-  - mcp__marketer-mcp__search_assets
-  - mcp__marketer-mcp__get_asset_information
-  - mcp__marketer-mcp__update_asset
+description: Upload media files to Sitecore XM Cloud Media Library using the Authoring GraphQL API presigned URL method
 ---
 
-# Sitecore Media Uploader
+# Media Uploader (GraphQL API)
 
-**Upload and manage media assets in Sitecore XM Cloud via marketer-mcp. Supports uploading new assets, searching existing assets, updating metadata, and retrieving asset details.**
+Upload media files to Sitecore XM Cloud Media Library using the **Authoring GraphQL API** presigned URL method.
 
----
+## What I do
+- Upload media files to Sitecore XM Cloud Media Library
+- Get presigned upload URLs via GraphQL mutation
+- Support both local files and remote URLs
+- Handle authentication via OAuth Client Credentials
+- Report upload results with Sitecore item IDs
 
-## Capabilities
-
-1. **Upload media assets** -- Upload images and files to the Sitecore Media Library using `upload_asset`
-2. **Search before upload** -- Check if an asset already exists to avoid duplicates using `search_assets`
-3. **Inspect asset details** -- Retrieve full metadata for any asset by ID using `get_asset_information`
-4. **Update asset metadata** -- Set alt text, description, and tags on uploaded assets using `update_asset`
-
----
-
-## When to Use
-
+## When to use
 Use this skill when:
-- Uploading new images or media files to Sitecore Media Library
+- Uploading images to Sitecore Media Library
 - Migrating media assets to XM Cloud
-- Preparing images for use in components (e.g., HeroBanner backgroundImage, Card image fields)
-- Checking if an asset already exists before uploading a duplicate
-- Updating alt text, descriptions, or tags on existing media assets
-- Looking up an asset's ID to use in image XML fields (`<image mediaid='{GUID}' />`)
+- Preparing images for component authoring
+- You have local files or URLs to upload
 
----
+## Required Inputs
 
-## Workflow: Upload a Media Asset
+| Input | Description | Example |
+|:------|:------------|:--------|
+| **Authentication** | OAuth Client Credentials (from `.env`) | See Prerequisites section |
+| **Image Source** | Local file path OR external URL | `C:\images\hero.jpg` or `https://example.com/image.jpg` |
+| **Target Path** | Destination in Media Library | `Project/main/Images/hero-banner` |
 
-### Step 1: Search Before Upload (Prevent Duplicates)
+## Prerequisites
 
-**Always search first.** Before uploading, check if the asset (or a similar one) already exists in the Media Library.
+**Environment variables** (from `.env` file at project root):
 
-```
-mcp__marketer-mcp__search_assets({
-  query: "hero-banner",
-  type: "image"
-})
-```
-
-**Decision logic:**
-- If a matching asset is found: show the user the existing asset details and ask whether to use the existing one or upload a new version
-- If no match: proceed with upload
-
-**Present search results:**
-```
-Found existing assets matching "hero-banner":
-
-1. hero-banner-desktop.jpg
-   - ID: {CFD9E144-F974-4AA8-A552-CBF55E67E628}
-   - Path: /sitecore/media library/Project/main/Images/hero-banner-desktop
-   - Dimensions: 1920x1080
-
-Use existing asset or upload new? (existing/new)
+```bash
+SITECORE_CLIENT_ID=your-client-id
+SITECORE_CLIENT_SECRET=your-client-secret
+SITECORE_AUTHORING_ENDPOINT=https://<instance>.sitecorecloud.io/sitecore/api/authoring/graphql/v1/
 ```
 
-### Step 2: Collect Upload Inputs
+## Authentication Flow
 
-Before uploading, gather from the user:
+**OAuth Client Credentials Grant:**
 
-| Input | Description | Required | Example |
-|:------|:------------|:---------|:--------|
-| **Image source** | Local file path or external URL | Yes | `/path/to/hero.jpg` or `https://example.com/hero.jpg` |
-| **Asset name** | Name for the asset in Media Library | Yes | `hero-banner-desktop` |
-| **Alt text** | Accessibility text for the image | Recommended | `"Aerial view of convention center"` |
-| **Description** | Longer description of the asset | Optional | `"Main hero banner for the home page"` |
-| **Tags** | Categorization tags | Optional | `["hero", "banner", "homepage"]` |
+Get Bearer token via OAuth before making API calls:
 
-**CRITICAL: Image source restrictions**
-- **Accepted:** Local file paths (`/Users/john/images/hero.jpg`, `C:\images\hero.jpg`)
-- **Accepted:** External URLs (`https://example.com/hero.jpg`)
-- **NOT accepted:** Pasted/embedded images -- binary data cannot be written to disk correctly
+```bash
+POST https://auth.sitecorecloud.io/oauth/token
+Content-Type: application/x-www-form-urlencoded
 
-If the user pastes an image directly:
-> "I cannot process pasted images directly. Please provide the local file path where the image is saved, or a URL I can download it from."
-
-### Step 3: Upload the Asset
-
-```
-mcp__marketer-mcp__upload_asset({
-  filePath: "/path/to/hero.jpg",
-  name: "hero-banner-desktop",
-  itemPath: "/sitecore/media library/Project/main/Images",
-  language: "en",
-  extension: "jpg",
-  siteName: "main"
-})
+grant_type=client_credentials
+client_id={SITECORE_CLIENT_ID}
+client_secret={SITECORE_CLIENT_SECRET}
+audience=https://api.sitecorecloud.io
 ```
 
-**All 6 parameters are REQUIRED:**
-- `filePath`: Local file path or URL to the image
-- `name`: Asset name in Media Library
-- `itemPath`: Media Library folder path (e.g., `/sitecore/media library/Project/main/Images`)
-- `language`: Language code (e.g., `"en"`)
-- `extension`: File extension without dot (e.g., `"jpg"`, `"png"`, `"webp"`)
-- `siteName`: Site name (e.g., `"main"`)
+The response will contain an `access_token` field - use this as the Bearer token for all subsequent API calls.
 
-**Capture the response** -- the returned asset ID is needed for:
-- Updating metadata (Step 4)
-- Constructing image XML for component fields
+## Image Source Requirements
 
-### Step 4: Update Metadata
+**CRITICAL**: DO NOT accept pasted/embedded images.
 
-After a successful upload, immediately update the asset's metadata (alt text, description, tags) using `update_asset`:
+The image source MUST be one of:
+- **Local file path**: `C:\Users\John\images\hero.jpg`
+- **External URL**: `https://example.com/image.jpg`
 
-```
-mcp__marketer-mcp__update_asset({
-  asset_id: "<returned-asset-id>",
-  fields: {
-    "Description": "Main hero banner image for the home page, 1920x1080px"
-  },
-  language: "en",
-  altText: "Aerial view of convention center at sunset"
-})
-```
+If user pastes an image directly:
+> "I cannot process pasted images directly. Please provide the local file path where the image is saved, or a URL to download it from."
 
-**Required parameters:**
-- `asset_id`: The asset GUID from the upload response
-- `fields`: Object with field name/value pairs (e.g., `Description`, custom metadata fields)
-- `language`: Language code (e.g., `"en"`)
+## Upload Workflow
 
-**Optional parameters:**
-- `altText`: Alt text for the asset (accessibility)
-- `name`: Rename the asset
+### Step 0: Load Environment Variables & Get Auth Token
 
-**Why update separately?** The `upload_asset` tool handles the file upload. Metadata (alt text, description) is applied via `update_asset` after the upload completes.
+**IMPORTANT:** Read `.env` file from project root before starting:
 
-### Step 5: Verify the Upload
+```bash
+# Read from: C:\Users\John\Documents\GitHub\mcp-migration-solution\.env
+Read('.env')
 
-After uploading and updating metadata, confirm the asset by retrieving its details:
-
-```
-mcp__marketer-mcp__get_asset_information({
-  asset_id: "<returned-asset-id>"
-})
+# Parse and extract:
+# - SITECORE_CLIENT_ID (required)
+# - SITECORE_CLIENT_SECRET (required)
+# - SITECORE_AUTHORING_ENDPOINT (required)
 ```
 
-Verify:
-- Asset name is correct
-- File was uploaded successfully (non-zero file size)
-- Alt text and description are populated
-- Tags are applied
+Get Bearer token via OAuth flow (see Authentication Flow above):
 
-### Step 6: Report Results
+```bash
+curl -s -X POST "https://auth.sitecorecloud.io/oauth/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials&client_id=${SITECORE_CLIENT_ID}&client_secret=${SITECORE_CLIENT_SECRET}&audience=https://api.sitecorecloud.io"
+```
 
+Extract `access_token` from response to use as Bearer token.
+
+### Step 1: Validate Inputs
+- Check OAuth credentials available (CLIENT_ID and CLIENT_SECRET)
+- Check image source exists (local) or is accessible (URL)
+- Determine target path
+
+### Step 2: Download Remote Image (if URL)
+```bash
+curl -L -o ".opencode/assets/temp-upload.jpg" "https://example.com/image.jpg"
+```
+
+### Step 3: Get Presigned Upload URL
+```bash
+curl -s -X POST "<AUTHORING_ENDPOINT>" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <AUTH_TOKEN>" \
+  -d '{"query":"mutation { uploadMedia(input: { itemPath: \"<TARGET_PATH>\" }) { presignedUploadUrl } }"}'
+```
+
+### Step 4: Upload File to Presigned URL
+```bash
+curl --request POST "<PRESIGNED_URL>" \
+  --header "Authorization: Bearer <AUTH_TOKEN>" \
+  --form "=@<LOCAL_FILE_PATH>"
+```
+
+### Step 5: Report Results
 ```
 ==============================================================
 MEDIA UPLOAD COMPLETE
 ==============================================================
 
-Asset Name:    hero-banner-desktop
-Asset ID:      {CFD9E144-F974-4AA8-A552-CBF55E67E628}
-Source:         /Users/john/images/hero.jpg
+Source:        <original source>
+Target:        /sitecore/media library/<target-path>
 
-Metadata:
-- Alt Text:    Aerial view of convention center at sunset
-- Description: Main hero banner image for the home page
-- Tags:        hero, banner, homepage
-
-Image XML (for component fields):
-  <image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />
+RESULT
+--------------------------------------------------------------
+Status:        SUCCESS
+Sitecore ID:   <item-id>
+Item Path:     <full-sitecore-path>
+Media URL:     /-/media/<target-path>
 
 ==============================================================
-
-To use this image in a component, provide the Image XML above
-to the sitecore-content-author skill's update_content call.
 ```
 
----
-
-## Workflow: Search and Inspect Existing Assets
-
-When the user wants to find assets already in the Media Library:
-
-### Search by Query
-
-```
-mcp__marketer-mcp__search_assets({
-  query: "banner",
-  type: "image"
-})
-```
-
-### Get Full Details
-
-For any asset returned from search, get complete metadata:
-
-```
-mcp__marketer-mcp__get_asset_information({
-  asset_id: "<asset-id>"
-})
-```
-
-### Present Results
-
-```
-Asset: hero-banner-desktop.jpg
-ID:    {CFD9E144-F974-4AA8-A552-CBF55E67E628}
-Alt:   Aerial view of convention center at sunset
-Tags:  hero, banner, homepage
-
-Image XML: <image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />
-```
-
----
-
-## Workflow: Update Existing Asset Metadata
-
-When the user wants to update alt text, description, or tags on an asset that already exists:
-
-1. If the user provides an asset ID, use it directly
-2. If the user provides a name, search for it first:
-   ```
-   mcp__marketer-mcp__search_assets({ query: "asset-name" })
-   ```
-3. Update the metadata:
-   ```
-   mcp__marketer-mcp__update_asset({
-     asset_id: "<asset-id>",
-     fields: { "Description": "Updated description" },
-     language: "en",
-     altText: "Updated alt text"
-   })
-   ```
-4. Verify with `get_asset_information` to confirm changes applied
-
----
-
-## Workflow: Bulk Upload (Multiple Assets)
-
-When uploading multiple assets:
-
-1. **Present the plan first** -- list all assets to be uploaded with names and sources
-2. **Get explicit approval** before starting (bulk operation gate)
-3. **Search for each** before uploading to prevent duplicates
-4. **Upload sequentially** -- report each result as it completes
-5. **Update metadata** for each asset after upload
-6. **Provide summary table** at the end:
-
-```
-Bulk Upload Complete: 4/4 assets uploaded
-
-| # | Asset Name | ID | Status |
-|:--|:-----------|:---|:-------|
-| 1 | hero-banner | {GUID-1} | Uploaded + metadata set |
-| 2 | card-image-1 | {GUID-2} | Uploaded + metadata set |
-| 3 | card-image-2 | {GUID-3} | Uploaded + metadata set |
-| 4 | logo-dark | {GUID-4} | Already existed (skipped) |
-
-Image XML references:
-- hero-banner: <image mediaid='{GUID-1}' />
-- card-image-1: <image mediaid='{GUID-2}' />
-- card-image-2: <image mediaid='{GUID-3}' />
-- logo-dark: <image mediaid='{GUID-4}' />
-```
-
-If any upload fails during a batch, report the failure and ask whether to continue with remaining assets or stop.
-
----
-
-## Integration with Content Author Skill
-
-After uploading assets, the returned asset IDs are used in the `sitecore-content-author` skill to populate image fields on components. The image XML format is:
-
-```
-<image mediaid='{ASSET-ID-GUID}' />
-```
-
-**Rules for image XML:**
-- MUST use single quotes around attribute values
-- GUID MUST have braces: `{GUID}`
-- GUID should be UPPERCASE
-- Self-closing tag with space before `/>`
-
-**Example flow:**
-1. Upload image via this skill -> get asset ID `{CFD9E144-F974-4AA8-A552-CBF55E67E628}`
-2. Use `sitecore-content-author` to set the image field:
-   ```
-   mcp__marketer-mcp__update_content({
-     siteName: "main",
-     itemId: "<component-datasource-id>",
-     fields: {
-       "backgroundImage": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />"
-     }
-   })
-   ```
-
----
-
-## Supported File Types
-
-Common media types supported by Sitecore XM Cloud Media Library:
-
-| Type | Extensions |
-|:-----|:-----------|
-| Images | `.jpg`, `.jpeg`, `.png`, `.gif`, `.svg`, `.webp`, `.bmp`, `.tiff` |
-| Documents | `.pdf`, `.doc`, `.docx`, `.xls`, `.xlsx`, `.ppt`, `.pptx` |
-| Video | `.mp4`, `.webm`, `.mov` |
-| Audio | `.mp3`, `.wav`, `.ogg` |
-
-**Best practices for images:**
-- Use optimized/compressed images before uploading (smaller file = faster page loads)
-- Use descriptive asset names (e.g., `hero-banner-desktop` not `IMG_2847`)
-- Always set alt text for accessibility compliance
-- Prefer `.webp` or optimized `.jpg` for web images
-
----
-
-## Error Handling
+## Common Errors
 
 | Error | Cause | Resolution |
 |:------|:------|:-----------|
-| Upload fails | File path invalid or inaccessible | Verify the file exists at the specified path |
-| Upload fails | URL unreachable | Check the URL is publicly accessible and returns an image |
-| Asset not found | Wrong asset ID | Use `search_assets` to find the correct ID |
-| Metadata update fails | Invalid asset ID | Verify the ID from the upload response |
-| Duplicate asset | Asset with same name exists | Use `search_assets` result or upload with a different name |
-| Pasted image corrupted | Binary data written via text tool | Ask for file path or URL instead -- never save pasted images |
-| MCP connection error | marketer-mcp server unavailable | Check MCP connection status and retry |
+| `AUTH_NOT_AUTHENTICATED` | Invalid OAuth credentials | Verify CLIENT_ID and CLIENT_SECRET in `.env` |
+| `401 Unauthorized` | Token expired or invalid credentials | Re-authenticate via OAuth to get fresh token |
+| `invalid_client` | Invalid CLIENT_ID or CLIENT_SECRET | Check OAuth credentials in `.env` |
+| `presignedUploadUrl is null` | Mutation failed | Check error message in response |
+| `404 on upload` | Presigned URL expired | Get new presigned URL |
+| `no decode delegate` | Corrupted image file | Ask for file path/URL, don't save pasted images |
+| No credentials found | Missing .env configuration | Add SITECORE_CLIENT_ID and SITECORE_CLIENT_SECRET to `.env` |
 
----
+## Key Principles
 
-## Guidelines
+1. **Load .env first** - Check for OAuth credentials before starting
+2. **Get OAuth token first** - Always authenticate via OAuth Client Credentials before API calls
+3. **NEVER modify the bearer token** - Use exactly as provided from OAuth response
+4. **NEVER save pasted images with write tool** - This corrupts binary data
+5. **Path format matters** - `itemPath` should NOT include `/sitecore/media library/` prefix
+6. **Use POST with --form** - Upload via `curl --request POST --form "=@file"`
+7. **Include Bearer token on upload** - Presigned URL still requires Authorization header
 
-- **Always search before uploading** -- prevent duplicate assets in the Media Library
-- **Always set alt text** -- accessibility is not optional. If the user does not provide alt text, ask for it before finalizing
-- **Always provide the image XML** -- the user will need it for component field population
-- **Describe before executing** -- tell the user what you're about to upload and where, then wait for confirmation
-- **Verify after executing** -- use `get_asset_information` to confirm the upload succeeded and metadata is correct
-- **Never save pasted images** -- binary data written via text tools will be corrupted. Always request a file path or URL
-- **Report asset IDs clearly** -- the asset ID is the primary key for all downstream operations (content authoring, field population)
-- **For bulk operations (3+ assets)** -- present the full plan and get explicit approval before starting
+## Usage
 
----
-
-## Usage Examples
-
-**Single upload:**
 ```
 /sitecore-upload-media
 
-Image: /Users/john/images/hero-banner.jpg
-Name: hero-banner-desktop
-Alt text: Aerial view of convention center at sunset
+Image: C:\Users\John\images\hero-banner.jpg
+Target: Project/main/Banners/hero
 ```
 
-**Upload from URL:**
-```
-/sitecore-upload-media
-
-Image: https://example.com/images/hero-banner.jpg
-Name: hero-banner-desktop
-Alt text: Aerial view of convention center at sunset
-```
-
-**Search existing assets:**
+**With URL source**:
 ```
 /sitecore-upload-media
 
-Find all banner images in the Media Library
-```
-
-**Update metadata on existing asset:**
-```
-/sitecore-upload-media
-
-Update alt text on asset {CFD9E144-F974-4AA8-A552-CBF55E67E628}
-New alt text: "Updated aerial view of convention center"
+Image: https://example.com/hero-banner.jpg
+Target: Project/main/Banners/hero
 ```
