@@ -1,0 +1,12 @@
+# Railway config for the sitecore-mcp-proxy service.
+# Overrides the root railway.toml so the proxy gets its own health check path
+# instead of inheriting /setup/healthz from the main wrapper.
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
