@@ -43,6 +43,32 @@ Use this skill when:
 - Need to populate various field types in a single workflow
 - Creating parent components with children (e.g., HeroBanner with Button)
 
+**EXCEPTION - Delegate to specialized skills:**
+
+- **Article Pages** → Use `/sitecore-author-article-page` instead
+  - Triggers: "create article", "edit article", "new blog post", "publish article"
+  - When working in `/Articles` folder or with Article Page template
+  - When updating article-specific fields (heading, subheading, datePublished, tags)
+
+---
+
+## Skill Delegation Rules
+
+**Before authoring, check if a specialized skill should handle the request:**
+
+| User Request Pattern | Delegate To | Why |
+|:---------------------|:------------|:----|
+| "create article [title]" | `/sitecore-author-article-page` | Article-specific template, fields, and workflow |
+| "edit article [name]" | `/sitecore-author-article-page` | Article-specific field updates |
+| "new blog post about [topic]" | `/sitecore-author-article-page` | Blog posts use Article Page template |
+| "add [name] tag" | `/sitecore-author-tags` | Tag name → ID mapping |
+| "add [name] profile" | `/sitecore-author-profiles` | Profile name → ID mapping |
+
+**Only use this skill (`/sitecore-author`) for:**
+- General page creation (Landing Pages, Event Pages, etc.)
+- Adding components to any page type
+- Multi-component workflows
+
 ---
 
 ## ⚠️ CONTEXT EFFICIENCY - Check Local Files First
@@ -372,13 +398,16 @@ Add HeroBanner with Button to /Home page
 
 ## Related Skills
 
-| Skill                          | Purpose                                                         |
-| :----------------------------- | :-------------------------------------------------------------- |
-| `/sitecore-component-docs`     | Component-specific field formats and MCP authoring instructions |
-| `/sitecore-author-placeholder` | Placeholder path construction rules                             |
-| `/sitecore-author-image`       | Image field XML formatting                                      |
-| `/sitecore-author-link`        | Link field XML formatting                                       |
-| `/sitecore-upload-media`       | Upload images to Media Library                                  |
+| Skill | Purpose |
+|:------|:--------|
+| `/sitecore-author-article-page` | **Article/blog post authoring** (use instead of this skill for articles) |
+| `/sitecore-author-tags` | Tag management (name → ID mapping) |
+| `/sitecore-author-profiles` | Profile management (name → ID mapping) |
+| `/sitecore-component-docs` | Component-specific field formats and MCP authoring instructions |
+| `/sitecore-author-placeholder` | Placeholder path construction rules |
+| `/sitecore-author-image` | Image field XML formatting |
+| `/sitecore-author-link` | Link field XML formatting |
+| `/sitecore-upload-media` | Upload images to Media Library |
 
 ---
 
