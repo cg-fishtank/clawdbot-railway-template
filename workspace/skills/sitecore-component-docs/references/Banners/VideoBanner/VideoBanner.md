@@ -1,414 +1,130 @@
 # VideoBanner Component
 
 ## Purpose
+VideoBanner renders a full-viewport-height banner with an auto-playing, muted, looping background video. When a video URL is provided, it is loaded as an MP4 source inside a `<video>` element with a `bg-black/40` overlay to ensure heading legibility. An optional fallback background image is shown when no video URL is present. A `buttons` placeholder is available for CTAs positioned below the heading. Video errors are caught and logged; lazy loading is handled via a `useEffect` with an error listener.
 
-The VideoBanner component displays a full-width banner section with an autoplaying background video, heading text, and call-to-action buttons. It features a dark overlay (40% black) for improved text readability and falls back gracefully when video cannot be played. This component is ideal for home pages, campaign landing pages, and any section where dynamic visual content creates greater engagement than static imagery.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `77685258-dca2-4a26-90ab-1844f73548f7` |
+| **Component Name** | `VideoBanner` |
+| **Category** | `Banners` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Components/Banners/Video Banner`
-- **Template Name:** `Video Banner`
-
-### Fields
-
-| Field Name            | Sitecore Type | Required | Description                               | Validation/Constraints                    |
-| --------------------- | ------------- | -------- | ----------------------------------------- | ----------------------------------------- |
-| heading               | Single-Line Text | Yes   | Main headline displayed over the video    | Recommended max 60 characters             |
-| backgroundVideo       | Image/File    | Yes      | MP4 video file for background             | MP4 format required, recommended <10MB    |
-| backgroundImage       | Image         | No       | Fallback image when video cannot play     | Recommended 1920x1080px                   |
-| backgroundImageMobile | Image         | No       | Mobile fallback image                     | Recommended 800x800px                     |
-
-### Rendering Parameters (Styles)
-
-| Parameter        | Type     | Options                                           | Default                                    | Description                          |
-| ---------------- | -------- | ------------------------------------------------- | ------------------------------------------ | ------------------------------------ |
-| textColor        | Droplist | text-white, text-black, text-content              | text-white                                 | Color of the heading text            |
-| contentAlignment | Droplist | items-start justify-start text-left, items-center justify-center text-center, items-end justify-end text-right | items-center justify-center text-center | Text and content alignment           |
-| padding (top)    | Droplist | top-none, top-xs, top-sm, top-md, top-lg, top-xl  | none                                       | Top padding                          |
-| padding (bottom) | Droplist | bottom-none, bottom-xs, bottom-sm, bottom-md, bottom-lg, bottom-xl | none                                   | Bottom padding                       |
-
-## JSS Field Component Mapping
-
-| Sitecore Field  | JSS Component                                               | Import                                                  |
-| --------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
-| heading         | `<Text field={fields?.heading} tag="h1" className="..." />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| backgroundVideo | Native `<video>` with `<source src={...} type="video/mp4">` | N/A - uses native HTML5 video element                   |
+## Fields
+| Field Name | Sitecore Type | Required | Description | Validation / Constraints |
+|------------|--------------|----------|-------------|--------------------------|
+| `heading` | Single-Line Text (`Field<string>`) | Yes | Primary banner headline rendered as `<h1>` | Non-empty; displayed at `heading-4xl` / `heading-5xl` (md+) |
+| `backgroundVideo` | File / Single-Line Text (`Field<string>`) | Yes | URL or path to the background video file | Must resolve to a valid MP4; loaded as `<source type="video/mp4">` |
+| `backgroundImage` | Image (`ImageField`) | No | Fallback desktop background image when video is absent | Used by `BackgroundImage` helper; recommended 1920px+ wide |
+| `backgroundImageMobile` | Image (`ImageField`) | No | Fallback mobile background image | Recommended 768px+ wide; swapped in below `md` breakpoint |
 
 ## Placeholders
+| Placeholder Key | Allowed Components | Notes |
+|----------------|--------------------|-------|
+| `buttons` | Button | Rendered in a centered flex row; `editable={false}` is set on the Placeholder (buttons cannot be edited inline in Experience Editor — use the placeholder settings panel) |
 
-| Placeholder Name | Description                                         | Allowed Components |
-| ---------------- | --------------------------------------------------- | ------------------ |
-| buttons          | CTA buttons displayed below the heading             | Button, LinkButton |
+> The placeholder name is generated via `placeholderGenerator(params, 'buttons')`.
+
+## JSS Field Component Mapping
+| Sitecore Field | JSS Component | Import |
+|---------------|--------------|--------|
+| `heading` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `backgroundImage` / `backgroundImageMobile` | `<BackgroundImage>` (shared) | `import { BackgroundImage } from 'component-children/Shared/BackgroundImage/BackgroundImage'` |
+| `backgroundVideo` | Native `<video>` / `<source>` | Value accessed via `fields?.backgroundVideo?.value?.src` |
 
 ## Component Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Full-width video background banner with heading and optional buttons |
 
-The VideoBanner exports 1 rendering variant:
-
-| Variant | Export Name | Use Case                                    |
-| ------- | ----------- | ------------------------------------------- |
-| Default | `Default`   | Full-width video background banner          |
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The primary headline displayed over the video
-- **Tone/Style:** Bold, attention-grabbing, concise
-- **Character limit:** 60 characters recommended for best display
-- **Example:** "Experience the Future Today"
-
-#### backgroundVideo
-
-- **Format:** MP4 (H.264 codec recommended)
-- **File size:** Under 10MB recommended for fast loading
-- **Dimensions:** 1920x1080px minimum
-- **Duration:** 10-30 seconds (loops automatically)
-- **Audio:** Must be silent or audio-free (video plays muted)
-- **Media Library path:** `/sitecore/media library/Project/[Site]/Videos/Banners/`
-- **Tips:**
-  - Compress videos for web delivery
-  - Use subtle motion; avoid fast cuts
-  - Ensure video works without audio (no dialogue)
-  - Test on mobile devices for performance
-
-#### backgroundImage (Fallback)
-
-- **Purpose:** Displayed if video cannot load or on mobile devices with slow connections
-- **Recommended dimensions:** 1920x1080px
-- **Aspect ratio:** 16:9 (landscape)
-- **File formats:** JPG, PNG, WebP
-- **Media Library path:** `/sitecore/media library/Project/[Site]/Banners/`
-
-#### backgroundImageMobile
-
-- **Purpose:** Mobile-specific fallback image
-- **Recommended dimensions:** 800x800px
-- **Aspect ratio:** 1:1 or 4:5 (square/portrait)
-- **File formats:** JPG, PNG, WebP
-- **Media Library path:** `/sitecore/media library/Project/[Site]/Banners/Mobile/`
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields         | Optional Fields                         | Use Case                           |
-| --------- | ----------------------- | --------------------------------------- | ---------------------------------- |
-| Minimal   | heading, backgroundVideo | -                                       | Simple video banner                |
-| Standard  | heading, backgroundVideo | backgroundImage                         | Video with fallback                |
-| Full      | heading, backgroundVideo | backgroundImage, backgroundImageMobile + buttons | Complete video section      |
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-import { Field, ImageField } from '@sitecore-content-sdk/nextjs';
-import { ComponentProps } from 'lib/component-props';
-import { BackgroundImageProps } from 'lib/hooks/useBackgroundImage';
+// From lib/types/components/Banners/video-banner (inferred)
+import { VideoBannerProps } from 'lib/types/components/Banners/video-banner';
 
-type VideoBannerFields = BackgroundImageProps & {
-  backgroundVideo: ImageField;
-  heading: Field<string>;
+type VideoBannerProps = ComponentProps & {
+  fields: {
+    heading: Field<string>;
+    backgroundVideo: Field<string>;   // .value.src holds the video URL
+    backgroundImage?: ImageField;
+    backgroundImageMobile?: ImageField;
+  };
 };
-
-export type VideoBannerProps = ComponentProps & {
-  fields: VideoBannerFields;
-};
-
-// BackgroundImageProps includes:
-// - backgroundImage: ImageField (optional fallback)
-// - backgroundImageMobile: ImageField (optional fallback)
 ```
 
 ## Example Content Entry
 
 ### Minimum Viable Content
-
 ```json
 {
+  "componentName": "VideoBanner",
+  "dataSource": "/sitecore/content/MySite/Data/Banners/HomeVideoBanner",
   "fields": {
-    "heading": { "value": "Experience the Future Today" },
-    "backgroundVideo": {
-      "value": {
-        "src": "/-/media/Project/Site/Videos/hero-video.mp4"
-      }
-    }
+    "heading": { "value": "Innovation in Motion" },
+    "backgroundVideo": { "value": { "src": "/media/videos/hero-loop.mp4" } }
   }
 }
 ```
 
 ### Full Content Example
-
 ```json
 {
+  "componentName": "VideoBanner",
+  "dataSource": "/sitecore/content/MySite/Data/Banners/HomeVideoBanner",
   "fields": {
-    "heading": { "value": "Experience the Future of Innovation" },
-    "backgroundVideo": {
-      "value": {
-        "src": "/-/media/Project/Site/Videos/innovation-hero.mp4"
-      }
-    },
+    "heading": { "value": "Innovation in Motion" },
+    "backgroundVideo": { "value": { "src": "/media/videos/hero-loop.mp4" } },
     "backgroundImage": {
-      "value": {
-        "src": "/-/media/Project/Site/Banners/innovation-fallback.jpg",
-        "alt": "Innovation concept image",
-        "width": "1920",
-        "height": "1080"
-      }
+      "value": { "src": "/media/banners/video-fallback-desktop.jpg", "alt": "Abstract flowing light", "width": 1920, "height": 900 }
     },
     "backgroundImageMobile": {
-      "value": {
-        "src": "/-/media/Project/Site/Banners/Mobile/innovation-mobile.jpg",
-        "alt": "Innovation concept",
-        "width": "800",
-        "height": "800"
-      }
+      "value": { "src": "/media/banners/video-fallback-mobile.jpg", "alt": "Abstract flowing light", "width": 768, "height": 600 }
     }
+  },
+  "placeholders": {
+    "buttons": [
+      { "componentName": "Button", "fields": { "link": { "value": { "href": "/explore", "text": "Explore Now" } } } }
+    ]
   }
 }
 ```
 
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Data sources: `/sitecore/content/[Site]/Home/Data/Video Banners/`
-- Videos: `/sitecore/media library/Project/[Site]/Videos/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading
-- **Forms panel required:** backgroundVideo, backgroundImage, backgroundImageMobile
-- **Video preview:** Video may not autoplay in Experience Editor
-- **Placeholder:** Add buttons via the "buttons" placeholder
-
-### Video Player Behavior
-
-- **Autoplay:** Yes (required for background video effect)
-- **Muted:** Yes (required for autoplay to work)
-- **Loop:** Yes (continuous playback)
-- **PlaysInline:** Yes (prevents fullscreen on iOS)
-- **Controls:** Hidden (no user controls shown)
-
-### Accessibility Features
-
-- **role="region":** Component has region role for landmark navigation
-- **aria-label:** Set to the heading value (or "Video banner" fallback)
-- **aria-hidden:** Video and overlay are hidden from assistive technology
-- **sr-only:** Fallback text "Your browser does not support the video tag" for screen readers
-
-### Personalization Opportunities
-
-- **heading:** Personalize messaging based on visitor segments
-- **backgroundVideo:** Use different videos for different campaigns
-- **Buttons:** Show different CTAs based on visitor behavior
-
-## Common Mistakes to Avoid
-
-1. **Large video files:** Keep videos under 10MB for fast loading. Compress using tools like HandBrake.
-
-2. **Videos with audio:** Background videos must be silent. Autoplay with audio is blocked by browsers.
-
-3. **Fast-moving content:** Subtle, slow motion works best for background videos. Avoid quick cuts or fast action.
-
-4. **Missing fallback image:** Always provide a fallback image for users on slow connections or older browsers.
-
-5. **Overly long headings:** Keep headlines short for readability over moving backgrounds.
-
-6. **No video source:** If `backgroundVideo.value.src` is missing, the component shows only the overlay.
-
-7. **Performance on mobile:** Consider whether video is necessary on mobile; images may provide better performance.
-
-## Related Components
-
-- `HeroBanner` - Static image background banner
-- `ContentBanner` - Banner with gradient overlay
-- `SplitBanner` - Side-by-side image and content layout
-- `TextBanner` - Text-only banner without media
-
----
-
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the VideoBanner component using the Marketer MCP tools.
+### Step 1: Add to Page
+1. Open the target page in Sitecore Pages or Experience Editor.
+2. Click **Add component** in the desired layout slot.
+3. Search for **VideoBanner** and select it.
+4. Assign or create a datasource under the site's Data/Banners folder.
 
-### Prerequisites
+### Step 2: Populate Fields
+| Field | Action |
+|-------|--------|
+| `heading` | Enter the primary headline text (required). This renders as `<h1>`. |
+| `backgroundVideo` | Enter the MP4 video URL or upload to the Media Library and link the file (required). |
+| `backgroundImage` | Optionally add a desktop fallback image shown before video loads or if video fails. |
+| `backgroundImageMobile` | Optionally add a mobile fallback image. |
 
-Before authoring this component via MCP:
+### Step 3: Add Buttons (Optional)
+1. In the `buttons` placeholder, click **Add component** and select **Button**.
+2. Note: because `editable={false}` is set, inline editing of buttons is disabled. Use the placeholder settings panel or datasource configuration to manage buttons.
 
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the VideoBanner rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"` for root placement)
-4. Have media IDs for video and fallback images
-
-### Step 1: Find the Target Page
-
-```javascript
-// Search for the page where VideoBanner will be added
-await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Home Page"
-});
-// Returns: { itemId: "page-guid", name: "PageName", path: "/sitecore/..." }
-```
-
-### Step 2: Add VideoBanner to Page
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "video-banner-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "VideoBanner_1",
-  language: "en",
-  fields: {
-    "heading": "Experience the Future Today"
-  }
-});
-
-// Returns:
-// {
-//   "datasourceId": "created-datasource-guid",
-//   "placeholderId": "headless-main"
-// }
-```
-
-**IMPORTANT:** Save the `datasourceId` - it's needed for updating media fields.
-
-### Step 3: Update Video and Image Fields
-
-Video and image fields require XML format with specific syntax:
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,  // From Step 2
-  language: "en",
-  fields: {
-    "backgroundVideo": "<image mediaid='{VIDEO-GUID-HERE}' />",
-    "backgroundImage": "<image mediaid='{IMAGE-GUID-HERE}' />",
-    "backgroundImageMobile": "<image mediaid='{MOBILE-IMAGE-GUID}' />"
-  }
-});
-```
-
-**Video/Image Field Rules:**
-
-- MUST use single quotes around attribute values
-- GUID MUST be wrapped in braces: `{GUID}`
-- GUID should be UPPERCASE
-- Video uses same XML format as images
-- If media needs uploading first, use `/sitecore-upload-media` skill
-
-### Step 4: Add Button Components (Optional)
-
-Add buttons to the buttons placeholder:
-
-```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "button-rendering-id",
-  placeholderPath: "headless-main/buttons-{VIDEO-BANNER-UID}",
-  componentItemName: "VideoBanner_CTA",
-  language: "en",
-  fields: {
-    "linkText": "Get Started",
-    "linkUrl": "/contact"
-  }
-});
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Home"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add VideoBanner component
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "video-banner-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "VideoBanner_Hero",
-  language: "en",
-  fields: {
-    "heading": "Experience the Future of Innovation"
-  }
-});
-
-const datasourceId = addResult.datasourceId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 3: Update video and image fields
-// ═══════════════════════════════════════════════════════════════
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "backgroundVideo": "<image mediaid='{ABC12345-DEF6-7890-GHIJ-KLMNOPQRSTUV}' />",
-    "backgroundImage": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />",
-    "backgroundImageMobile": "<image mediaid='{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}' />"
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: VideoBanner with all fields populated
-// ═══════════════════════════════════════════════════════════════
-```
+### Accessibility Notes
+- The `<video>` element is marked `aria-hidden="true"` — it is decorative.
+- The section has `role="region"` and `aria-label` set to the heading text for screen reader navigation.
+- A screen-reader-only `<p>` with translation key `'Your browser does not support the video tag.'` is provided as fallback copy inside the `<video>` element.
 
 ### Field Type Quick Reference
-
-| Field                 | Type             | MCP Format                          |
-| :-------------------- | :--------------- | :---------------------------------- |
-| heading               | Single-Line Text | `"Plain text value"`                |
-| backgroundVideo       | File/Image       | `<image mediaid='{GUID}' />`        |
-| backgroundImage       | Image            | `<image mediaid='{GUID}' />`        |
-| backgroundImageMobile | Image            | `<image mediaid='{GUID}' />`        |
-
-### MCP Authoring Checklist
-
-Before authoring VideoBanner via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have VideoBanner rendering ID (from component manifest)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] Component item name is unique (e.g., `VideoBanner_1`)
-- [ ] Have media GUID for backgroundVideo (MP4 file)
-- [ ] Video is uploaded to Media Library as MP4
-- [ ] Media XML uses single quotes and braces: `<image mediaid='{GUID}' />`
-
-### MCP Error Handling
-
-| Error                  | Cause                   | Solution                                    |
-| :--------------------- | :---------------------- | :------------------------------------------ |
-| "Item already exists"  | Duplicate component name | Use unique suffix: `VideoBanner_2`         |
-| Component not visible  | Wrong placeholder path   | Use `"headless-main"` without leading slash |
-| Video not playing      | Wrong media format       | Ensure MP4 format, check GUID               |
-| `updatedFields: {}`    | Normal response          | Update succeeded despite empty response    |
-| "Cannot find field"    | Wrong field name         | Field names are case-sensitive             |
-
-### Related Skills for MCP Authoring
-
-| Skill                          | Purpose                                  |
-| :----------------------------- | :--------------------------------------- |
-| `/sitecore-author-placeholder` | Placeholder path construction rules      |
-| `/sitecore-author-image`       | Media field XML formatting details       |
-| `/sitecore-upload-media`       | Upload videos to Media Library first     |
-| `/sitecore-pagebuilder`        | Full page creation workflow              |
+| Field | Sitecore Template Field Type | Notes |
+|-------|------------------------------|-------|
+| `heading` | Single-Line Text | Renders as `<h1>`; plain text only |
+| `backgroundVideo` | File or Single-Line Text | Must be an MP4 URL; `.value.src` is read directly |
+| `backgroundImage` | Image | Fallback for desktop; provide alt text |
+| `backgroundImageMobile` | Image | Fallback for mobile; provide alt text |
 
 ---
 
 ## Change Log
-
-| Date       | Change                | Author      |
-| ---------- | --------------------- | ----------- |
-| 2026-02-09 | Initial documentation | Claude Code |
+| Date | Change | Author |
+|------|--------|--------|
+| 2026-02-19 | Initial documentation | Claude Code |

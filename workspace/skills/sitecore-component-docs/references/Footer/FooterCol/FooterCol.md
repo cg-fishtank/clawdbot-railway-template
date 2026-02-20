@@ -1,102 +1,46 @@
 # FooterCol Component
 
 ## Purpose
+FooterCol renders a single navigational column in the site footer, consisting of a heading and a list of page links fetched via GraphQL at server time. On desktop it displays as a static vertical list; on mobile it collapses into an accordion controlled by the parent `AccordionProvider` (supplied by `FooterMenu`). The link list items are typed as `FOOTER_LINK_TEMPLATE_ID` children of the datasource item and are resolved server-side via `getComponentServerProps`.
 
-The FooterCol component displays a single column within the footer navigation, featuring a heading and a list of navigation links. It supports responsive behavior with an accordion pattern on mobile devices (collapsible sections) and expanded display on desktop. The component is designed to be placed within a FooterMenu placeholder to create organized footer navigation.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `267ec5a1-36d9-4a3c-92b2-620a56806568` |
+| **Component Name** | `FooterCol` |
+| **Category** | `Footer` |
 
-## Sitecore Template Requirements
+## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| `heading` | Single-Line Text | Yes | Column heading rendered as `<h3>` (e.g. "About Us") |
 
-### Data Source Template
+**Note:** The link list is **not** a standard field. It is fetched via GraphQL (`GetFooterColumnLinks`) using the `FOOTER_LINK_TEMPLATE_ID` filter on children of the datasource item, then injected into `rendering.data.item.links.results`.
 
-- **Template Path:** `/sitecore/templates/Project/[Site]/Footer/Footer Column`
-- **Template Name:** `Footer Column`
-
-### Child Item Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Footer/Footer Link`
-- **Template Name:** `Footer Link`
-- **Purpose:** Child items under the Footer Column datasource, each containing a single link
-
-### Fields
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | Yes | Column heading displayed above links | Recommended max 30 characters |
-
-### Child Item Fields (Footer Link)
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| link | General Link | Yes | Navigation link with text and URL | Internal, external, or media links |
+## Placeholders
+**Placeholders:** None
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text tag="h3" className="heading-sm text-content" field={fields?.heading} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| link (child items) | `<Button link={link?.jsonValue} variant="link" />` | Custom Button component |
+|---------------|--------------|--------|
+| `heading` | `Text` | `@sitecore-content-sdk/nextjs` |
+| Link items | `Button` (variant: `"link"`) | `component-children/Shared/Button/Button` |
 
-## GraphQL Query
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Mobile accordion + desktop static list |
+| Static | `StaticView` (internal) | Rendered when no `AccordionContext` is available |
 
-The component fetches child link items via GraphQL:
-
-```graphql
-query GetFooterColumnLinks($datasourcePath: String!, $language: String!, $templateId: String!) {
-  item(path: $datasourcePath, language: $language) {
-    links: children(includeTemplateIDs: [$templateId]) {
-      results {
-        ... on FooterLink {
-          link {
-            ...LinkFieldFragment
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The column category name (e.g., "Products", "Resources", "Company")
-- **Tone/Style:** Concise, descriptive category labels
-- **Character limit:** 30 characters recommended
-- **Example:** "Resources"
-
-### Creating Footer Links (Child Items)
-
-1. Navigate to the Footer Column datasource item
-2. Create child items using the `Footer Link` template
-3. For each link:
-   - Set the `link` field with URL and display text
-   - Use internal links for site pages
-   - Use external links for external resources
-
-#### link (Child Item)
-
-- **Type:** General Link
-- **Required:** Yes
-- **Link Types:** Internal, External, Media
-- **Guidance:** Use descriptive link text; avoid "Click here"
-- **Example:**
-  ```json
-  {
-    "value": {
-      "href": "/about-us",
-      "text": "About Us",
-      "target": "",
-      "title": "Learn about our company"
-    }
-  }
-  ```
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+import {
+  ComponentRendering,
+  Field,
+  GetComponentServerProps,
+} from '@sitecore-content-sdk/nextjs';
+import { LinkGQLType } from 'lib/types';
+
 type FooterColFields = {
   heading: Field<string>;
 };
@@ -113,10 +57,9 @@ type FooterColRenderingType = {
   };
 };
 
-type FooterColProps = ComponentProps &
-  FooterColRenderingType & {
-    fields: FooterColFields;
-  };
+type FooterColProps = ComponentProps & FooterColRenderingType & {
+  fields: FooterColFields;
+};
 
 type PageLinkType = {
   link: LinkGQLType;
@@ -124,195 +67,91 @@ type PageLinkType = {
 };
 ```
 
-## Content Examples
+## Server Props
+`getComponentServerProps` fetches the column's link list from Sitecore using GraphQL. If no datasource is set, it returns the rendering unchanged.
 
-### Minimal (Required Fields Only)
+```typescript
+export const getComponentServerProps: GetComponentServerProps = async (rendering, layoutData) => {
+  const language = getLayoutLanguage(layoutData);
+  const graphQLClient = getGraphQlClient();
 
+  if (!rendering.dataSource) {
+    return { rendering, route: layoutData?.sitecore?.route };
+  }
+
+  const data = await graphQLClient.request(GetFooterColumnLinks.loc?.source.body || '', {
+    datasourcePath: rendering.dataSource,
+    language,
+    templateId: FOOTER_LINK_TEMPLATE_ID,
+  });
+
+  return {
+    rendering: { ...rendering, data },
+    route: layoutData?.sitecore?.route,
+  };
+};
+```
+
+## Accordion Behavior
+- FooterCol reads accordion state from the parent `AccordionProvider` (set up by `FooterMenu`).
+- On mobile (`lg:hidden`): clicking the heading toggles the link list open/closed with `AccordionMotion` animation.
+- On desktop (`lg:flex`): the heading and links are always visible as a static column.
+- In Experience Editor: the accordion is always expanded (`isEditing || isOpen(accordionId)`).
+- If no `AccordionContext` exists (`noContext === true`), the `StaticView` fallback is rendered without accordion controls.
+
+## Example Content Entry
+
+### Minimum Viable Content (datasource item)
 ```json
 {
   "fields": {
-    "heading": { "value": "Resources" }
+    "heading": { "value": "About Us" }
   }
 }
 ```
 
-### With Child Link Items
-
-**Parent Item:**
-```json
-{
-  "fields": {
-    "heading": { "value": "Resources" }
-  }
-}
+### Full Content Example
+Datasource item structure in Sitecore content tree:
 ```
-
-**Child Items (Footer Links):**
-```json
-[
-  {
-    "link": {
-      "value": {
-        "href": "/documentation",
-        "text": "Documentation"
-      }
-    }
-  },
-  {
-    "link": {
-      "value": {
-        "href": "/support",
-        "text": "Support Center"
-      }
-    }
-  },
-  {
-    "link": {
-      "value": {
-        "href": "https://blog.example.com",
-        "text": "Blog",
-        "target": "_blank"
-      }
-    }
-  }
-]
+/sitecore/content/MySite/Global/Footer/FooterCol-About
+  - Template: Footer Column
+  - Fields:
+      heading: "About Us"
+  - Children (each using FOOTER_LINK_TEMPLATE_ID template):
+      /FooterLink-Mission  → link: /about/mission
+      /FooterLink-Team     → link: /about/team
+      /FooterLink-Careers  → link: /careers
 ```
-
-## Responsive Behavior
-
-| Viewport | Behavior |
-|----------|----------|
-| Mobile (< 1024px) | Accordion pattern - heading toggles link visibility |
-| Desktop (≥ 1024px) | Expanded - heading and all links always visible |
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Footer Columns: `/sitecore/content/[Site]/Home/Data/Footer/[Footer Menu]/[Footer Column]`
-- Footer Links: Created as children under each Footer Column
-
-### Experience Editor Behavior
-
-- **Inline editable:** heading field
-- **Link management:** Add/edit child link items in Content Editor
-- **Accordion testing:** Accordion behavior only visible in preview mode, not Experience Editor
-
-## Authoring Rules
-
-1. **Consistent Column Count:** Keep footer columns balanced across the footer
-2. **Link Limit:** Recommend 5-8 links per column for optimal usability
-3. **Link Order:** Place most important links at the top
-4. **Descriptive Text:** Use clear, action-oriented link text
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Too many links | Overwhelming for users | Limit to 5-8 links per column |
-| Generic link text | Poor accessibility/SEO | Use descriptive, unique link text |
-| Missing heading | Column appears empty on mobile | Always provide a heading |
-| Broken links | Poor user experience | Verify all links before publishing |
-
-## Related Components
-
-- `FooterMenu` - Parent container that holds multiple FooterCol components
-- `FooterMain` - Alternative footer layout with newsletter section
-- `FooterLegal` - Legal links and copyright section
-
----
 
 ## MCP Authoring Instructions
 
-### Prerequisites
-
-Before authoring FooterCol via MCP:
-1. Have the parent FooterMenu page/placeholder ID
-2. Have the FooterCol rendering ID from the component manifest
-3. Know the target placeholder (typically within FooterMenu)
-
-### Step 1: Create FooterCol Datasource
-
+### Step 1: Add FooterCol into FooterMenu Placeholder
 ```javascript
-// Create the Footer Column datasource item
-const datasource = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: "/sitecore/content/Site/Home/Data/Footer",
-  templatePath: "/sitecore/templates/Project/Site/Footer/Footer Column",
-  name: "Resources Column",
-  language: "en"
+await mcp__marketer_mcp__add_component_on_page({
+  itemPath: "/sitecore/content/MySite/Global/Footer-Page",
+  componentName: "FooterCol",
+  placeholderName: "footermenu",
+  dataSource: "/sitecore/content/MySite/Global/Footer/FooterCol-About"
 });
 ```
 
-### Step 2: Set Heading Field
-
+### Step 2: Set Heading
 ```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasource.itemId,
-  language: "en",
+await mcp__marketer_mcp__update_component_fields({
+  itemPath: "/sitecore/content/MySite/Global/Footer/FooterCol-About",
   fields: {
-    "heading": "Resources"
+    "heading": { "value": "About Us" }
   }
-});
-```
-
-### Step 3: Create Child Link Items
-
-```javascript
-// Create first link
-await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: datasource.itemPath,
-  templatePath: "/sitecore/templates/Project/Site/Footer/Footer Link",
-  name: "Documentation Link",
-  language: "en"
-});
-
-// Set link field using General Link format
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: linkItemId,
-  language: "en",
-  fields: {
-    "link": "<link text='Documentation' linktype='internal' url='/documentation' />"
-  }
-});
-```
-
-### Step 4: Add Component to Page
-
-```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: footerMenuPageId,
-  componentRenderingId: "footer-col-rendering-id",
-  placeholderPath: "footermenu",
-  componentItemName: "FooterCol_Resources",
-  language: "en",
-  dataSourceId: datasource.itemId
 });
 ```
 
 ### Field Type Quick Reference
-
 | Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
-| link (child) | General Link | `<link text='Text' linktype='internal' url='/path' />` |
-
-### MCP Authoring Checklist
-
-- [ ] Create Footer Column datasource
-- [ ] Set heading field
-- [ ] Create child Footer Link items
-- [ ] Set link fields on each child item
-- [ ] Add FooterCol component to FooterMenu placeholder
-- [ ] Publish all items
+|-------|------|-----------|
+| `heading` | Single-Line Text | `{ "value": "Column Title" }` |
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

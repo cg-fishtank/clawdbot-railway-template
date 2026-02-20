@@ -1,26 +1,26 @@
 ---
 name: sitecore-component-docs
 description: Discover and provide Sitecore Component documentation when authoring components via MCP. This skill MUST be used every time a component is authored.
-always: true
 ---
 
-# Sitecore Component Docs (Automatic)
+# Sitecore Component Docs
 
-**Version:** 2.0
+**Version:** 3.1
 
-## How It Works
+## When to Use
 
-This skill activates **automatically** when Claude detects component authoring.
-No manual invocation is needed.
+**You MUST use this skill BEFORE authoring any component via MCP.** This is not optional. Every time you add, configure, or update a component, look up its documentation first.
 
-### Automatic Activation Triggers
+### Required Activation Points
 
-Claude MUST activate this skill when:
+Use this skill before:
 
 - Calling `mcp__marketer-mcp__add_component_on_page`
 - Calling `mcp__marketer-mcp__create_component_datasource`
 - Calling `mcp__marketer-mcp__set_component_datasource`
 - Any workflow that adds or configures a component
+
+**Skipping this step leads to wrong field names, incorrect formats, and failed MCP calls.**
 
 ---
 
@@ -39,14 +39,14 @@ Identify the component from:
 ### Step 2: Search for Component Documentation
 
 ```
-Glob: /data/workspace/skills/sitecore-component-docs/**/{ComponentName}/{ComponentName}.md
+Glob: /data/workspace/skills/sitecore-component-docs/references/**/{ComponentName}/{ComponentName}.md
 ```
 
 Example searches:
 
-- ArticleBanner → `/data/workspace/skills/sitecore-component-docs/**/ArticleBanner/ArticleBanner.md`
-- HeroBanner → `/data/workspace/skills/sitecore-component-docs/**/HeroBanner/HeroBanner.md`
-- CardGrid → `/data/workspace/skills/sitecore-component-docs/**/CardGrid/CardGrid.md`
+- ArticleBanner → `/data/workspace/skills/sitecore-component-docs/references/Articles/ArticleBanner/ArticleBanner.md`
+- HeroBanner → `/data/workspace/skills/sitecore-component-docs/references/Banners/HeroBanner/HeroBanner.md`
+- CardGrid → `/data/workspace/skills/sitecore-component-docs/references/Cards/CardGrid/CardGrid.md`
 
 ### Step 3: Read and Apply Documentation
 
@@ -60,8 +60,8 @@ Example searches:
 
 **If component documentation NOT found:**
 
-1. Proceed with `sitecore-content-author/references/component-registry.md` field definitions
-2. Use standard field type formats from sitecore-author skills
+1. Run `/generator-component-docs` for the component to create documentation
+2. If generation not possible, call MCP `list_components` directly as last resort
 
 ---
 
@@ -69,13 +69,19 @@ Example searches:
 
 When component documentation exists, it contains:
 
-| Section                        | Purpose                               |
-| ------------------------------ | ------------------------------------- |
-| **Fields**                     | Field names, types, required/optional |
-| **MCP Authoring Instructions** | Exact field formats for MCP calls     |
-| **JSS Field Mapping**          | How fields render in Next.js          |
-| **Content Matrix**             | Required vs optional field validation |
-| **Troubleshooting**            | Common issues and fixes               |
+| Section                            | Purpose                                         |
+| ---------------------------------- | ----------------------------------------------- |
+| **Rendering Information**          | Rendering ID, component name, category          |
+| **Fields**                         | Field names, Sitecore types, required/optional  |
+| **Placeholders**                   | Child placeholder keys and allowed components   |
+| **Rendering Parameters (Styles)**  | Style params like theme, layout options         |
+| **JSS Field Component Mapping**    | How fields render in Next.js with imports       |
+| **Component Variants**             | Available variants (Default, Contained, etc.)   |
+| **Content Authoring Instructions** | Field-by-field guidance and content matrix      |
+| **Component Props Interface**      | TypeScript interface from source code           |
+| **MCP Authoring Instructions**     | Exact field formats for MCP calls with examples |
+| **Common Mistakes to Avoid**       | Pitfalls and how to avoid them                  |
+| **Troubleshooting**                | Common issues, causes, and solutions            |
 
 ---
 
@@ -87,35 +93,34 @@ All Sitecore Component Docs are stored in this skill's folder:
 /data/workspace/skills/sitecore-component-docs/references/{Category}/{ComponentName}/{ComponentName}.md
 ```
 
-Categories: Account, Articles, Authors, Banners, Cards, Containers, Events, Footer, IconFeatureCards, Navigation, Page Content, Products, Search, Tabs, WhereToBuy
+Categories: Accordions, Account, Articles, Authors, Banners, Cards, Containers, Events, Footer, IconFeatureCards, Navigation, Page Content, People, Products, Search, Tabs, WhereToBuy
 
-**65 component documentation files are available.** Documentation is discovered dynamically by component name.
+**65+ component documentation files are available.** Documentation is discovered dynamically by component name. Generated by `/generator-component-docs`.
 
 ---
 
 ## Related Skills
 
-| Skill                    | Integration                                                |
-| ------------------------ | ---------------------------------------------------------- |
-| `/sitecore-author`       | Orchestrates authoring; calls this skill automatically     |
-| `/sitecore-author-image` | Image field formats from Sitecore Component Docs           |
-| `/sitecore-author-link`  | Link field formats from Sitecore Component Docs            |
-| `/component-lookup`      | Fallback for rendering IDs when no Sitecore Component Docs |
-| `/field-validator`       | Validates field names before MCP calls                     |
+| Skill                    | Integration                                                  |
+| ------------------------ | ------------------------------------------------------------ |
+| `/sitecore-author`       | Orchestrates authoring; must invoke this skill per component |
+| `/sitecore-author-image` | Image field formats from Sitecore Component Docs             |
+| `/sitecore-author-link`  | Link field formats from Sitecore Component Docs              |
+| `/sitecore-field-validator`       | Validates field names before MCP calls                       |
 
 ---
 
-## Example: Automatic Workflow
+## Example Workflow
 
 **User request:** "Add an ArticleBanner to the page with title 'Welcome'"
 
-**Claude (internal process):**
+**What you must do:**
 
-1. Detected: ArticleBanner component authoring
-2. Glob search: `/data/workspace/skills/sitecore-component-docs/**/ArticleBanner/ArticleBanner.md`
-3. Found: `/data/workspace/skills/sitecore-component-docs/references/Articles/ArticleBanner/ArticleBanner.md`
-4. Read documentation
-5. Apply MCP authoring format:
+1. Identify the component: ArticleBanner
+2. Look up docs: `Glob: /data/workspace/skills/sitecore-component-docs/references/**/ArticleBanner/ArticleBanner.md`
+3. Read the matched file: `/data/workspace/skills/sitecore-component-docs/references/Articles/ArticleBanner/ArticleBanner.md`
+4. Extract the rendering ID, field names, and field formats from the documentation
+5. Build the MCP call using documented field names and formats:
    ```json
    {
    	"pageId": "...",
@@ -126,4 +131,4 @@ Categories: Account, Articles, Authors, Banners, Cards, Containers, Events, Foot
    	}
    }
    ```
-6. Execute MCP call with correct field formats
+6. Execute the MCP call with validated fields

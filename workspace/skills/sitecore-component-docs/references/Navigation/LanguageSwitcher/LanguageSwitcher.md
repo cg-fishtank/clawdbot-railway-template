@@ -1,153 +1,95 @@
 # LanguageSwitcher Component
 
 ## Purpose
+The LanguageSwitcher component renders a dropdown UI element that allows visitors to switch the site's active language. The main component shell (`Default`) wraps the rendering in a `Frame` and passes the application's configured `availableLanguages` list (from `lib/i18n/i18n-config`) down to the child `LanguageSwitcher` rendering component. The child component reads the current locale from `useSitecore()` (`page.locale`), displays the active language name as a toggle button, and shows a dropdown list of all available locales. Selecting a language calls a custom `/api/v1/language-switcher` API route to resolve the equivalent URL in the target language, then performs a Next.js router push followed by a page reload to ensure Sitecore Search and other locale-sensitive services receive the updated locale.
 
-The LanguageSwitcher component provides a dropdown interface for users to switch between available site languages. It reads available languages from the application configuration (not CMS content) and handles navigation to the equivalent page in the selected language. This is a system component with no CMS-authored fields.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `0f8af5fd-1363-456c-bb35-65625e1ee354` |
+| **Component Name** | `LanguageSwitcher` |
+| **Category** | `Navigation` |
 
-## Sitecore Template Requirements
+## Fields
+**Fields:** None — this is a system component. All language data is sourced from the application's i18n configuration (`availableLanguages`) and the current Sitecore context (`page.locale`). No datasource fields are required.
 
-### Data Source
+## Placeholders
+**Placeholders:** None — this component does not expose any placeholders.
 
-**Important:** This component does NOT use a datasource or CMS fields. Language options are configured in the application code via `lib/i18n/i18n-config.ts`.
+## JSS Field Component Mapping
+This component has no JSS field bindings. Data sources:
 
-### Fields
+| Data | Source |
+|------|--------|
+| Current locale | `useSitecore()` → `page.locale` |
+| Available languages | `availableLanguages` from `lib/i18n/i18n-config` |
+| Language switch path | `/api/v1/language-switcher?destinationLanguage=&itemId=` API route |
+| Current page item ID | `useSitecore()` → `page.layout.sitecore.route.itemId` |
 
-None - This is a code-driven component.
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard language switcher toggle with dropdown list |
 
-## Configuration
-
-### Available Languages
-
-Languages are configured in the application code:
-
+## Props Interface
 ```typescript
-// lib/i18n/i18n-config.ts
-export const availableLanguages = [
-  { code: 'en', name: 'English' },
-  { code: 'fr', name: 'Français' },
-  { code: 'de', name: 'Deutsch' },
-  // Add more languages as needed
-];
-```
+// From: src/components/Navigation/LanguageSwitcher/LanguageSwitcher.tsx
+// (delegates immediately to the child component)
 
-### Adding a New Language
+// Child: src/component-children/Navigation/LanguageSwitcher/LanguageSwitcher.tsx
 
-1. Add the language to Sitecore (System > Languages)
-2. Create language versions of content items
-3. Update `availableLanguages` array in the config file
-4. Rebuild and deploy the application
+type LanguageSwitcherLanguagesProps = {
+  languages: string[];  // Array of locale codes, e.g. ["en", "fr-CA", "de-DE"]
+};
 
-## Component Props Interface
+type LanguageSwitcherProps = ComponentProps & LanguageSwitcherLanguagesProps;
 
-```typescript
-// The component receives languages from configuration
-type LanguageSwitcherProps = ComponentProps & {
-  languages: Array<{
-    code: string;
-    name: string;
-  }>;
+type LanguageSwitcherToggleProps = {
+  displayDropdown: boolean;
+  contextLanguage: string;
+  setDisplayDropdown: Dispatch<SetStateAction<boolean>>;
+  theme?: ThemeType;
+};
+
+type LanguageSwitcherDropdownProps = {
+  displayDropdown: boolean;
+  contextLanguage: string;
+  languages: string[];
+  theme?: ThemeType;
+};
+
+type LanguageSwitcherItemProps = {
+  locale: string;
+  contextLanguage: string;
+  languageName: string;
 };
 ```
 
-## Content Authoring Instructions
-
-### No CMS Configuration Required
-
-The LanguageSwitcher is fully configured in code. Content authors do not need to create or configure any Sitecore items for this component.
-
-### Ensuring Content Availability
-
-For the language switcher to work properly:
-
-1. **Create Language Versions:** Ensure pages have content in all supported languages
-2. **Translate Content:** Provide localized content for each language version
-3. **Publish Translations:** Publish all language versions
-
-## Visual Layout
-
-```
-┌─────────────────┐
-│ English ▼       │
-├─────────────────┤
-│ English      ✓  │
-│ Français        │
-│ Deutsch         │
-└─────────────────┘
-```
-
-## Sitecore XM Cloud Specifics
-
-### Language Setup
-
-1. Navigate to System > Languages in Content Editor
-2. Add required languages
-3. Create language versions for content items
-
-### Experience Editor Behavior
-
-- **Not editable:** Component has no CMS fields
-- **Language switching:** May not work in Experience Editor
-- **Testing:** Test language switching in preview mode
-
-## Authoring Rules
-
-1. **Content Consistency:** Ensure all pages exist in all supported languages
-2. **Translation Quality:** Provide proper translations, not auto-translated content
-3. **Fallback Behavior:** Understand fallback behavior for missing translations
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Missing translations | Users see empty pages | Create all language versions |
-| Incomplete config | Languages don't appear | Update i18n-config.ts |
-| Unpublished content | 404 on language switch | Publish all versions |
-
-## Related Components
-
-- `Header` - Typically contains LanguageSwitcher in tertiarynav placeholder
-- `TertiaryNav` - Often paired with LanguageSwitcher
-
----
+## Example Content Entry
+No content entry is required. This is a system component that reads from application configuration. It is typically placed inside the `tertiarynavcomponents` placeholder of a `TertiaryNav` component.
 
 ## MCP Authoring Instructions
 
-### Adding LanguageSwitcher to Page
-
-Since this component has no datasource:
-
+### Step 1: Add to Page (via TertiaryNav placeholder)
 ```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "language-switcher-rendering-id",
-  placeholderPath: "tertiarynav-{dynamic-id}",  // Or tertiarynavcomponents
-  componentItemName: "LanguageSwitcher_1",
-  language: "en",
-  fields: {}  // No fields to set
+await mcp__marketer_mcp__add_component_on_page({
+  itemId: "<target-page-item-id>",
+  renderingId: "0f8af5fd-1363-456c-bb35-65625e1ee354",
+  placeholderName: "tertiarynavcomponents-{uid}",
+  // No datasource required
 });
 ```
 
-### Creating Language Versions of Content
-
-To support the language switcher, create content in multiple languages:
-
-```javascript
-// Update page content in French
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: pageId,
-  language: "fr",  // French version
-  fields: {
-    "heading": "Bienvenue",
-    "body": "<p>Contenu en français...</p>"
-  }
-});
-```
+### Notes
+- This component requires `NEXT_PUBLIC_ENABLE_LANGUAGES` to be configured. If only one language is available, the switcher still renders but shows a single option.
+- The `NEXT_PUBLIC_API_URL` environment variable must point to the Next.js API host so the `/api/v1/language-switcher` route can be called client-side.
+- In Experience Editor (`page.mode.isEditing`), the dropdown toggle is disabled to prevent accidental navigation during editing.
+- The dropdown closes automatically when the user clicks outside (`useClickOutside` hook) or when the locale changes.
+- Language names are displayed using `getLanguageName()` which formats locale codes (e.g., `"en"` → `"English"`, `"fr-CA"` → `"French (Canada)"`).
 
 ---
 
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

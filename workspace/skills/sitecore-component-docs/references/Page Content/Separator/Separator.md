@@ -1,181 +1,76 @@
-# Separator
+# Separator Component
 
 ## Purpose
+Separator renders a thin horizontal rule that visually divides content sections on a page. It has no fields and requires no datasource — its sole output is a `0.5 rem`-tall `div` styled with `bg-surface/10` (10% opacity of the surface colour token), giving a subtle divider that adapts to the parent Frame's theme automatically via `useFrame()`. The component is wrapped in `ContainedWrapper` for consistent horizontal padding alignment with surrounding content.
 
-The Separator component renders a horizontal divider line to visually separate content sections on a page. It provides a subtle visual break between components without adding significant vertical space. The component adapts to the current theme context, ensuring the separator color harmonizes with the surrounding design.
-
-## Sitecore Configuration
-
-### Template Path
-
-`/sitecore/templates/Project/[Site]/Page Content/Separator`
-
-### Data Source Location
-
-This component does not require a data source as it has no content fields.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `21ef8e28-97a9-4b50-850e-ab87fa7dc0dc` |
+| **Component Name** | `Separator` |
+| **Category** | `Page Content` |
 
 ## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| *(none)* | — | — | This component has no author-configurable fields |
 
-This component has **no content fields**. It is a purely presentational element.
+## Placeholders
+**Placeholders:** None
 
-| Field | Sitecore Type | Required | Description |
-| ----- | ------------- | -------- | ----------- |
-| N/A   | N/A           | N/A      | No fields   |
+## JSS Field Component Mapping
+*(No fields — no JSS field components used)*
 
-## Rendering Parameters
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Full-width horizontal rule at 10% surface opacity |
 
-| Parameter | Type     | Options                      | Default | Description                     |
-| --------- | -------- | ---------------------------- | ------- | ------------------------------- |
-| theme     | Droplist | primary, secondary, tertiary | (auto)  | Separator line color theme      |
-
-## Component Interface
-
+## Props Interface
 ```typescript
+// SeparatorProps extends ComponentProps with no additional fields
 type SeparatorProps = ComponentProps;
 ```
 
-## Content Examples
+## Example Content Entry
 
-### Usage (No Fields)
-
-The Separator has no content fields. Simply add it to a placeholder to insert a visual divider.
-
+### Minimum Viable Content
 ```json
 {
   "fields": {}
 }
 ```
 
-## Authoring Rules
-
-1. **Use sparingly:** Don't overuse separators. Visual hierarchy should primarily come from spacing and typography.
-2. **Consistent placement:** Use separators consistently throughout the site for predictable visual rhythm.
-3. **Theme awareness:** The separator auto-adapts to theme context. Avoid forcing a theme unless necessary.
-
-## Common Mistakes
-
-| Mistake                   | Why It's Wrong                               | Correct Approach                           |
-| ------------------------- | -------------------------------------------- | ------------------------------------------ |
-| Overusing separators      | Creates visual clutter                       | Use spacing and layout for hierarchy first |
-| Forcing theme color       | May clash with surrounding content           | Let auto-theme work in most cases          |
-| Using between tight sections | Adds unnecessary visual noise            | Reserve for major section breaks           |
-
-## Related Components
-
-- `ContentBlock` - Use heading hierarchy instead of separators when possible
-- `CommonRichtext` - Horizontal rules (`<hr>`) available in rich text
-
-## Visual Layout
-
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                                                                    │
-│    [Previous Component Content]                                    │
-│                                                                    │
-├────────────────────────────────────────────────────────────────────┤
-│                          ─────────────                             │
-├────────────────────────────────────────────────────────────────────┤
-│                                                                    │
-│    [Next Component Content]                                        │
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
+### Full Content Example
+```json
+{
+  "fields": {}
+}
 ```
 
-The separator renders as a thin (0.5px/2px) horizontal line with reduced opacity (`bg-surface/10`).
-
----
+> This component has no configurable content. Drop it onto the page to insert a visual divider.
 
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the Separator component using the Marketer MCP tools.
-
-### Prerequisites
-
-Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the Separator rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"` for root placement)
-
-### Step 1: Find the Target Page
-
-```javascript
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Services Page"
-});
-const pageId = pageSearch.results[0].itemId;
-```
-
-### Step 2: Add Separator to Page
-
-Since Separator has no content fields, simply add the component:
-
+### Step 1: Add to Page
 ```javascript
 await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "separator-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "Separator_1",
-  language: "en",
-  fields: {}
+  itemId: "<page-item-id>",
+  renderingId: "21ef8e28-97a9-4b50-850e-ab87fa7dc0dc",
+  placeholderName: "<target-placeholder>"
+  // No datasource required — Separator has no fields
 });
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Services"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add Separator component (no fields needed)
-// ═══════════════════════════════════════════════════════════════
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "separator-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "Separator_AfterIntro",
-  language: "en",
-  fields: {}
-});
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: Separator divider added to page
-// ═══════════════════════════════════════════════════════════════
 ```
 
 ### Field Type Quick Reference
-
 | Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| N/A   | N/A  | `{}`       |
+|-------|------|-----------|
+| *(none)* | — | — |
 
-### MCP Authoring Checklist
-
-Before authoring Separator via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have Separator rendering ID (from component manifest)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] Component item name is unique (e.g., `Separator_1`)
-
-### MCP Error Handling
-
-| Error                 | Cause                    | Solution                                |
-|:----------------------|:-------------------------|:----------------------------------------|
-| "Item already exists" | Duplicate component name | Use unique suffix: `Separator_2`        |
-| Component not visible | Wrong placeholder path   | Use `"headless-main"` without leading slash |
+> **Note:** No datasource item is needed. The Separator is a structural/layout component only. Its visual weight adjusts automatically to the parent Frame theme.
 
 ---
-
 ## Change Log
-
-| Date       | Change                | Author      |
-|------------|----------------------|-------------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| Date | Change | Author |
+|------|--------|--------|
+| 2026-02-19 | Initial documentation | Claude Code |

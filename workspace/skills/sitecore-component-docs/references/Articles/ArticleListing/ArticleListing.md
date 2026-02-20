@@ -1,98 +1,45 @@
 # ArticleListing Component
 
 ## Purpose
+ArticleListing fetches and displays a paginated grid of article cards, supporting optional tag-based filtering. During server-side rendering, `getComponentServerProps` queries the Sitecore GraphQL API for all articles of the appropriate type (Article, Insights, or News) under the site content root, normalizes their SXA tags for serialization, and stores the results on `rendering.data`. The child `ArticleListingRendering` (from `component-children/Articles/ArticleListing/ArticleListing.tsx`) then applies client-side tag filtering via `useContextPageTags` if `filterByTags` is enabled, and delegates paginated display to `ArticleListGrid` (`component-children/Articles/ArticleListing/ArticleListGrid.tsx`).
 
-The ArticleListing component displays a paginated, filterable list of articles from the site's content repository. It supports tag-based filtering via page context, multiple content variants (Default, Insights, News), and uses server-side GraphQL data fetching for optimal performance. The component is typically used on article index pages or category landing pages to present browsable article collections.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `358eaadd-3a03-4fe8-8a04-6d0bf849bf13` |
+| **Component Name** | `ArticleListing` |
+| **Category** | `Articles` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Articles/Article Listing`
-- **Template Name:** `Article Listing`
-
-### Fields
-
+## Fields
 | Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | Yes | Section heading displayed above the article grid | Recommended max 60 characters |
-| filterByTags | Checkbox | No | When checked, filters articles based on tags from page context | Boolean field |
-| tagsHeading | Single-Line Text | No | Custom label for the tag filter display | Falls back to "Filtering by tags:" if not set |
-| noResultsText | Single-Line Text | No | Message shown when tag filtering returns no matches | Falls back to variant-specific default message |
+|------------|--------------|----------|-------------|----------------------|
+| `heading` | Single-Line Text (`Field<string>`) | Yes | Section heading displayed above the article grid | Rendered as `<h2>` |
+| `filterByTags` | Checkbox (`Field<boolean>`) | No | When `true`, filters the article list to match SXA tags active on the current page context | Boolean; default behavior is to show all articles |
+| `tagsHeading` | Single-Line Text (`Field<string>`) | No | Custom label displayed when tag filtering is active (e.g. "Filtering by:") | Falls back to dictionary key `'Filtering by tags:'` |
+| `noResultsText` | Single-Line Text (`Field<string>`) | No | Custom message shown when tag filtering produces no matching articles | Falls back to variant-specific dictionary key |
+| `PageSizeCount` | Number (`Field<number>`) | No | Number of articles shown per page in the paginated grid | Validated via `getValidPageSize()`; default used if invalid |
+
+## Placeholders
+**Placeholders:** None
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg mb-6" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| filterByTags | Read via `rendering.fields.filterByTags.value` | N/A (boolean check) |
-| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+|---------------|--------------|--------|
+| `heading` | `<Text tag="h2" field={fields?.heading} className="heading-lg mb-6" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `tagsHeading` | `<Text field={fields.tagsHeading} tag="span" className="font-semibold" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `noResultsText` | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `filterByTags` | Accessed as `fields.filterByTags.value` (boolean) — no JSS render component | N/A |
 
 ## Component Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Lists all general article types; variant also auto-detected from rendering params `Variant` field |
+| Insights | `Insights` | Lists only Insights-type articles; hardcoded `ARTICLE_VARIANTS.INSIGHTS` |
+| News | `News` | Lists only News-type articles; hardcoded `ARTICLE_VARIANTS.NEWS` |
 
-The ArticleListing exports 3 rendering variants, each fetching content from different article templates:
-
-| Variant | Export Name | Article Template | Use Case |
-|---------|-------------|------------------|----------|
-| Default | `Default` | Article | General articles, blog posts |
-| Insights | `Insights` | Insights Article | Research, whitepapers, industry insights |
-| News | `News` | News Article | News articles, press releases |
-
-### Pagination Behavior
-
-- Articles display in a paginated grid (6 items per page by default)
-- Pagination controls appear when results exceed page size
-- Results sorted by `datePublished` descending (newest first)
-
-### Tag Filtering Behavior
-
-When `filterByTags` is enabled:
-1. Component reads tags from page context (via `useContextPageTags`)
-2. Articles are filtered to show only those matching the page's tags
-3. If no matches found, displays all articles with a warning message
-4. Custom filter messages can be configured via `tagsHeading` and `noResultsText`
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The section title displayed above the article grid
-- **Tone/Style:** Clear, descriptive, action-oriented
-- **Character limit:** 60 characters recommended
-- **Example:** "Latest Articles", "Industry Insights", "Career Opportunities"
-
-#### filterByTags
-
-- **What to enter:** Check this box to enable tag-based filtering
-- **Behavior:** When enabled, the component filters articles to match tags assigned to the current page
-- **Use case:** Use on category pages where you want to show only relevant articles based on page taxonomy
-
-#### tagsHeading
-
-- **What to enter:** Label text that appears before the tag names in the filter display
-- **Default:** "Filtering by tags:" (when left empty)
-- **Example:** "Showing articles tagged:", "Category filter:"
-
-#### noResultsText
-
-- **What to enter:** Message displayed when tag filtering returns no matching articles
-- **Default:** Variant-specific message (e.g., "No articles found matching your criteria")
-- **Example:** "No matching articles found. Showing all results."
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields | Optional Fields | Use Case |
-|-----------|-----------------|-----------------|----------|
-| Basic | heading | - | Simple article listing without filtering |
-| Filtered | heading, filterByTags | tagsHeading, noResultsText | Category page with tag-based filtering |
-| Custom Messages | heading, filterByTags | tagsHeading, noResultsText | Filtered listing with branded messaging |
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+// From lib/types/components/Articles/article-listing.ts
 import { ComponentRendering, Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { ArticleDataType } from 'lib/types';
@@ -103,11 +50,12 @@ type ArticleListingFields = {
   filterByTags?: Field<boolean>;
   tagsHeading?: Field<string>;
   noResultsText?: Field<string>;
+  PageSizeCount?: Field<number>;
 };
 
 type ArticleListingRenderingType = {
   rendering: ComponentRendering & {
-    data: ArticleDataType[];
+    data: ArticleDataType[]; // Populated by getComponentServerProps
   };
 };
 
@@ -117,13 +65,25 @@ export type ArticleListingProps = ComponentProps &
     variant?: ArticleVariant;
   };
 
-// ArticleVariant = 'default' | 'insights' | 'news'
+// ArticleDataType (lib/types/page/article.ts):
+export type ArticleDataType = {
+  id: string;
+  name: string;
+  image: ImageGQLType;
+  datePublished: DateGQLType;
+  displayDateTime?: QueryField;
+  pageCategory: PageCategoryField;
+  heading?: QueryField;
+  subheading?: QueryField;
+  body?: QueryField;
+  url: ItemUrl;
+  sxaTags?: { targetItems?: TagItem[] };
+} | null;
 ```
 
 ## Example Content Entry
 
 ### Minimum Viable Content
-
 ```json
 {
   "fields": {
@@ -133,246 +93,51 @@ export type ArticleListingProps = ComponentProps &
 ```
 
 ### Full Content Example
-
 ```json
 {
   "fields": {
-    "heading": { "value": "Industry Insights & Analysis" },
+    "heading": { "value": "Insights Library" },
     "filterByTags": { "value": true },
-    "tagsHeading": { "value": "Showing articles for:" },
-    "noResultsText": { "value": "No articles match your selected tags. Displaying all available content." }
+    "tagsHeading": { "value": "Filtering by:" },
+    "noResultsText": { "value": "No articles match the selected topics. Showing all results." },
+    "PageSizeCount": { "value": 12 }
   }
 }
 ```
 
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Component datasources: `/sitecore/content/[Site]/Home/Data/Article Listings/`
-- Article content: `/sitecore/content/[Site]/Home/Articles/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading, tagsHeading, noResultsText
-- **Forms panel required:** filterByTags (checkbox)
-- **Article grid:** Not directly editable - displays server-fetched content
-
-### Rendering Variant Selection
-
-In Experience Editor or Content Editor:
-1. Select the ArticleListing component
-2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default, Insights, or News
-
-### Server-Side Data Fetching
-
-The component uses `getComponentServerProps` to:
-1. Fetch all articles of the selected variant type via GraphQL
-2. Process and normalize tag data for filtering
-3. Sort articles by publication date (newest first)
-4. Pass processed data to client-side rendering
-
-## Common Mistakes to Avoid
-
-1. **Missing heading:** Always provide a heading value - it's required for proper component rendering and accessibility.
-
-2. **Wrong variant for content type:** Match the component variant to your article templates:
-   - General articles → Default variant
-   - Research/whitepapers → Insights variant
-   - Press releases → News variant
-
-3. **Enabling filterByTags without page tags:** If `filterByTags` is enabled but the page has no assigned tags, the component will display all articles (no filtering occurs).
-
-4. **Expecting instant filtering:** Tag filtering happens on page load based on page context - it's not interactive/real-time filtering.
-
-5. **Mixing article types:** Each variant only displays articles from its corresponding template. Don't expect an Insights listing to show general articles.
-
-6. **Forgetting noResultsText:** If using tag filtering, always configure `noResultsText` to provide meaningful feedback when no matches are found.
-
-## Related Components
-
-- `LatestArticleGrid` - Displays a fixed number of latest articles (no pagination)
-- `ArticleListingByAuthor` - Filters articles by author context
-- `ArticleBanner` - Banner component for individual article pages
-- `ArticleCard` - Card format used within the listing grid
-
----
-
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the ArticleListing component using the Marketer MCP tools.
-
-### Prerequisites
-
-Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the ArticleListing rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"` for root placement)
-
-### Step 1: Find the Target Page
-
-```javascript
-// Search for the page where ArticleListing will be added
-await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Articles Index Page"
-});
-// Returns: { itemId: "page-guid", name: "PageName", path: "/sitecore/..." }
-```
-
-### Step 2: Add ArticleListing to Page
-
+### Step 1: Add Component to Page
 ```javascript
 const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
-  componentRenderingId: "article-listing-rendering-id",
-  placeholderPath: "headless-main",  // Root level = NO leading slash
-  componentItemName: "ArticleListing_1",  // Must be unique on page
+  componentRenderingId: "358eaadd-3a03-4fe8-8a04-6d0bf849bf13",
+  placeholderPath: "headless-main",
+  componentItemName: "ArticleListing_1",
   language: "en",
   fields: {
     "heading": "Latest Articles"
   }
 });
-
-// Returns:
-// {
-//   "datasourceId": "created-datasource-guid",
-//   "placeholderId": "headless-main"
-// }
 ```
 
-**IMPORTANT:** Save the `datasourceId` - it's needed for updating fields later.
+### Step 2: Choose a Variant
+Use `Default` for general articles, `Insights` for insights-only, `News` for news-only. The variant controls which GraphQL template IDs are queried server-side.
 
-### Step 3: Enable Tag Filtering (Optional)
-
-To enable tag-based filtering, update the datasource with checkbox field:
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,  // From Step 2
-  language: "en",
-  fields: {
-    "filterByTags": "1"  // "1" enables checkbox, "0" or "" disables
-  }
-});
-```
-
-### Step 4: Configure Filter Messages (Optional)
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "tagsHeading": "Showing articles for:",
-    "noResultsText": "No matching articles found. Displaying all content."
-  }
-});
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Insights Landing Page"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add ArticleListing component (Insights variant)
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "article-listing-insights-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "InsightsListing_Main",
-  language: "en",
-  fields: {
-    "heading": "Industry Insights & Analysis"
-  }
-});
-
-const datasourceId = addResult.datasourceId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 3: Enable tag filtering with custom messages
-// ═══════════════════════════════════════════════════════════════
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "filterByTags": "1",
-    "tagsHeading": "Filtered by topic:",
-    "noResultsText": "No insights match your criteria. Showing all available research."
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: ArticleListing with tag filtering enabled
-// ═══════════════════════════════════════════════════════════════
-```
-
-### Variant Selection via Rendering
-
-To use a specific variant, use the corresponding rendering ID:
-
-| Variant | Rendering Name |
-|---------|----------------|
-| Default | `ArticleListing` |
-| Insights | `ArticleListing-Insights` |
-| News | `ArticleListing-News` |
+### Step 3: Configure Tag Filtering (Optional)
+Enable `filterByTags` on the datasource to allow the listing to filter by the active page's SXA tags context.
 
 ### Field Type Quick Reference
-
 | Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
-| filterByTags | Checkbox | `"1"` (enabled) or `""` (disabled) |
-| tagsHeading | Single-Line Text | `"Plain text value"` |
-| noResultsText | Single-Line Text | `"Plain text value"` |
-
-### MCP Authoring Checklist
-
-Before authoring ArticleListing via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have ArticleListing rendering ID (from component manifest)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] Component item name is unique (e.g., `ArticleListing_1`)
-- [ ] heading field has content (required)
-- [ ] filterByTags uses `"1"` for enabled (not `"true"` or `true`)
-- [ ] Using correct variant rendering for content type
-
-### MCP Error Handling
-
-| Error | Cause | Solution |
-|:------|:------|:---------|
-| "Item already exists" | Duplicate component name | Use unique suffix: `ArticleListing_2` |
-| Component not visible | Wrong placeholder path | Use `"headless-main"` without leading slash |
-| No articles displayed | Wrong variant for templates | Verify variant matches article template type |
-| `updatedFields: {}` | Normal response | Update succeeded despite empty response |
-| "Cannot find field" | Wrong field name | Field names are case-sensitive |
-| Filtering not working | Checkbox format wrong | Use `"1"` string, not boolean or "true" |
-
-### Related Skills for MCP Authoring
-
-| Skill | Purpose |
-|:------|:--------|
-| `/sitecore-author-placeholder` | Placeholder path construction rules |
-| `/sitecore-pagebuilder` | Page creation and component placement |
+|-------|------|-----------|
+| `heading` | Single-Line Text | `"heading": "Latest Articles"` |
+| `filterByTags` | Checkbox | `"filterByTags": true` |
+| `tagsHeading` | Single-Line Text | `"tagsHeading": "Filtering by:"` |
+| `noResultsText` | Single-Line Text | `"noResultsText": "No results found."` |
+| `PageSizeCount` | Number | `"PageSizeCount": 12` |
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-06 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

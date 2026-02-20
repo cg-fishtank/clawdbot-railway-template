@@ -1,86 +1,48 @@
 # LatestArticleGrid Component
 
 ## Purpose
+LatestArticleGrid fetches and displays the most recent articles (up to 6) from the Sitecore GraphQL API, sorted by publication date. It supports two layout variants (Default grid and VerticalList) and three content-type variants (Default articles, Insights, News), with `getComponentServerProps` selecting the appropriate GraphQL query (`GetLatestArticles`, `GetLatestInsights`, or `GetLatestNews`) based on the active variant. Results are cached in an in-memory `Map` per variant/language/content-root combination with a 5-minute TTL to reduce GraphQL load. The child components `DefaultRendering` and `VerticalListRendering` (from `component-children/Articles/LatestArticleGrid/LatestArticleGrid.tsx`) handle the visual grid or list layout, and both are aware of `ColumnSplitter` container context to adapt their wrapping accordingly.
 
-The LatestArticleGrid component displays a fixed grid of the most recently published articles (maximum 6), automatically sorted by publication date descending. It supports multiple rendering variants (Default, VerticalList) and content variants (Insights, News), with intelligent layout adaptation when placed inside ColumnSplitter containers. The component uses server-side GraphQL data fetching with a 5-minute in-memory cache for optimal performance.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `91821aa1-e6be-4404-8d00-cf6e859cdf0b` |
+| **Component Name** | `LatestArticleGrid` |
+| **Category** | `Articles` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Articles/Latest Article Grid`
-- **Template Name:** `Latest Article Grid`
-
-### Fields
-
+## Fields
 | Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | Yes | Section heading displayed above the article grid | Recommended max 60 characters |
+|------------|--------------|----------|-------------|----------------------|
+| `heading` | Single-Line Text (`Field<string>`) | Yes | Section heading displayed above the article grid or list | Rendered as `<h2>` with `heading-4xl` class |
+
+## Placeholders
+**Placeholders:** None
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text tag="h2" field={fields?.heading} className="heading-4xl" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+|---------------|--------------|--------|
+| `heading` | `<Text tag="h2" field={fields?.heading} className="heading-4xl" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
 
-The LatestArticleGrid exports 4 rendering variants:
+### Layout Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | 3-column grid layout (2-column on medium, 1-column on mobile); adapts to 4-column + 2-col grid inside `ColumnSplitter` |
+| VerticalList | `VerticalList` | Stacked row layout displaying up to 3 articles; renders without `Frame` wrapper when inside `ColumnSplitter` |
 
-### Rendering Variants (Layout)
+### Content Type Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Fetches from general article template (`ARTICLE_TEMPLATE_ID`) |
+| Insights | `Insights` | Fetches from Insights template (`INSIGHTS_TEMPLATE_ID`) using `GetLatestInsights` query |
+| News | `News` | Fetches from News template (`NEWS_TEMPLATE_ID`) using `GetLatestNews` query |
 
-| Variant | Export Name | Layout | Max Items | Use Case |
-|---------|-------------|--------|-----------|----------|
-| Default | `Default` | 3-column grid | 6 | Homepage, landing pages |
-| VerticalList | `VerticalList` | Single column stack | 3 | Sidebar, narrow containers |
+> The `Insights` and `News` exports use the `DefaultRendering` (grid) layout with the respective content-type variant.
 
-### Content Variants (Article Type)
-
-| Variant | Export Name | Article Template | Use Case |
-|---------|-------------|------------------|----------|
-| Default | `Default` | Article | General articles, blog posts |
-| Insights | `Insights` | Insights Article | Research, whitepapers, industry insights |
-| News | `News` | News Article | News articles, press releases |
-
-### Layout Behavior
-
-**Default Variant:**
-- Standalone: 3-column grid (`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3`)
-- Inside ColumnSplitter: 2-column grid (`grid grid-cols-1 md:grid-cols-2`), max 4 items
-
-**VerticalList Variant:**
-- Standalone: Wrapped in ContainedWrapper
-- Inside ColumnSplitter: No wrapper (direct render), max 3 items
-
-### Caching Behavior
-
-The component implements a 5-minute in-memory cache:
-- Cache key: `latest-articles-{variant}-{templateId}-{contentRootId}-{language}-6`
-- TTL: 5 minutes (300,000ms)
-- Scope: Per variant and language combination
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** Section title displayed above the article grid
-- **Tone/Style:** Clear, engaging, action-oriented
-- **Character limit:** 60 characters recommended
-- **Example:** "Latest News", "Recent Insights", "Featured Articles"
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields | Layout | Use Case |
-|-----------|-----------------|--------|----------|
-| Grid | heading | 3-column | Homepage featured articles |
-| Sidebar | heading | Vertical list | Blog sidebar, related content |
-| Split Column | heading | 2-column | Within ColumnSplitter component |
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+// From components/Articles/LatestArticleGrid/LatestArticleGrid.tsx
 import { ComponentRendering, Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { ArticleDataType } from 'lib/types';
@@ -90,27 +52,36 @@ export type LatestArticleGridFields = {
   heading: Field<string>;
 };
 
-type ArticleListingRenderingType = {
-  rendering: ComponentRendering & {
-    data: ArticleDataType[];
-  };
-};
-
 export type LatestArticleGridProps = ComponentProps &
   ArticleListingRenderingType & {
     className?: string;
     fields: LatestArticleGridFields;
-    max?: number;
+    max?: number;        // Max articles to show; defaults to 3 in child renderings (server fetches max 6)
     variant?: ArticleVariant;
   };
 
-// ArticleVariant = 'default' | 'insights' | 'news'
+type ArticleListingRenderingType = {
+  rendering: ComponentRendering & {
+    data: ArticleDataType[]; // Populated by getComponentServerProps (up to 6 items, sorted by datePublished)
+  };
+};
+
+// Internal query cache type:
+type ArticleListQueryType = {
+  search: {
+    results: ArticleDataType[];
+    total: number;
+    pageInfo: {
+      endCursor: string;
+      hasNext: boolean;
+    };
+  };
+};
 ```
 
 ## Example Content Entry
 
 ### Minimum Viable Content
-
 ```json
 {
   "fields": {
@@ -119,255 +90,55 @@ export type LatestArticleGridProps = ComponentProps &
 }
 ```
 
-### News Section Example
-
+### Full Content Example
 ```json
 {
   "fields": {
-    "heading": { "value": "Breaking News & Updates" }
+    "heading": { "value": "Latest Insights" }
   }
 }
 ```
 
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Component datasources: `/sitecore/content/[Site]/Home/Data/Latest Article Grids/`
-- Article content: `/sitecore/content/[Site]/Home/Articles/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading
-- **Article grid:** Not directly editable - displays server-fetched content
-- **Layout adaptation:** Preview in ColumnSplitter to see 2-column layout
-
-### Rendering Variant Selection
-
-In Experience Editor or Content Editor:
-1. Select the LatestArticleGrid component
-2. Open "Rendering Properties" or "Component Properties"
-3. Choose from available variants:
-   - Default (3-column grid, general articles)
-   - VerticalList (single column, general articles)
-   - Insights (3-column grid, insights articles)
-   - News (3-column grid, news articles)
-
-### Container-Aware Rendering
-
-The component detects its container context using `useContainer()`:
-
-| Container | Default Variant | VerticalList Variant |
-|-----------|----------------|---------------------|
-| None (root) | 3-col grid, 6 max, wrapped | 1-col, 3 max, wrapped |
-| ColumnSplitter | 2-col grid, 4 max, wrapped | 1-col, 3 max, no wrapper |
-
-### Server-Side Data Fetching
-
-The component uses `getComponentServerProps` to:
-1. Determine variant from rendering parameters
-2. Fetch latest 6 articles via GraphQL (variant-specific query)
-3. Sort by `datePublished` descending
-4. Cache results for 5 minutes
-5. Pass to client-side rendering
-
-## Common Mistakes to Avoid
-
-1. **Missing heading:** Always provide a heading value - it's required for proper component rendering and accessibility.
-
-2. **Wrong variant for content type:** Match the component variant to your article templates:
-   - General articles → Default or VerticalList variant
-   - Research/whitepapers → Insights variant
-   - Press releases → News variant
-
-3. **Expecting more than 6 articles:** The component is hard-coded to fetch and display a maximum of 6 articles. Use `ArticleListing` for paginated full listings.
-
-4. **Expecting real-time updates:** Due to 5-minute caching, newly published articles may take up to 5 minutes to appear. Cache clears on server restart.
-
-5. **Incorrect container expectations:** When placed in ColumnSplitter:
-   - Default variant shows 4 articles max (not 6)
-   - VerticalList variant removes wrapper for proper spacing
-
-6. **Mixing rendering and content variants:** The Default/VerticalList variants are layout choices. Insights/News are content type choices. You cannot combine them (e.g., no "VerticalList-Insights" - use VerticalList for layout with general articles, or Insights for insights content with grid layout).
-
-## Related Components
-
-- `ArticleListing` - Full paginated article listing with tag filtering
-- `ArticleListingByAuthor` - Articles filtered by author context
-- `ColumnSplitter` - Parent container that triggers responsive layout
-- `ArticleCard` / `TextCard` - Card components used within the grid
-- `TextRow` - Row component used in VerticalList layout
-
----
+> LatestArticleGrid has only one authored field. All article data is fetched automatically server-side from GraphQL based on the variant and site content root.
 
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the LatestArticleGrid component using the Marketer MCP tools.
-
-### Prerequisites
-
-Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the LatestArticleGrid rendering ID from the component manifest
-3. Know the target placeholder:
-   - Root level: `"headless-main"`
-   - Inside ColumnSplitter: Dynamic placeholder path
-
-### Step 1: Find the Target Page
-
-```javascript
-// Search for the page where LatestArticleGrid will be added
-await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Homepage"
-});
-// Returns: { itemId: "page-guid", name: "Home", path: "/sitecore/..." }
-```
-
-### Step 2: Add LatestArticleGrid to Page (Root Level)
-
+### Step 1: Add Component to Page
 ```javascript
 const result = await mcp__marketer-mcp__add_component_on_page({
   pageId: "page-guid",
-  componentRenderingId: "latest-article-grid-rendering-id",
-  placeholderPath: "headless-main",  // Root level = NO leading slash
-  componentItemName: "LatestArticles_1",  // Must be unique on page
+  componentRenderingId: "91821aa1-e6be-4404-8d00-cf6e859cdf0b",
+  placeholderPath: "headless-main",
+  componentItemName: "LatestArticleGrid_1",
   language: "en",
   fields: {
     "heading": "Latest Articles"
   }
 });
-
-// Returns:
-// {
-//   "datasourceId": "created-datasource-guid",
-//   "placeholderId": "headless-main"
-// }
 ```
 
-### Step 3: Add to ColumnSplitter (Nested Placement)
+### Step 2: Choose Layout and Content Variant
+- Use `Default` for the 3-column grid of general articles.
+- Use `VerticalList` for a stacked list layout (e.g. inside a `ColumnSplitter`).
+- Use `Insights` or `News` exports for type-specific content grids.
 
-When placing inside a ColumnSplitter, use the dynamic placeholder path:
-
-```javascript
-// First, add ColumnSplitter to the page
-const columnSplitterResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "column-splitter-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "ColumnSplitter_1",
-  language: "en",
-  fields: {}
-});
-
-// Then add LatestArticleGrid to the left column
-// Placeholder format: headless-main/column-splitter-{uid}-left
-const latestGridResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "latest-article-grid-vertical-list-rendering-id",
-  placeholderPath: "headless-main/column-splitter-{uid}-left",  // Replace {uid} with actual UID
-  componentItemName: "LatestArticles_Sidebar",
-  language: "en",
-  fields: {
-    "heading": "Recent Posts"
-  }
-});
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Insights Landing"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add LatestArticleGrid component (Insights variant)
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "latest-article-grid-insights-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "LatestInsights_Hero",
-  language: "en",
-  fields: {
-    "heading": "Latest Research & Insights"
-  }
-});
-
-const datasourceId = addResult.datasourceId;
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: Grid displays 6 most recent Insights articles
-// Automatically sorted by datePublished descending
-// ═══════════════════════════════════════════════════════════════
-```
-
-### Variant Selection via Rendering
-
-To use a specific variant, use the corresponding rendering ID:
-
-| Variant | Rendering Name | Layout | Content Type |
-|---------|----------------|--------|--------------|
-| Default | `LatestArticleGrid` | 3-col grid | General articles |
-| VerticalList | `LatestArticleGrid-VerticalList` | 1-col stack | General articles |
-| Insights | `LatestArticleGrid-Insights` | 3-col grid | Insights articles |
-| News | `LatestArticleGrid-News` | 3-col grid | News articles |
+### Step 3: Understand Caching Behavior
+The component maintains an in-memory server-side cache keyed by `variant + templateId + contentRootId + language`. Cached results expire after **5 minutes**. No manual cache invalidation is available — a server restart or cache TTL expiry will refresh the data.
 
 ### Field Type Quick Reference
-
 | Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
+|-------|------|-----------|
+| `heading` | Single-Line Text | `"heading": "Latest Insights"` |
 
-### Placeholder Patterns for Nested Placement
-
-| Container | Placeholder Path Pattern |
-|-----------|-------------------------|
-| Root level | `"headless-main"` |
-| ColumnSplitter left | `"headless-main/column-splitter-{uid}-left"` |
-| ColumnSplitter right | `"headless-main/column-splitter-{uid}-right"` |
-
-**Note:** Replace `{uid}` with the actual UID from the ColumnSplitter component.
-
-### MCP Authoring Checklist
-
-Before authoring LatestArticleGrid via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have LatestArticleGrid rendering ID (from component manifest)
-- [ ] Correct placeholder path for placement location
-- [ ] Component item name is unique (e.g., `LatestArticles_1`)
-- [ ] heading field has content (required)
-- [ ] Using correct variant for content type and layout needs
-
-### MCP Error Handling
-
-| Error | Cause | Solution |
-|:------|:------|:---------|
-| "Item already exists" | Duplicate component name | Use unique suffix: `LatestArticles_2` |
-| Component not visible | Wrong placeholder path | Verify placeholder path (no leading slash for root) |
-| No articles displayed | Wrong variant for templates | Verify variant matches article template type |
-| Only 4 articles shown | Component in ColumnSplitter | Expected behavior - max 4 in split layout |
-| `updatedFields: {}` | Normal response | Update succeeded despite empty response |
-| "Cannot find field" | Wrong field name | Field name is case-sensitive: `heading` |
-
-### Related Skills for MCP Authoring
-
-| Skill | Purpose |
-|:------|:--------|
-| `/sitecore-author-placeholder` | Placeholder path construction rules |
-| `/sitecore-pagebuilder` | Page creation and component placement |
+### Data Fetch Behavior Reference
+| Variant | GraphQL Query | Template ID Constant | Max Items |
+|---------|--------------|---------------------|-----------|
+| Default | `GetLatestArticles` | `ARTICLE_TEMPLATE_ID` | 6 |
+| Insights | `GetLatestInsights` | `INSIGHTS_TEMPLATE_ID` | 6 |
+| News | `GetLatestNews` | `NEWS_TEMPLATE_ID` | 6 |
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-06 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

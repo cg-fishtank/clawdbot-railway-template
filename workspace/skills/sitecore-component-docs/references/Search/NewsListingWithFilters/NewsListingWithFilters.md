@@ -1,47 +1,44 @@
 # NewsListingWithFilters Component
 
 ## Purpose
+Renders a filterable news article listing powered by Sitecore Search (Reflektion). Like `InsightsListingWithFilters`, it reuses the generic `SearchListingWithFiltersWidget` but pre-configures it with `NEWS_TEMPLATE_ID` and `ARTICLE_VARIANTS.NEWS` so results are scoped exclusively to news content items. The current page item ID is passed as a React key to ensure the widget resets on client-side navigation. If no widget ID is configured the component shows `NoWidgetIdError` in Experience Editor.
 
-The NewsListingWithFilters component displays a searchable, filterable listing of "News" content type articles using Sitecore Search (RFK). It provides faceted filtering, keyword search, and pagination specifically configured for the News article variant. This component is typically used on news hub, press release, or media pages.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `648113ab-a10b-4fef-adab-5f278c015800` |
+| **Component Name** | `NewsListingWithFilters` |
+| **Category** | `Search` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Search/News Listing With Filters`
-- **Template Name:** `News Listing With Filters`
-
-### Fields
-
+## Fields
 | Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | No | Main heading displayed above the listing | Recommended max 80 characters |
-| tagsHeading | Single-Line Text | No | Label for the tags/filter section | e.g., "Filter by topic" |
-| noResultsText | Single-Line Text | No | Message shown when no results match filters | e.g., "No news found" |
-| widgetId | Single-Line Text | Yes | Sitecore Search widget ID (RFK ID) | Must match configured Search widget |
-| PageSizeCount | Number | No | Number of results per page | Default varies by widget config |
-| filterByKeyword | Treelist | No | Pre-configured keyword filters | Links to tag items |
-| tags | Treelist | No | Category/tag filter options | Links to tag or category items |
+|------------|--------------|----------|-------------|----------------------|
+| `widgetId` | Single-Line Text (`Field<string>`) | Yes | Sitecore Search widget ID (`rfkId`) | Must match a configured widget in the Sitecore Search portal |
+| `heading` | Single-Line Text (`Field<string>`) | No | Optional heading rendered above the widget | — |
+| `tagsHeading` | Single-Line Text (`Field<string>`) | No | Label displayed above the tag filter group | — |
+| `noResultsText` | Single-Line Text (`Field<string>`) | No | Message shown when search returns zero results | — |
+| `PageSizeCount` | Integer (`Field<number>`) | No | Number of results per page | Positive integer |
+| `filterByKeyword` | Treelist (`TagType[]`) | No | Pre-selected keyword filter items | Treelist of Tag items |
+| `tags` | Treelist (`TagType[] \| CategoryType[]`) | No | Pre-selected tag/category filter items | Treelist of Tag/Category items |
 
-### Rendering Parameters (Styles)
-
-| Parameter | Type | Options | Default | Description |
-|-----------|------|---------|---------|-------------|
-| theme | Droplist | primary, secondary, tertiary | primary | Color theme for the component |
-| padding (top) | Droplist | top-none, top-xs, top-sm, top-md, top-lg, top-xl | none | Top padding |
-| padding (bottom) | Droplist | bottom-none, bottom-xs, bottom-sm, bottom-md, bottom-lg, bottom-xl | none | Bottom padding |
+## Placeholders
+**Placeholders:** None
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} tag="h2" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| tagsHeading | `<Text field={fields?.tagsHeading} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| noResultsText | `<Text field={fields?.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+|---------------|--------------|--------|
+| `widgetId` | `props.fields?.widgetId?.value` (raw string) | — |
+| `heading` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `noResultsText` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
-## Component Props Interface
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard news listing with filters, scoped to News template |
 
+## Props Interface
 ```typescript
+// lib/types/components/Search/search-listing-filters.ts
 import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { CategoryType } from 'lib/helpers/page-category';
@@ -62,229 +59,34 @@ export type SearchListingWithFiltersProps = ComponentProps & {
 };
 ```
 
-## Content Type Filtering
-
-This component automatically filters results to the News content type using:
-
-- **Template ID:** `NEWS_TEMPLATE_ID` from `lib/graphql/id`
-- **Variant:** `ARTICLE_VARIANTS.NEWS` for card display styling
-
-This ensures only News-type articles appear in the listing, regardless of other filter selections.
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The main title for the news listing section
-- **Tone/Style:** Clear, professional, newsworthy
-- **Character limit:** 80 characters recommended
-- **Example:** "Latest News" or "Press Releases"
-
-#### tagsHeading
-
-- **What to enter:** Label text for the filter/tags section
-- **Tone/Style:** Instructional, concise
-- **Example:** "Filter by topic" or "Browse by year"
-
-#### noResultsText
-
-- **What to enter:** Message displayed when no news matches the current filters
-- **Tone/Style:** Helpful, encouraging
-- **Example:** "No news articles found. Try broadening your search." or "No press releases match your criteria."
-
-#### widgetId (Required)
-
-- **What to enter:** The Sitecore Search (Discover) widget ID
-- **How to obtain:** Get from Sitecore Search portal under Widgets configuration
-- **Format:** Alphanumeric string (e.g., "rfkid_news")
-- **Important:** This field MUST be configured for the component to function
-
-#### PageSizeCount
-
-- **What to enter:** Number of news articles to display per page
-- **Recommended values:** 6, 9, or 12 (multiples of 3 for grid layout)
-- **Example:** `9`
-
-#### filterByKeyword
-
-- **What to select:** Keyword items that enable pre-filtering
-- **Selection path:** `/sitecore/content/[Site]/Data/Keywords/`
-
-#### tags
-
-- **What to select:** Category or tag items for filter facets
-- **Selection path:** `/sitecore/content/[Site]/Data/Page Categories/` or `/sitecore/content/[Site]/Data/Tags/`
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields | Optional Fields | Use Case |
-|-----------|-----------------|-----------------|----------|
-| Minimal | widgetId | - | Basic news listing |
-| Standard | widgetId, heading | tagsHeading, noResultsText | Typical news hub page |
-| Full | widgetId, heading, tagsHeading | noResultsText, tags, filterByKeyword, PageSizeCount | Complete press center |
-
 ## Example Content Entry
 
 ### Minimum Viable Content
-
-```json
-{
-  "fields": {
-    "widgetId": { "value": "rfkid_news" }
-  }
-}
-```
+| Field | Value |
+|-------|-------|
+| `widgetId` | `rfkid_news_listing` |
 
 ### Full Content Example
-
-```json
-{
-  "fields": {
-    "heading": { "value": "Latest News" },
-    "tagsHeading": { "value": "Filter by topic" },
-    "noResultsText": { "value": "No news articles found." },
-    "widgetId": { "value": "rfkid_news" },
-    "PageSizeCount": { "value": 9 },
-    "tags": [
-      {
-        "displayName": "Company Updates",
-        "fields": { "pageCategory": { "value": "Company Updates" } }
-      },
-      {
-        "displayName": "Product News",
-        "fields": { "pageCategory": { "value": "Product News" } }
-      },
-      {
-        "displayName": "Press Releases",
-        "fields": { "pageCategory": { "value": "Press Releases" } }
-      }
-    ]
-  }
-}
-```
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Component datasources: `/sitecore/content/[Site]/Home/Data/News Listings/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading, tagsHeading, noResultsText
-- **Forms panel required:** widgetId, PageSizeCount, tags, filterByKeyword
-- **Search widget:** Requires Sitecore Search configuration to be active
-
-### Sitecore Search Integration
-
-This component integrates with Sitecore Search (formerly Discover/RFK). Prerequisites:
-
-1. Sitecore Search account configured
-2. Search widget created in Sitecore Search portal
-3. API keys configured in environment variables (SEARCH_CONFIG)
-4. News content indexed with proper template ID
-
-## Relationship to ArticleBanner Variants
-
-News articles displayed by this component typically link to article detail pages using the **ArticleBanner-News** variant, which displays with:
-- Secondary (gray) badge theme
-- Outline button style
-
-## Common Mistakes to Avoid
-
-1. **Missing widgetId:** The component will show an error message in editing mode if widgetId is not configured.
-
-2. **Wrong content type indexed:** Ensure News content is properly indexed with the `NEWS_TEMPLATE_ID` for filtering to work.
-
-3. **Mixing news with general articles:** This component should only show news. For mixed content, use ArticleListingWithFilters.
-
-4. **Forgetting Search configuration:** The SEARCH_CONFIG environment variables must be set with valid API keys.
-
-## Related Components
-
-- `ArticleListingWithFilters` - Generic article listing without content type filter
-- `InsightsListingWithFilters` - Similar listing for Insights content type
-- `ArticleBanner-News` - Detail page banner variant for News articles
-
-## Troubleshooting
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| "No widget id configured" error | widgetId field is empty | Add valid Sitecore Search widget ID |
-| No results displayed | Search not configured or content not indexed | Verify SEARCH_CONFIG and index status |
-| Non-news content appearing | Template ID filtering not working | Verify NEWS_TEMPLATE_ID constant |
-| Wrong card styling | Variant not applied | Check ARTICLE_VARIANTS.NEWS usage |
-
----
+| Field | Value |
+|-------|-------|
+| `widgetId` | `rfkid_news_listing` |
+| `heading` | `News` |
+| `tagsHeading` | `Filter by Category` |
+| `noResultsText` | `No news articles found matching your criteria.` |
+| `PageSizeCount` | `12` |
+| `filterByKeyword` | _(Treelist: Tag items)_ |
+| `tags` | _(Treelist: Category items)_ |
 
 ## MCP Authoring Instructions
-
-### Prerequisites
-
-Before authoring this component via MCP:
-
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the NewsListingWithFilters rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"`)
-4. Have a valid Sitecore Search widget ID
-
-### Step 1: Add Component to Page
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "news-listing-with-filters-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "NewsListingWithFilters_1",
-  language: "en",
-  fields: {
-    "heading": "Latest News",
-    "tagsHeading": "Filter by topic",
-    "noResultsText": "No news found.",
-    "widgetId": "rfkid_news"
-  }
-});
-```
-
-### Step 2: Update Configuration (Optional)
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "PageSizeCount": "9"
-  }
-});
-```
-
-### Field Type Quick Reference
-
-| Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
-| tagsHeading | Single-Line Text | `"Plain text value"` |
-| noResultsText | Single-Line Text | `"Plain text value"` |
-| widgetId | Single-Line Text | `"rfkid_news"` |
-| PageSizeCount | Number | `"9"` |
-| tags | Treelist | `"{GUID1}|{GUID2}"` |
-| filterByKeyword | Treelist | `"{GUID1}|{GUID2}"` |
-
-### MCP Authoring Checklist
-
-- [ ] Have page ID from search
-- [ ] Have rendering ID from component manifest
-- [ ] Placeholder is `"headless-main"` (no leading slash)
-- [ ] Component name is unique
-- [ ] widgetId is a valid Sitecore Search widget ID
+To add this component to a page:
+1. Insert the `NewsListingWithFilters` rendering onto the page in the desired placeholder.
+2. Set the **datasource** to an item with the fields above (typically under `/sitecore/content/{Site}/Data/Search`).
+3. The **`widgetId`** field is mandatory — obtain the correct `rfkId` from the Sitecore Search portal for the News Listing widget.
+4. The component automatically scopes results to the News template ID; no additional template configuration is needed.
+5. `filterByKeyword` and `tags` Treelist fields accept items from the site taxonomy to pre-apply filters on page load.
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

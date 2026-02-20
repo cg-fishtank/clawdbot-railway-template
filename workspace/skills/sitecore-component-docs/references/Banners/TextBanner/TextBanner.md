@@ -1,102 +1,59 @@
 # TextBanner Component
 
 ## Purpose
+TextBanner is a text-only banner section — there is no background image. It renders a large `<h1>` heading and an optional rich-text subheading, centered (or aligned by Frame context) within a contained-width wrapper. A `buttons` placeholder sits beneath the text, allowing one or more CTAs to be placed without an image distraction. It is ideal for section dividers, announcement strips, and call-to-action panels where imagery would compete with the copy.
 
-The TextBanner component displays a clean, text-focused banner section with a prominent heading, optional subheading, and call-to-action buttons. It uses the surface background color (no image) with configurable content alignment and theme. This component is ideal for section introductions, simple announcements, page headers without imagery, and transitional sections between content blocks.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `e1c23b3a-a5fd-45b3-a686-6e08a04a5fe6` |
+| **Component Name** | `TextBanner` |
+| **Category** | `Banners` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Components/Banners/Text Banner`
-- **Template Name:** `Text Banner`
-
-### Fields
-
-| Field Name | Sitecore Type    | Required | Description                               | Validation/Constraints                    |
-| ---------- | ---------------- | -------- | ----------------------------------------- | ----------------------------------------- |
-| heading    | Single-Line Text | Yes      | Main headline displayed prominently       | Recommended max 80 characters             |
-| subheading | Rich Text        | No       | Supporting text below the headline        | Supports basic formatting, max-width 800px |
-
-### Rendering Parameters (Styles)
-
-| Parameter        | Type     | Options                                           | Default                                    | Description                          |
-| ---------------- | -------- | ------------------------------------------------- | ------------------------------------------ | ------------------------------------ |
-| theme            | Droplist | primary, secondary, tertiary                      | primary                                    | Color theme (background and text)    |
-| contentAlignment | Droplist | items-start justify-start text-left, items-center justify-center text-center, items-end justify-end text-right | items-center justify-center text-center | Text and content alignment           |
-| padding (top)    | Droplist | top-none, top-xs, top-sm, top-md, top-lg, top-xl  | none                                       | Top padding                          |
-| padding (bottom) | Droplist | bottom-none, bottom-xs, bottom-sm, bottom-md, bottom-lg, bottom-xl | none                                   | Bottom padding                       |
-
-## JSS Field Component Mapping
-
-| Sitecore Field | JSS Component                                               | Import                                                  |
-| -------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
-| heading        | `<Text field={fields?.heading} tag="h1" className="..." />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| subheading     | `<RichText field={fields?.subheading} className="..." />`   | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+## Fields
+| Field Name | Sitecore Type | Required | Description | Validation / Constraints |
+|------------|--------------|----------|-------------|--------------------------|
+| `heading` | Single-Line Text (`Field<string>`) | Yes | Primary headline rendered as an `<h1>` | Non-empty; displayed at `heading-4xl` / `heading-5xl` (md+) |
+| `subheading` | Rich Text (`Field<string>`) | No | Supporting text below the heading; rendered as rich text up to `max-w-200` | Supports inline HTML |
 
 ## Placeholders
+| Placeholder Key | Allowed Components | Notes |
+|----------------|--------------------|-------|
+| `buttons` | Button | Rendered only when at least one component is present; flex row with Frame-driven alignment |
 
-| Placeholder Name | Description                                         | Allowed Components |
-| ---------------- | --------------------------------------------------- | ------------------ |
-| buttons          | CTA buttons displayed below the content             | Button, LinkButton |
+> The placeholder name is generated via `placeholderGenerator(params, 'buttons')`. Buttons are conditionally rendered: the wrapper `<div>` is only emitted when `components?.length > 0`.
+
+## JSS Field Component Mapping
+| Sitecore Field | JSS Component | Import |
+|---------------|--------------|--------|
+| `heading` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `subheading` | `<RichText>` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Text-only banner with heading, subheading, and optional buttons |
 
-The TextBanner exports 1 rendering variant:
-
-| Variant | Export Name | Use Case                                    |
-| ------- | ----------- | ------------------------------------------- |
-| Default | `Default`   | Standard text banner with centered content  |
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The primary section or page headline
-- **Tone/Style:** Clear, direct, attention-grabbing
-- **Character limit:** 80 characters recommended for best display
-- **Example:** "Ready to Get Started?"
-
-#### subheading
-
-- **What to enter:** Supporting context or call-to-action text
-- **Tone/Style:** Informative, complements the headline
-- **Formatting:** Basic rich text - bold, italic, links
-- **Max width:** Content is constrained to 800px (max-w-200)
-- **Example:** "<p>Join thousands of customers who have transformed their business with our solutions.</p>"
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields | Optional Fields       | Use Case                           |
-| --------- | --------------- | --------------------- | ---------------------------------- |
-| Minimal   | heading         | -                     | Simple section header              |
-| Standard  | heading, subheading | -                  | Section with description           |
-| Full      | heading, subheading | buttons            | Complete CTA section               |
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-import { Field } from '@sitecore-content-sdk/nextjs';
-import { ComponentProps } from 'lib/component-props';
+// From lib/types/components/Banners/text-banner (inferred)
+import { TextBannerProps } from 'lib/types/components/Banners/text-banner';
 
-type TextBannerFields = {
-  heading: Field<string>;
-  subheading?: Field<string>;
-};
-
-export type TextBannerProps = ComponentProps & {
-  fields: TextBannerFields;
+type TextBannerProps = ComponentProps & {
+  fields: {
+    heading: Field<string>;
+    subheading?: Field<string>;
+  };
 };
 ```
 
 ## Example Content Entry
 
 ### Minimum Viable Content
-
 ```json
 {
+  "componentName": "TextBanner",
+  "dataSource": "/sitecore/content/MySite/Data/Banners/CtaTextBanner",
   "fields": {
     "heading": { "value": "Ready to Get Started?" }
   }
@@ -104,208 +61,51 @@ export type TextBannerProps = ComponentProps & {
 ```
 
 ### Full Content Example
-
 ```json
 {
+  "componentName": "TextBanner",
+  "dataSource": "/sitecore/content/MySite/Data/Banners/CtaTextBanner",
   "fields": {
-    "heading": { "value": "Ready to Transform Your Business?" },
-    "subheading": {
-      "value": "<p>Join thousands of customers who have achieved remarkable results with our platform. Start your journey today.</p>"
-    }
+    "heading": { "value": "Ready to Get Started?" },
+    "subheading": { "value": "<p>Join thousands of customers who trust our platform every day. No contracts, no hidden fees.</p>" }
+  },
+  "placeholders": {
+    "buttons": [
+      { "componentName": "Button", "fields": { "link": { "value": { "href": "/sign-up", "text": "Create Free Account" } } } },
+      { "componentName": "Button", "fields": { "link": { "value": { "href": "/pricing", "text": "See Pricing" } } } }
+    ]
   }
 }
 ```
 
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Data sources: `/sitecore/content/[Site]/Home/Data/Text Banners/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading, subheading
-- **Forms panel required:** None (all fields are inline editable)
-- **Placeholder:** Add buttons via the "buttons" placeholder
-
-### Layout Notes
-
-- Minimum height: 320px (min-h-80)
-- Content is wrapped in ContainedWrapper for max-width constraint
-- Vertical padding: 60px (py-15)
-- Responsive: Text sizes adjust between mobile and desktop
-
-### Accessibility Features
-
-- **role="region":** Component has region role for landmark navigation
-- **aria-label:** Set to the heading value for screen readers
-
-### Personalization Opportunities
-
-- **heading/subheading:** Personalize messaging based on visitor segments
-- **theme:** Use different color themes for different campaigns
-- **Buttons:** Show different CTAs based on visitor behavior
-
-## Common Mistakes to Avoid
-
-1. **Overly long headings:** Headlines exceeding 80 characters may wrap to multiple lines.
-
-2. **Rich text overload in subheading:** Keep subheading text concise (1-2 sentences). It has a max-width constraint of 800px.
-
-3. **Missing CTAs:** TextBanners are often used for calls-to-action; don't forget to add buttons via the placeholder.
-
-4. **Inconsistent alignment:** Match contentAlignment with your page design. Centered (default) works best for most cases.
-
-5. **Theme mismatch:** Ensure the theme matches surrounding sections for visual consistency.
-
-## Related Components
-
-- `ContentBanner` - Banner with background image
-- `HeroBanner` - Full hero section with background image
-- `SplitBanner` - Side-by-side image and content layout
-- `RichTextBlock` - For longer text content without banner styling
-
----
-
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the TextBanner component using the Marketer MCP tools.
+### Step 1: Add to Page
+1. Open the target page in Sitecore Pages or Experience Editor.
+2. Click **Add component** in the desired layout slot.
+3. Search for **TextBanner** and select it.
+4. Assign or create a datasource under the site's Data/Banners folder.
 
-### Prerequisites
+### Step 2: Populate Fields
+| Field | Action |
+|-------|--------|
+| `heading` | Enter the primary headline text (required). This renders as the page's `<h1>`. |
+| `subheading` | Optionally add supporting copy via the rich-text editor. Keep concise — the banner has no image to balance longer text. |
 
-Before authoring this component via MCP:
-
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the TextBanner rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"` for root placement)
-
-### Step 1: Find the Target Page
-
-```javascript
-// Search for the page where TextBanner will be added
-await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Contact Page"
-});
-// Returns: { itemId: "page-guid", name: "PageName", path: "/sitecore/..." }
-```
-
-### Step 2: Add TextBanner to Page
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "text-banner-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "TextBanner_1",
-  language: "en",
-  fields: {
-    "heading": "Ready to Transform Your Business?",
-    "subheading": "<p>Join thousands of customers who have achieved remarkable results.</p>"
-  }
-});
-
-// Returns:
-// {
-//   "datasourceId": "created-datasource-guid",
-//   "placeholderId": "headless-main"
-// }
-```
-
-### Step 3: Add Button Components (Optional)
-
-Add buttons to the buttons placeholder:
-
-```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "button-rendering-id",
-  placeholderPath: "headless-main/buttons-{TEXT-BANNER-UID}",
-  componentItemName: "TextBanner_CTA",
-  language: "en",
-  fields: {
-    "linkText": "Contact Us",
-    "linkUrl": "/contact"
-  }
-});
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Home"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add TextBanner component
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "text-banner-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "TextBanner_CTA_Section",
-  language: "en",
-  fields: {
-    "heading": "Ready to Transform Your Business?",
-    "subheading": "<p>Join thousands of customers who have achieved remarkable results with our platform. Start your journey today.</p>"
-  }
-});
-
-const datasourceId = addResult.datasourceId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 3: (Optional) Update fields if needed
-// ═══════════════════════════════════════════════════════════════
-// All fields are text-based and can be set in add_component_on_page
-// No additional update needed unless modifying later
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: TextBanner with all fields populated
-// ═══════════════════════════════════════════════════════════════
-```
+### Step 3: Add Buttons (Optional)
+1. In the `buttons` placeholder, click **Add component** and select **Button**.
+2. Configure the link URL, display text, and variant.
+3. If no buttons are added, the placeholder wrapper is suppressed entirely — no empty space is left behind.
 
 ### Field Type Quick Reference
-
-| Field      | Type             | MCP Format              |
-| :--------- | :--------------- | :---------------------- |
-| heading    | Single-Line Text | `"Plain text value"`    |
-| subheading | Rich Text        | `"<p>HTML content</p>"` |
-
-### MCP Authoring Checklist
-
-Before authoring TextBanner via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have TextBanner rendering ID (from component manifest)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] Component item name is unique (e.g., `TextBanner_1`)
-
-### MCP Error Handling
-
-| Error                  | Cause                   | Solution                                    |
-| :--------------------- | :---------------------- | :------------------------------------------ |
-| "Item already exists"  | Duplicate component name | Use unique suffix: `TextBanner_2`          |
-| Component not visible  | Wrong placeholder path   | Use `"headless-main"` without leading slash |
-| `updatedFields: {}`    | Normal response          | Update succeeded despite empty response    |
-| "Cannot find field"    | Wrong field name         | Field names are case-sensitive             |
-
-### Related Skills for MCP Authoring
-
-| Skill                          | Purpose                                  |
-| :----------------------------- | :--------------------------------------- |
-| `/sitecore-author-placeholder` | Placeholder path construction rules      |
-| `/sitecore-pagebuilder`        | Full page creation workflow              |
+| Field | Sitecore Template Field Type | Notes |
+|-------|------------------------------|-------|
+| `heading` | Single-Line Text | Renders as `<h1>`; plain text only |
+| `subheading` | Rich Text | Supports bold, italic, inline links |
 
 ---
 
 ## Change Log
-
-| Date       | Change                | Author      |
-| ---------- | --------------------- | ----------- |
-| 2026-02-09 | Initial documentation | Claude Code |
+| Date | Change | Author |
+|------|--------|--------|
+| 2026-02-19 | Initial documentation | Claude Code |

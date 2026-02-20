@@ -1,431 +1,152 @@
 # SplitBanner Component
 
 ## Purpose
+SplitBanner is a two-column banner that places an image on one side and authored text content on the other. The image column fills exactly half the banner width on large viewports, while the content column holds a heading, optional subheading, optional body copy, a link field, and a `buttons` placeholder. A `Contained` variant wraps the same layout inside a `ContainedWrapper` to constrain its maximum width to the site's content grid, whereas the `Default` variant spans the full viewport width.
 
-The SplitBanner component displays a side-by-side layout with an image on one side and content (heading, subheading, body text, and CTAs) on the other. It supports configurable image positioning (left or right) and responsive behavior that stacks content vertically on mobile. This component is ideal for feature highlights, product showcases, and content sections that benefit from visual separation between imagery and text.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `f22c31f6-9a23-406b-8285-4391a49926f7` |
+| **Component Name** | `SplitBanner` |
+| **Category** | `Banners` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Components/Banners/Split Banner`
-- **Template Name:** `Split Banner`
-
-### Fields
-
-| Field Name  | Sitecore Type    | Required | Description                               | Validation/Constraints                    |
-| ----------- | ---------------- | -------- | ----------------------------------------- | ----------------------------------------- |
-| heading     | Single-Line Text | Yes      | Main headline displayed in the content area | Recommended max 80 characters           |
-| subheading  | Rich Text        | No       | Emphasized supporting text                | Supports basic formatting                 |
-| body        | Rich Text        | No       | Detailed description or body text         | Supports full rich text formatting        |
-| image       | Image            | Yes      | Desktop image (displays on half the width) | Recommended 960x640px minimum            |
-| imageMobile | Image            | No       | Mobile-specific image                     | Recommended 800x600px                     |
-| link        | General Link     | No       | [VERIFY: May not be used in rendering]    | Internal or external link                 |
-
-### Rendering Parameters (Styles)
-
-| Parameter        | Type     | Options                                           | Default                  | Description                          |
-| ---------------- | -------- | ------------------------------------------------- | ------------------------ | ------------------------------------ |
-| theme            | Droplist | primary, secondary, tertiary                      | primary                  | Color theme for the content area     |
-| bannerImgLeft    | Checkbox | true, false                                       | false                    | When true, positions image on left   |
-| contentAlignment | Droplist | items-start text-left, items-center text-center, items-end text-right | items-start text-left | Text alignment within content area   |
-| padding (top)    | Droplist | top-none, top-xs, top-sm, top-md, top-lg, top-xl  | none                     | Top padding                          |
-| padding (bottom) | Droplist | bottom-none, bottom-xs, bottom-sm, bottom-md, bottom-lg, bottom-xl | none                 | Bottom padding                       |
-
-## JSS Field Component Mapping
-
-| Sitecore Field | JSS Component                                               | Import                                                  |
-| -------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
-| heading        | `<Text field={fields?.heading} tag="h2" className="..." />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| subheading     | `<RichText field={fields?.subheading} className="..." />`   | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
-| body           | `<RichText field={fields?.body} className="..." />`         | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
-| image          | `<HalfWidthImage image={imageSrc} />`                       | Custom component using `useImage` hook                  |
-| imageMobile    | `<HalfWidthImage image={imageSrc} />`                       | Falls back to image if not provided                     |
+## Fields
+| Field Name | Sitecore Type | Required | Description | Validation / Constraints |
+|------------|--------------|----------|-------------|--------------------------|
+| `image` | Image (`ImageField`) | Yes | Desktop image displayed in the image half of the banner | Recommended min-width 960px; used by `useImage` hook which falls back to `imageMobile` |
+| `imageMobile` | Image (`ImageField`) | Yes | Mobile-specific image | Recommended min-width 768px |
+| `heading` | Single-Line Text (`Field<string>`) | Yes | Main banner headline rendered as `<h2>` | Non-empty; displayed at `heading-4xl` / `heading-5xl` (lg+) |
+| `subheading` | Rich Text (`Field<string>`) | No | Secondary headline or introductory line beneath the main heading | Supports inline HTML |
+| `body` | Rich Text (`Field<string>`) | No | Longer descriptive body copy | Supports inline HTML |
+| `link` | General Link (`LinkField`) | No | Optional standalone link (separate from placeholder buttons) | href + link text |
 
 ## Placeholders
+| Placeholder Key | Allowed Components | Notes |
+|----------------|--------------------|-------|
+| `buttons` | Button | Rendered in a flex row below the body copy; supports multiple CTAs |
 
-| Placeholder Name | Description                                         | Allowed Components |
-| ---------------- | --------------------------------------------------- | ------------------ |
-| buttons          | CTA buttons displayed below the body text           | Button, LinkButton |
+> The placeholder name is generated via `placeholderGenerator(params, 'buttons')`.
+
+## JSS Field Component Mapping
+| Sitecore Field | JSS Component | Import |
+|---------------|--------------|--------|
+| `heading` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `subheading` | `<RichText>` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| `body` | `<RichText>` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| `image` / `imageMobile` | `<HalfWidthImage>` (shared) | `import { HalfWidthImage } from 'component-children/Shared/Image/Image'` |
 
 ## Component Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Full-width two-column layout; image fills its half to the viewport edge |
+| Contained | `Contained` | Same layout wrapped in `ContainedWrapper`; max-width constrained to site content grid |
 
-The SplitBanner exports 2 rendering variants:
+### Contained Variant Implementation
+The `Contained` export renders `ContainedSplitBanner`, which wraps the base `SplitBanner` child inside a `<ContainedWrapper>` and passes `variant="Contained"` to the child for `data-variant` attribution.
 
-| Variant   | Export Name | Layout                               | Use Case                                    |
-| --------- | ----------- | ------------------------------------ | ------------------------------------------- |
-| Default   | `Default`   | Full-width split layout              | Primary feature sections                    |
-| Contained | `Contained` | Max-width constrained split layout   | Contained sections with side margins        |
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The main feature or section headline
-- **Tone/Style:** Clear, benefit-focused, action-oriented
-- **Character limit:** 80 characters recommended for best display
-- **Example:** "Streamline Your Workflow with Automation"
-
-#### subheading
-
-- **What to enter:** Emphasized supporting statement or tagline
-- **Tone/Style:** Complements the headline, highlights key benefit
-- **Formatting:** Basic rich text, typically 1 line
-- **Example:** "<p>Reduce manual tasks by 50% with intelligent process automation.</p>"
-
-#### body
-
-- **What to enter:** Detailed description or explanation
-- **Tone/Style:** Informative, expands on the headline/subheading
-- **Formatting:** Full rich text support - paragraphs, lists, bold, links
-- **Example:** "<p>Our automation platform helps teams focus on high-value work by handling repetitive tasks automatically.</p>"
-
-#### image (Desktop)
-
-- **Recommended dimensions:** 960x640px or larger
-- **Aspect ratio:** 3:2 (landscape)
-- **File formats:** JPG, PNG, WebP
-- **Alt text requirements:** Descriptive text for accessibility
-- **Media Library path:** `/sitecore/media library/Project/[Site]/Features/`
-- **Tips:** Image fills half the component width on desktop
-
-#### imageMobile
-
-- **Recommended dimensions:** 800x600px
-- **Aspect ratio:** 4:3 (landscape)
-- **File formats:** JPG, PNG, WebP
-- **Alt text requirements:** Can be same as desktop image
-- **Media Library path:** `/sitecore/media library/Project/[Site]/Features/Mobile/`
-- **Tips:** Displays below 1024px viewport; stacks above or below content
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields    | Optional Fields                      | Use Case                           |
-| --------- | ------------------ | ------------------------------------ | ---------------------------------- |
-| Minimal   | heading, image     | -                                    | Simple feature highlight           |
-| Standard  | heading, subheading, image | body, imageMobile              | Feature with description           |
-| Full      | heading, subheading, body, image | imageMobile + buttons       | Complete feature section           |
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-import { Field, LinkField } from '@sitecore-content-sdk/nextjs';
-import { ComponentProps } from 'lib/component-props';
-import { ImageProps } from 'lib/hooks/useImage';
+// From lib/types/components/Banners/split-banner (inferred)
+import { SplitBannerProps } from 'lib/types/components/Banners/split-banner';
 
-type SplitBannerFields = ImageProps & {
-  heading: Field<string>;
-  subheading?: Field<string>;
-  body?: Field<string>;
-  link?: LinkField;
+type SplitBannerProps = ComponentProps & {
+  fields: {
+    image: ImageField;
+    imageMobile: ImageField;
+    heading: Field<string>;
+    subheading?: Field<string>;
+    body?: Field<string>;
+    link?: LinkField;
+  };
+  variant?: 'Default' | 'Contained';
 };
-
-export type SplitBannerProps = ComponentProps & {
-  fields: SplitBannerFields;
-  variant?: string;
-};
-
-// ImageProps includes:
-// - image: ImageField (required)
-// - imageMobile: ImageField (optional)
 ```
 
 ## Example Content Entry
 
 ### Minimum Viable Content
-
 ```json
 {
+  "componentName": "SplitBanner",
+  "dataSource": "/sitecore/content/MySite/Data/Banners/FeatureSplitBanner",
   "fields": {
-    "heading": { "value": "Streamline Your Workflow" },
     "image": {
-      "value": {
-        "src": "/-/media/Project/Site/Features/workflow-automation.jpg",
-        "alt": "Dashboard showing workflow automation",
-        "width": "960",
-        "height": "640"
-      }
-    }
+      "value": { "src": "/media/banners/split-desktop.jpg", "alt": "Product in use", "width": 960, "height": 700 }
+    },
+    "imageMobile": {
+      "value": { "src": "/media/banners/split-mobile.jpg", "alt": "Product in use", "width": 768, "height": 500 }
+    },
+    "heading": { "value": "Built for Performance" }
   }
 }
 ```
 
 ### Full Content Example
-
 ```json
 {
+  "componentName": "SplitBanner",
+  "dataSource": "/sitecore/content/MySite/Data/Banners/FeatureSplitBanner",
   "fields": {
-    "heading": { "value": "Streamline Your Workflow with Automation" },
-    "subheading": {
-      "value": "<p>Reduce manual tasks by 50% with intelligent process automation.</p>"
-    },
-    "body": {
-      "value": "<p>Our automation platform helps teams focus on high-value work by handling repetitive tasks automatically. From data entry to report generation, let technology do the heavy lifting.</p>"
-    },
     "image": {
-      "value": {
-        "src": "/-/media/Project/Site/Features/workflow-automation.jpg",
-        "alt": "Dashboard showing workflow automation in action",
-        "width": "960",
-        "height": "640"
-      }
+      "value": { "src": "/media/banners/split-desktop.jpg", "alt": "Product in use", "width": 960, "height": 700 }
     },
     "imageMobile": {
-      "value": {
-        "src": "/-/media/Project/Site/Features/Mobile/workflow-automation-mobile.jpg",
-        "alt": "Workflow automation dashboard",
-        "width": "800",
-        "height": "600"
-      }
-    }
+      "value": { "src": "/media/banners/split-mobile.jpg", "alt": "Product in use", "width": 768, "height": 500 }
+    },
+    "heading": { "value": "Built for Performance" },
+    "subheading": { "value": "<p>Engineered to exceed expectations.</p>" },
+    "body": { "value": "<p>Our product line combines cutting-edge materials with precision manufacturing to deliver unmatched durability and reliability in every environment.</p>" },
+    "link": { "value": { "href": "/products/performance", "text": "View Range" } }
+  },
+  "placeholders": {
+    "buttons": [
+      { "componentName": "Button", "fields": { "link": { "value": { "href": "/contact", "text": "Get a Quote" } } } }
+    ]
   }
 }
 ```
 
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Data sources: `/sitecore/content/[Site]/Home/Data/Split Banners/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading, subheading, body
-- **Forms panel required:** image, imageMobile
-- **Image selection:** Click image area to open media browser
-- **Placeholder:** Add buttons via the "buttons" placeholder
-
-### Rendering Variant Selection
-
-In Experience Editor or Content Editor:
-
-1. Select the SplitBanner component
-2. Open "Rendering Properties" or "Component Properties"
-3. Choose variant from dropdown: Default or Contained
-
-### Personalization Opportunities
-
-- **heading/subheading/body:** Personalize messaging based on visitor segments
-- **image:** Use different imagery for different industries or personas
-- **bannerImgLeft:** Alternate image positions for visual variety
-
-## Common Mistakes to Avoid
-
-1. **Missing mobile image:** If `imageMobile` is not set, the desktop image is used. Consider providing an optimized mobile crop.
-
-2. **Inconsistent image positioning:** When using multiple SplitBanners on a page, alternate `bannerImgLeft` for visual rhythm.
-
-3. **Overly long body text:** Keep body text concise. Long paragraphs reduce visual balance with the image.
-
-4. **Forgetting buttons:** Add CTAs via the buttons placeholder for engagement.
-
-5. **Wrong variant choice:** Use Default for full-width impact, Contained for content within page margins.
-
-6. **Missing alt text:** Always provide meaningful alt text for accessibility compliance.
-
-## Related Components
-
-- `ContentBanner` - Full-width banner with background image
-- `HeroBanner` - Hero section with background image and overlay
-- `TextBanner` - Text-only banner without image
-- `CardGrid` - For multiple features in card layout
-
----
-
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the SplitBanner component using the Marketer MCP tools.
+### Step 1: Add to Page
+1. Open the target page in Sitecore Pages or Experience Editor.
+2. Click **Add component** in the desired layout slot.
+3. Search for **SplitBanner** and select either the **Default** or **Contained** variant.
+4. Assign or create a datasource under the site's Data/Banners folder.
 
-### Prerequisites
+### Step 2: Choose a Variant
+| Variant | When to Use |
+|---------|-------------|
+| Default | When the banner should bleed to the viewport edge (e.g. a hero-like mid-page moment) |
+| Contained | When the banner should align to the site's content grid (e.g. inside an article or product page) |
 
-Before authoring this component via MCP:
+### Step 3: Populate Fields
+| Field | Action |
+|-------|--------|
+| `image` | Select a desktop landscape image from the Media Library (required). |
+| `imageMobile` | Select or upload a mobile-optimised crop (required). |
+| `heading` | Enter the main headline text (required). |
+| `subheading` | Optionally add a secondary headline using the rich-text editor. |
+| `body` | Optionally add supporting paragraph copy. |
+| `link` | Optionally add a standalone text link (separate from placeholder buttons). |
 
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the SplitBanner rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"` for root placement)
-4. Have media IDs for any images to be used
-
-### Step 1: Find the Target Page
-
-```javascript
-// Search for the page where SplitBanner will be added
-await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Features Page"
-});
-// Returns: { itemId: "page-guid", name: "PageName", path: "/sitecore/..." }
-```
-
-### Step 2: Add SplitBanner to Page
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "split-banner-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "SplitBanner_1",
-  language: "en",
-  fields: {
-    "heading": "Streamline Your Workflow with Automation",
-    "subheading": "<p>Reduce manual tasks by 50%.</p>",
-    "body": "<p>Our platform helps teams focus on high-value work.</p>"
-  }
-});
-
-// Returns:
-// {
-//   "datasourceId": "created-datasource-guid",
-//   "placeholderId": "headless-main"
-// }
-```
-
-**IMPORTANT:** Save the `datasourceId` - it's needed for updating image fields.
-
-### Step 3: Update Image Fields
-
-Image fields require XML format with specific syntax:
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,  // From Step 2
-  language: "en",
-  fields: {
-    "image": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />",
-    "imageMobile": "<image mediaid='{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}' />"
-  }
-});
-```
-
-**Image Field Rules:**
-
-- MUST use single quotes around attribute values
-- GUID MUST be wrapped in braces: `{GUID}`
-- GUID should be UPPERCASE
-- If image needs uploading first, use `/sitecore-upload-media` skill
-
-### Step 4: Add Button Components (Optional)
-
-Add buttons to the buttons placeholder:
-
-```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "button-rendering-id",
-  placeholderPath: "headless-main/buttons-{SPLIT-BANNER-UID}",
-  componentItemName: "SplitBanner_CTA",
-  language: "en",
-  fields: {
-    "linkText": "Learn More",
-    "linkUrl": "/features/automation"
-  }
-});
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Features"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add SplitBanner component
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "split-banner-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "SplitBanner_Automation",
-  language: "en",
-  fields: {
-    "heading": "Streamline Your Workflow with Automation",
-    "subheading": "<p>Reduce manual tasks by 50% with intelligent process automation.</p>",
-    "body": "<p>Our automation platform helps teams focus on high-value work by handling repetitive tasks automatically.</p>"
-  }
-});
-
-const datasourceId = addResult.datasourceId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 3: Update image fields
-// ═══════════════════════════════════════════════════════════════
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "image": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />",
-    "imageMobile": "<image mediaid='{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}' />"
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: SplitBanner with all fields populated
-// ═══════════════════════════════════════════════════════════════
-```
-
-### Variant Selection via Rendering
-
-To use a specific variant, use the corresponding rendering ID:
-
-| Variant   | Rendering Name        |
-| --------- | --------------------- |
-| Default   | `SplitBanner`         |
-| Contained | `SplitBanner-Contained` |
+### Step 4: Add Buttons
+1. In the `buttons` placeholder, click **Add component** and select **Button**.
+2. Configure the link URL, text, and styling variant.
 
 ### Field Type Quick Reference
-
-| Field       | Type             | MCP Format                          |
-| :---------- | :--------------- | :---------------------------------- |
-| heading     | Single-Line Text | `"Plain text value"`                |
-| subheading  | Rich Text        | `"<p>HTML content</p>"`             |
-| body        | Rich Text        | `"<p>HTML content</p>"`             |
-| image       | Image            | `<image mediaid='{GUID}' />`        |
-| imageMobile | Image            | `<image mediaid='{GUID}' />`        |
-| link        | General Link     | `<link linktype='internal' ... />`  |
-
-### MCP Authoring Checklist
-
-Before authoring SplitBanner via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have SplitBanner rendering ID (from component manifest)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] Component item name is unique (e.g., `SplitBanner_1`)
-- [ ] Have media GUIDs for image field
-- [ ] Image XML uses single quotes and braces: `<image mediaid='{GUID}' />`
-
-### MCP Error Handling
-
-| Error                  | Cause                   | Solution                                    |
-| :--------------------- | :---------------------- | :------------------------------------------ |
-| "Item already exists"  | Duplicate component name | Use unique suffix: `SplitBanner_2`         |
-| Component not visible  | Wrong placeholder path   | Use `"headless-main"` without leading slash |
-| Image not showing      | Wrong XML format         | Verify single quotes, braces around GUID   |
-| `updatedFields: {}`    | Normal response          | Update succeeded despite empty response    |
-| "Cannot find field"    | Wrong field name         | Field names are case-sensitive             |
-
-### Related Skills for MCP Authoring
-
-| Skill                          | Purpose                                  |
-| :----------------------------- | :--------------------------------------- |
-| `/sitecore-author-placeholder` | Placeholder path construction rules      |
-| `/sitecore-author-image`       | Image field XML formatting details       |
-| `/sitecore-upload-media`       | Upload images to Media Library first     |
-| `/sitecore-pagebuilder`        | Full page creation workflow              |
+| Field | Sitecore Template Field Type | Notes |
+|-------|------------------------------|-------|
+| `image` | Image | Landscape; recommended 960px+ wide |
+| `imageMobile` | Image | Portrait/square crop; recommended 768px wide |
+| `heading` | Single-Line Text | Renders as `<h2>` |
+| `subheading` | Rich Text | Bold/italic/links supported |
+| `body` | Rich Text | Full rich-text editing supported |
+| `link` | General Link | Internal or external URL + display text |
 
 ---
 
 ## Change Log
-
-| Date       | Change                | Author      |
-| ---------- | --------------------- | ----------- |
-| 2026-02-09 | Initial documentation | Claude Code |
+| Date | Change | Author |
+|------|--------|--------|
+| 2026-02-19 | Initial documentation | Claude Code |

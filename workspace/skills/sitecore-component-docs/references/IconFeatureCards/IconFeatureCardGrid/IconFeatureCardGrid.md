@@ -1,73 +1,50 @@
 # IconFeatureCardGrid Component
 
 ## Purpose
+IconFeatureCardGrid is a section container that renders a heading, an optional rich-text subheading, and a responsive grid of `IconFeatureCard` components via a Sitecore placeholder. The grid uses a custom `render` prop to output a 1-column layout on mobile, 2-column on tablet, and 4-column on desktop with consistent gap spacing. It is wrapped in a `ContainedWrapper` for max-width centering and a `Frame` for theme/spacing context.
 
-The IconFeatureCardGrid component serves as a container for displaying a collection of IconFeatureCard components in a responsive grid layout. It includes a heading and subheading for the section, followed by a 4-column grid (desktop) that stacks responsively on smaller screens. The component is ideal for feature highlights, service offerings, or benefit sections.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `1b8a9932-1383-4d81-aedd-0e86025c0a98` |
+| **Component Name** | `IconFeatureCardGrid` |
+| **Category** | `IconFeatureCards` |
 
-## Sitecore Template Requirements
+## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| `heading` | Single-Line Text | Yes | Section heading rendered as `<h2>` with `heading-4xl` style |
+| `subheading` | Rich Text | No | Optional introductory text below the heading |
 
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Feature Cards/Icon Feature Card Grid`
-- **Template Name:** `Icon Feature Card Grid`
-
-### Fields
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | Yes | Section heading (H2) | Recommended max 80 characters |
-| subheading | Rich Text | No | Section description/introduction | Keep concise, 1-2 sentences |
-
-## Placeholder Configuration
-
-| Placeholder Key | Purpose | Allowed Components |
+## Placeholders
+| Placeholder Name | Pattern | Allowed Components |
 |-----------------|---------|-------------------|
-| `iconfeaturecardgrid` | Feature card container | IconFeatureCard |
+| `iconfeaturecardgrid` | `placeholderGenerator(params, 'iconfeaturecardgrid')` | `IconFeatureCard` |
+
+The placeholder uses a custom `render` prop that wraps all child components in a responsive grid `<div>`:
+- Mobile: `grid-cols-1`
+- Tablet (md): `grid-cols-2`
+- Desktop (lg): `grid-cols-4`
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} tag="h2" className="heading-4xl mb-6 leading-none" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| subheading | `<RichText field={fields?.subheading} className="richtext copy-lg leading-none" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+|---------------|--------------|--------|
+| `heading` | `Text` | `@sitecore-content-sdk/nextjs` |
+| `subheading` | `RichText` | `@sitecore-content-sdk/nextjs` |
+| Placeholder children | `Placeholder` | `@sitecore-content-sdk/nextjs` |
 
-## Content Authoring Instructions
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard icon feature card grid with `withDatasourceCheck` |
 
-### Field-by-Field Guidance
-
-#### heading
-
-- **Type:** Single-Line Text
-- **Required:** Yes
-- **What to enter:** Section title that introduces the feature cards
-- **Tone/Style:** Clear, compelling, benefit-oriented
-- **Character limit:** 80 characters recommended
-- **Example:** "Why Choose Us"
-
-#### subheading
-
-- **Type:** Rich Text
-- **Required:** No
-- **What to enter:** Brief introduction to the features being highlighted
-- **Tone/Style:** Informative, sets context for the cards
-- **Formatting:** Keep simple, typically a single paragraph
-- **Example:**
-  ```html
-  <p>Discover the benefits that set us apart from the competition and make us the right choice for your needs.</p>
-  ```
-
-### Adding Feature Cards
-
-After configuring the grid, add IconFeatureCard components to the `iconfeaturecardgrid` placeholder:
-
-1. In Experience Editor, select the IconFeatureCardGrid component
-2. Click on the placeholder area
-3. Add IconFeatureCard components
-4. Configure each card with heading, icon, subheading, and optional link
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+import {
+  Field,
+  RichTextField,
+} from '@sitecore-content-sdk/nextjs';
+
 type IconFeatureCardGridFields = {
   heading: Field<string>;
   subheading: RichTextField;
@@ -78,18 +55,31 @@ type IconFeatureCardGridProps = ComponentProps & {
 };
 ```
 
-## Responsive Grid Layout
+## Grid Layout
+The `Placeholder` uses a custom render function to control the grid container:
 
-| Viewport | Columns | Gap |
-|----------|---------|-----|
-| Mobile (< 768px) | 1 | 32px vertical |
-| Tablet (768px - 1024px) | 2 | 32px |
-| Desktop (≥ 1024px) | 4 | 32px |
+```tsx
+<Placeholder
+  name={placeholderGenerator(params, 'iconfeaturecardgrid')}
+  rendering={rendering}
+  render={(components) => (
+    <div className="mt-12 grid w-full grid-cols-1 gap-x-8 gap-y-8 pb-12 first:mt-0 md:grid-cols-2 lg:grid-cols-4">
+      {components}
+    </div>
+  )}
+/>
+```
 
-## Content Examples
+This means `IconFeatureCard` components placed in the placeholder are always laid out in the controlled grid — individual card widths should not be overridden.
 
-### Minimal (Required Fields Only)
+## Recommended Card Count
+- 4 cards fills one desktop row perfectly
+- 2 or 8 cards also work cleanly on desktop
+- Odd numbers (1, 3, 5, etc.) leave a partial row on desktop
 
+## Example Content Entry
+
+### Minimum Viable Content
 ```json
 {
   "fields": {
@@ -98,175 +88,60 @@ type IconFeatureCardGridProps = ComponentProps & {
 }
 ```
 
-### Complete (All Fields)
-
+### Full Content Example
 ```json
 {
   "fields": {
     "heading": { "value": "Why Choose Us" },
-    "subheading": {
-      "value": "<p>Discover the benefits that set us apart and make us the right choice for your business needs.</p>"
-    }
+    "subheading": { "value": "<p>Four reasons our clients trust us with their most important work.</p>" }
   }
 }
 ```
 
-## Visual Layout
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                                                                        │
-│  Why Choose Us                                        (heading - H2)   │
-│                                                                        │
-│  Discover the benefits that set us apart...          (subheading)      │
-│                                                                        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
-│  │  Card 1  │  │  Card 2  │  │  Card 3  │  │  Card 4  │               │
-│  │   🎧     │  │   🛡️     │  │   🚀     │  │   ⏰     │               │
-│  │ Support  │  │ Security │  │  Speed   │  │  24/7    │               │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘               │
-│                                                                        │
-└────────────────────────────────────────────────────────────────────────┘
-```
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Icon Feature Card Grid: `/sitecore/content/[Site]/Home/Data/Feature Cards/[Grid Name]`
-- Feature Cards: Created as separate items and added via placeholder
-
-### Experience Editor Behavior
-
-- **Inline editable:** heading, subheading
-- **Placeholder editing:** Add/remove IconFeatureCard components
-- **Grid preview:** Responsive grid visible in preview mode
-
-### Rendering Parameters (Styles)
-
-| Parameter | Type | Options | Default | Description |
-|-----------|------|---------|---------|-------------|
-| theme | Droplist | primary, secondary, tertiary | primary | Background/text theme |
-| padding (top) | Droplist | none, xs, sm, md, lg, xl | none | Top padding |
-| padding (bottom) | Droplist | none, xs, sm, md, lg, xl | none | Bottom padding |
-
-## Theme Inheritance
-
-The grid's theme affects child IconFeatureCard components through smart theming:
-
-| Grid Theme | Card Auto-Theme |
-|------------|-----------------|
-| `primary` | `secondary` (contrast) |
-| `secondary` | `tertiary` (contrast) |
-| `tertiary` | `secondary` (contrast) |
-
-## Authoring Rules
-
-1. **Balanced Content:** Aim for 4 or 8 cards for optimal grid balance
-2. **Consistent Cards:** Use similar content length across all cards
-3. **Clear Hierarchy:** Grid heading should be more prominent than card headings
-4. **Mobile Testing:** Verify single-column layout on mobile
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Empty placeholder | Section looks incomplete | Add 4+ IconFeatureCard components |
-| Uneven card count | Grid looks unbalanced | Use 4, 8, or 12 cards |
-| Long subheading | Pushes cards down | Keep to 1-2 sentences |
-| Inconsistent card content | Uneven visual appearance | Balance heading/subheading lengths |
-
-## Related Components
-
-- `IconFeatureCard` - Individual feature card placed within grid
-- `CardGrid` - Alternative grid for image-based cards
-- `ContentGrid` - Generic content grid component
-
----
+Then place `IconFeatureCard` components in the `iconfeaturecardgrid` placeholder.
 
 ## MCP Authoring Instructions
 
-### Step 1: Add IconFeatureCardGrid to Page
-
+### Step 1: Add to Page
 ```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "icon-feature-card-grid-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "IconFeatureCardGrid_WhyChooseUs",
-  language: "en",
-  fields: {
-    "heading": "Why Choose Us",
-    "subheading": "<p>Discover the benefits that set us apart.</p>"
-  }
-});
-
-const gridDatasourceId = result.datasourceId;
-```
-
-### Step 2: Create and Add IconFeatureCard Components
-
-```javascript
-// Create card datasource
-const card1 = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: "/sitecore/content/Site/Home/Data/Feature Cards",
-  templatePath: "/sitecore/templates/Project/Site/Feature Cards/Icon Feature Card",
-  name: "Support Card",
-  language: "en"
-});
-
-// Set card fields
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: card1.itemId,
-  language: "en",
-  fields: {
-    "heading": "24/7 Support",
-    "subheading": "<p>Always here when you need us.</p>",
-    "imageIcon": "headset"
-  }
-});
-
-// Add card to grid placeholder
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "icon-feature-card-rendering-id",
-  placeholderPath: "iconfeaturecardgrid-{dynamic-placeholder-id}",
-  componentItemName: "IconFeatureCard_Support",
-  language: "en",
-  dataSourceId: card1.itemId
+await mcp__marketer_mcp__add_component_on_page({
+  itemPath: "/sitecore/content/MySite/Home",
+  componentName: "IconFeatureCardGrid",
+  placeholderName: "main",
+  dataSource: "/sitecore/content/MySite/Data/IconFeatureCardGrid/WhyChooseUs"
 });
 ```
 
-### Step 3: Repeat for Additional Cards
+### Step 2: Set Grid Heading
+```javascript
+await mcp__marketer_mcp__update_component_fields({
+  itemPath: "/sitecore/content/MySite/Data/IconFeatureCardGrid/WhyChooseUs",
+  fields: {
+    "heading": { "value": "Why Choose Us" },
+    "subheading": { "value": "<p>Four reasons our clients trust us.</p>" }
+  }
+});
+```
 
-Create and add 3 more cards for a balanced 4-column layout:
-- Security card (icon: `shield-halved`)
-- Speed card (icon: `rocket`)
-- Availability card (icon: `clock`)
+### Step 3: Add IconFeatureCard Children
+```javascript
+// Repeat for each card (up to 4 for a full row)
+await mcp__marketer_mcp__add_component_on_page({
+  itemPath: "/sitecore/content/MySite/Home",
+  componentName: "IconFeatureCard",
+  placeholderName: "iconfeaturecardgrid",
+  dataSource: "/sitecore/content/MySite/Data/IconFeatureCards/FastDelivery"
+});
+```
 
 ### Field Type Quick Reference
-
 | Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
-| subheading | Rich Text | `"<p>HTML content</p>"` |
-
-### MCP Authoring Checklist
-
-- [ ] Have page ID
-- [ ] Have IconFeatureCardGrid rendering ID
-- [ ] Have IconFeatureCard rendering ID
-- [ ] Create 4 card datasources
-- [ ] Add grid to page
-- [ ] Get dynamic placeholder path for grid
-- [ ] Add 4 cards to grid placeholder
+|-------|------|-----------|
+| `heading` | Single-Line Text | `{ "value": "Section Title" }` |
+| `subheading` | Rich Text | `{ "value": "<p>Intro text</p>" }` |
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

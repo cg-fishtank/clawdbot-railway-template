@@ -1,634 +1,418 @@
 ---
 name: sitecore-author
-description: Orchestrates complete component authoring in SitecoreAI by coordinating image, link, placeholder, and upload sub-skills. Identifies field types, routes to correct formatting logic, handles multi-field updates, and manages parent-child component relationships. All changes are drafts — never publishes automatically.
-allowed-tools:
-  - mcp__marketer-mcp__update_content
-  - mcp__marketer-mcp__update_fields_on_content_item
-  - mcp__marketer-mcp__create_page
-  - mcp__marketer-mcp__create_content_item
-  - mcp__marketer-mcp__create_child_item
-  - mcp__marketer-mcp__create_component_datasource
-  - mcp__marketer-mcp__add_component_on_page
-  - mcp__marketer-mcp__get_components_on_page
-  - mcp__marketer-mcp__get_components_by_placeholder
-  - mcp__marketer-mcp__get_allowed_components_by_placeholder
-  - mcp__marketer-mcp__move_component_within_placeholder
-  - mcp__marketer-mcp__remove_component_on_page
-  - mcp__marketer-mcp__set_component_datasource
-  - mcp__marketer-mcp__search_assets
-  - mcp__marketer-mcp__get_asset_information
-  - mcp__marketer-mcp__update_asset
-  - mcp__marketer-mcp__upload_asset
-  - mcp__marketer-mcp__get_page
-  - mcp__marketer-mcp__get_content_item_by_id
-  - mcp__marketer-mcp__get_content_item_by_path
-  - mcp__marketer-mcp__list_available_insertoptions
+description: Orchestrates complete page creation and component authoring in Sitecore XM Cloud using context-specific templates and specialized field skills
 ---
 
-# Sitecore Author Orchestrator
+# Component Authorer Skill
 
-**Coordinates sub-skills for complete component authoring in SitecoreAI via marketer-mcp. Identifies field types, routes to the correct formatting skill, handles multi-field updates, and manages parent-child component hierarchies. All changes produce drafts only — publishing requires separate approval.**
+**Version:** 1.1
 
----
+## What I do
 
-## Sub-Skill Coordination
+- Create new pages with context-appropriate templates (Article Page, Event Page, etc.)
+- Add components to Sitecore pages with all fields populated
+- Orchestrate specialized skills for different field types:
+  - `/sitecore-author-placeholder` - Component placement
+  - `/sitecore-author-image` - Image field formatting
+  - `/sitecore-author-link` - Link field formatting
+- Handle nested/child components automatically
+- Support all common field types (text, rich text, image, link, checkbox)
+- **ALWAYS provide preview URL** in final response using `marketer_get_page_preview_url` (NOT optional!)
 
-This orchestrator delegates specialized work to four focused sub-skills:
+## Expected Output Format (REQUIRED)
 
-| Sub-Skill | Responsibility | Key Tools |
-|:----------|:---------------|:----------|
-| `sitecore-author-image` | Image field XML formatting, asset search, asset metadata | `search_assets`, `get_asset_information`, `update_content` |
-| `sitecore-author-link` | Link field XML formatting (internal, external, media, anchor) | `update_content`, `get_content_item_by_id` |
-| `sitecore-author-placeholder` | Placeholder path construction, dynamic ID retrieval, nesting | `add_component_on_page`, `get_components_on_page` |
-| `sitecore-upload-media` | Upload new media assets to the Media Library | `upload_asset`, `update_asset`, `search_assets` |
+Every successful authoring response MUST include:
 
-**When to use the orchestrator vs a sub-skill directly:**
-- Use **this orchestrator** when authoring a component end-to-end (add component + populate all field types)
-- Use a **sub-skill directly** when performing a single focused operation (e.g., only updating an image field)
+```
+Done! [Action summary]:
+• Field1: value
+• Field2: value
+
+Preview: https://xmc-main-xxx.sitecorecloud.io/...
+```
+
+**Never ask "Want the preview URL?" - always include it automatically.**
+
+## When to use
+
+Use this skill when:
+
+- Creating a new page in Sitecore (uses context-specific templates)
+- Creating a new component on a Sitecore page
+- Adding multiple components to build a page layout
+- Need to populate various field types in a single workflow
+- Creating parent components with children (e.g., HeroBanner with Button)
 
 ---
 
-## Context Efficiency — Check Local Files First
+## ⚠️ CONTEXT EFFICIENCY - Check Local Files First
 
-**The context window is a public good.** Before making MCP calls, check local reference files.
+**The context window is a public good.** Before making MCP calls, check local data sources.
 
-### Reference Data Files
+### Data Sources (Read First)
 
-| File | Tokens | Replaces MCP Call | Savings |
-|:-----|:-------|:------------------|:--------|
-| `references/component-registry.md` | ~2k | `list_components` | ~13k tokens |
-| `references/site-config.md` | ~200 | `search_site` for Home page | ~1.2k tokens |
-| `references/page-templates.md` | ~300 | `list_available_insertoptions` | ~600 tokens |
-| `references/placeholder-patterns.md` | ~400 | Manual placeholder construction | reference |
-| `references/component-authoring-guide.md` | ~300 | Per-component field formats | reference |
+1. **`/sitecore-component-docs` references** (~2k tokens per component)
+   - Component rendering IDs
+   - Field names, types, and requirements
+   - Placeholder keys
+   - **REPLACES**: `marketer_list_components` (~13k tokens) ✓
+   - Use `/sitecore-component-docs` or `/sitecore-field-validator` for quick access
 
-**Total savings: ~12,600 tokens per authoring session (83% reduction)**
+2. **`.claude/data/site-config.md`** (~200 tokens)
+   - Site ID: `13efad37-1cc8-4c29-924b-8dd2d54b4046`
+   - Home Page ID: `b132d115-7893-49aa-a06f-f1719a8704e3`
+   - **REPLACES**: `marketer_search_site` (~1.2k tokens) ✓
+
+3. **`references/page-templates.md`** (~300 tokens)
+   - Landing Page: `300f3d1b-52ef-4734-8eab-ae2e2a422759`
+   - Templates available under HOME only
+   - **LIMITATION**: Does NOT include context-specific templates (Article Page, Event Page, etc.)
+   - **USE**: For creating pages directly under /Home
+   - **DO NOT USE**: For creating pages under /Articles, /Events, etc. (use MCP instead)
+
+**Token Savings**: ~12,600 tokens per authoring session (83% reduction)
 
 ### When to Use MCP
 
-**ONLY use MCP for:**
+**ONLY use MCP for**:
+
+- **Template selection** - ALWAYS use `list_available_insertoptions` on the parent when creating new pages
 - Creating/updating actual content (`create_page`, `add_component_on_page`, `update_content`)
 - Querying latest page state (`get_components_on_page` for dynamic IDs)
-- Searching for non-Home pages
-- Reading current field values (`get_content_item_by_id`)
-- Searching and retrieving media assets (`search_assets`, `get_asset_information`)
-- Uploading new media (`upload_asset`)
-- Information not available in local reference files
+- Information not available locally
 
 ---
 
-## Orchestration Workflow
+## Workflow
 
-```
-+---------------------------------------------------------------------+
-| SITECORE AUTHOR ORCHESTRATOR WORKFLOW                               |
-+---------------------------------------------------------------------+
-|                                                                      |
-|  0. GATHER INFO LOCALLY                                              |
-|     Read reference files for rendering IDs, field schemas,           |
-|     placeholder keys, page IDs, template IDs                         |
-|     |                                                                |
-|  1. CLASSIFY FIELDS by type                                          |
-|     Scan the requested content and categorize every field:           |
-|     +-- Text / RichText / Multi-Line / Number / Date / Checkbox     |
-|     +-- Image fields                                                 |
-|     +-- Link fields                                                  |
-|     +-- Fields needing media upload first                            |
-|     |                                                                |
-|  2. DETERMINE PLACEHOLDER (delegate to sitecore-author-placeholder)  |
-|     +-- Root -> placeholder = "headless-main" (NO leading slash)     |
-|     +-- Nested -> "/{parent}/{key}-{dynamicId}" (HAS leading slash)  |
-|     |                                                                |
-|  3. ADD COMPONENT to page                                            |
-|     mcp__marketer-mcp__add_component_on_page                         |
-|     -> Returns datasourceId (content item ID for field updates)      |
-|     |                                                                |
-|  4. ROUTE FIELD UPDATES by type                                      |
-|     +-- Text / RichText / Checkbox / Number / Date                   |
-|     |   -> Direct: mcp__marketer-mcp__update_content                 |
-|     +-- Image fields                                                 |
-|     |   -> Delegate to sitecore-author-image formatting rules        |
-|     |   -> If image needs upload: delegate to sitecore-upload-media  |
-|     +-- Link fields                                                  |
-|     |   -> Delegate to sitecore-author-link formatting rules         |
-|     |                                                                |
-|  5. BATCH MULTI-FIELD UPDATES                                        |
-|     Group compatible fields into minimal update_content calls         |
-|     (all field types can go in one call once formatted correctly)     |
-|     |                                                                |
-|  6. HANDLE CHILDREN (if any)                                         |
-|     +-- Query parent's DynamicPlaceholderId                          |
-|     +-- Delegate path construction to sitecore-author-placeholder    |
-|     +-- REPEAT from step 3 for each child component                  |
-|     |                                                                |
-|  7. VERIFY                                                           |
-|     get_components_on_page to confirm component tree                  |
-|     get_page_preview_url for visual verification                     |
-|                                                                      |
-+---------------------------------------------------------------------+
-```
+This skill coordinates specialized skills and MCP calls:
+
+1. **Read local context** → /sitecore-component-docs, site-config.md (see "Context Efficiency" above)
+2. **Check component docs** → /sitecore-component-docs
+3. **Determine placeholder** → /sitecore-author-placeholder
+4. **Add component** → marketer_add_component_on_page
+5. **Update fields**:
+   - Text/Rich Text → marketer_update_content
+   - Images → /sitecore-author-image
+   - Links → /sitecore-author-link
+   - Checkboxes → marketer_update_content ("1" or "0")
+6. **Handle children** → Get parent dynamic ID, repeat steps 3-5
+7. **Get preview URL** → marketer_get_page_preview_url (MANDATORY)
 
 ---
 
-## Pre-Flight: Component Documentation (Always Do This First)
+## Workflow Steps
 
-> **Before authoring any component**, consult the `sitecore-component-docs` skill.
-> It contains field formats and MCP authoring instructions for 65 Sitecore components.
-> Run the Glob lookup described in `sitecore-component-docs` before calling any MCP tool.
->
-> ```
-> Glob: /data/workspace/skills/sitecore-component-docs/**/{ComponentName}/{ComponentName}.md
-> ```
->
-> If documentation is found, extract the "MCP Authoring Instructions" section and apply it to all field values.
-> Only skip this step if the component name is genuinely unknown at the time of authoring.
+### Step 0a: Select Page Template
+
+**CRITICAL**: When creating new pages, ALWAYS call `marketer_list_available_insertoptions` on parent item.
+
+- Context-specific templates (Article Page, Event Page) only appear under their parent sections
+- See `references/page-templates.md` for complete template listings
+- Token cost: ~600 tokens (cheaper than recreating page with wrong template)
 
 ---
 
-## Step 0: Gather Info Locally (Always Do This First)
+### Step 0b: Component Documentation
 
-**Get component rendering ID (from local registry -- NO MCP):**
-- Read `references/component-registry.md`
-- Search for the component name to get rendering ID and field schema
+**Automatic**: `/sitecore-component-docs` skill runs before every component authoring to fetch component-specific field formats.
 
-**Get Home page ID (from local config -- NO MCP):**
-- Read `references/site-config.md`
-- Home Page ID: `b132d115-7893-49aa-a06f-f1719a8704e3`
+---
 
-**Get template ID (from local config -- NO MCP):**
-- Read `references/page-templates.md`
-- Landing Page: `300f3d1b-52ef-4734-8eab-ae2e2a422759`
+### Step 1: Identify Component and Target Page
 
-**Find non-Home pages (requires MCP):**
+**Required Information:**
+
+- Page ID (from local config or MCP search)
+- Component rendering ID (from `/sitecore-component-docs`)
+- Target placeholder (e.g., "headless-main")
+- Field values to populate (validated via `/sitecore-field-validator`)
+- Children (if any)
+
+**Find Page (if not Home):**
+
+```javascript
+// Only use MCP if searching for non-Home pages
+await marketer_search_site({
+	site_name: "main",
+	search_query: "PageName",
+});
+// Returns: { itemId: "page-guid", name: "PageName", path: "/sitecore/..." }
 ```
-mcp__marketer-mcp__get_page({ page_name: "PageName" })
+
+**Get Rendering ID (from component docs - NO MCP):**
+
+```bash
+# ✓ Read per-component docs via /sitecore-component-docs (~200 tokens)
+Glob(pattern: ".claude/skills/sitecore-component-docs/references/**/HeroBanner/HeroBanner.md")
+# Extract Rendering ID from the doc's Rendering Information table
+
+# ❌ OLD WAY - Don't do this anymore
+# marketer_list_components() # ~13k tokens!
 ```
 
 ---
 
-## Step 1: Classify Fields by Type
+### Step 2: Determine Placeholder Path
 
-Before any MCP calls, categorize every field the user wants to populate:
+**Use `/sitecore-author-placeholder` skill for path construction.**
 
-| Field Type | Category | Routing Decision |
-|:-----------|:---------|:-----------------|
-| Single-Line Text | **direct** | `update_content` with plain string |
-| Multi-Line Text | **direct** | `update_content` with `<br />` line breaks |
-| Rich Text | **direct** | `update_content` with HTML tags |
-| Number | **direct** | `update_content` with string number |
-| Date | **direct** | `update_content` with `"20240115T120000Z"` format |
-| Checkbox | **direct** | `update_content` with `"1"` or `"0"` |
-| Multilist | **direct** | `update_content` with pipe-separated GUIDs `"{GUID1}\|{GUID2}"` |
-| Image | **image sub-skill** | Format via `sitecore-author-image` rules, then `update_content` |
-| General Link | **link sub-skill** | Format via `sitecore-author-link` rules, then `update_content` |
-| Image (needs upload) | **upload + image** | Upload via `sitecore-upload-media`, then format via `sitecore-author-image` |
+Quick reference:
 
-**Field names are case-sensitive.** Always verify exact names from `references/component-registry.md`.
+- **Root-level**: `"headless-main"` (NO leading slash)
+- **Child components**: `"/headless-main/buttons-1"` (HAS leading slash, requires parent's dynamic ID)
+
+See `/sitecore-author-placeholder` for complete rules and examples.
 
 ---
 
-## Step 2: Determine Placeholder Path
+### Step 3: Add Component to Page
 
-**Delegate to `sitecore-author-placeholder` rules.**
+```javascript
+const result = await marketer_add_component_on_page({
+	pageId: "page-guid",
+	componentRenderingId: "rendering-guid",
+	placeholderPath: placeholderPath,
+	componentItemName: "HeroBanner_1", // Must be unique
+	fields: {
+		// Only simple text fields here
+		Heading: "Welcome to Our Site",
+		Subheading: "Discover more",
+	},
+});
 
-| Scenario | Placeholder Path | Leading Slash? |
-|:---------|:-----------------|:---------------|
-| Root-level component | `headless-main` | **NO** |
-| Child of component (dynamic ID 1) | `/headless-main/buttons-1` | **YES** |
-| Deeply nested | `/headless-main/accordion-2/buttons-3` | **YES** |
+// Returns:
+// {
+//   "datasourceId": "created-datasource-guid",
+//   "placeholderId": "headless-main"
+// }
+```
 
-**Critical rules:**
-- Root-level: NO leading slash -- `"headless-main"` (correct), `"/headless-main"` (WRONG)
-- Nested: MUST have leading slash -- `"/headless-main/buttons-1"` (correct), `"headless-main/buttons-1"` (WRONG)
-- Dynamic ID is numeric (1, 2, 3...) and must be queried from Sitecore after adding the parent
+**IMPORTANT:** The `datasourceId` returned is the content item ID for updating fields.
 
 ---
 
-## Step 3: Add Component to Page
+### Step 4: Populate Complex Fields
 
-```
-mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "rendering-guid",
-  placeholderPath: "headless-main",
-  componentItemName: "HeroBanner_1",
-  fields: {
-    "Heading": "Welcome"
-  }
-})
-```
+After adding the component, update fields using specialized skills and direct MCP calls:
 
-**IMPORTANT:** The `datasourceId` in the response is the content item ID needed for all subsequent `update_content` calls.
+#### 4a: Image Fields
 
----
+Use `/sitecore-author-image` skill for XML formatting: `<image mediaid='{GUID}' />`
 
-## Step 4: Route Field Updates by Type
+- Must use single quotes, braces around GUID, UPPERCASE
+- If upload needed, use `/sitecore-upload-media` first
 
-After adding a component, update fields that were not included in the initial `add_component_on_page` call (complex fields typically need separate formatting).
+#### 4b: Link Fields
 
-### 4a: Direct Fields (Text, RichText, Checkbox, Number, Date)
+Use `/sitecore-author-link` skill for XML formatting: `<link text='...' linktype='external' url='...' anchor='' target='_blank' />`
 
-```
-mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  fields: {
-    "heading": "Welcome to Our Restaurant",
-    "subheading": "Experience fine dining",
-    "body": "<p>Rich text content here</p>",
-    "isEnabled": "1"
-  }
-})
-```
+- External links need `url`, internal links need `id='{GUID}'`
+- All attributes required (text, linktype, url, anchor, target)
 
-### 4b: Image Fields -- Delegate to `sitecore-author-image`
+#### 4c: Text/RichText Fields
 
-Follow the `sitecore-author-image` skill workflow:
-1. Search for the asset: `search_assets`
-2. Get asset metadata: `get_asset_information`
-3. Format the XML locally: `<image mediaid='{UPPERCASED-GUID}' />`
-4. Update the field: `update_content`
+Update directly via `marketer_update_content`:
 
-**Image XML format (CRITICAL -- see sitecore-author-image for full rules):**
-```xml
-<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />
-```
+- Single-line text: Plain strings
+- Rich text: HTML strings (e.g., `"<p>Content</p>"`)
+- Multi-line: Use `<br />` for line breaks
 
-Rules:
-- MUST use single quotes
-- GUID MUST have braces `{}`
-- GUID MUST be UPPERCASE
-- Self-closing tag with space before `/>`
+#### 4d: Checkbox Fields
 
-If the image needs to be uploaded first, delegate to `sitecore-upload-media` before formatting.
+Update directly via `marketer_update_content`:
 
-### 4c: Link Fields -- Delegate to `sitecore-author-link`
-
-Follow the `sitecore-author-link` skill workflow.
-
-**External link format:**
-```xml
-<link text='Learn More' linktype='external' url='https://example.com' anchor='' target='_blank' />
-```
-
-**Internal link format (with ID):**
-```xml
-<link text='About Us' linktype='internal' url='' anchor='' target='' id='{B1BBF454-6060-4596-9D2C-0EA4AA414A9D}' />
-```
-
-**Internal link format (with path):**
-```xml
-<link text='About Us' linktype='internal' url='/about' anchor='' target='_self' />
-```
-
-Rules:
-- MUST use single quotes for ALL attribute values
-- ALL attributes required: `text`, `linktype`, `url`, `anchor`, `target`
-- External links need `url='https://...'`
-- Internal links need `id='{GUID}'` with braces OR `url='/path'`
-- Empty attributes must still be present: `anchor='' target=''`
+- Checked: `"1"`
+- Unchecked: `"0"`
 
 ---
 
-## Step 5: Batch Multi-Field Updates
-
-**Minimize MCP calls by combining all formatted fields into a single `update_content` call.** All field types (text, image XML, link XML, checkbox) can be sent in one request once they are properly formatted.
-
-```
-mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  fields: {
-    "heading": "Welcome to Our Restaurant",
-    "subheading": "Experience fine dining",
-    "body": "<p>Discover our award-winning cuisine.</p>",
-    "backgroundImage": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />",
-    "backgroundImageMobile": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />",
-    "link": "<link text='View Menu' linktype='external' url='https://example.com/menu' anchor='' target='_blank' />",
-    "isEnabled": "1"
-  }
-})
-```
-
-**Multi-field update strategy:**
-1. Classify all fields (Step 1)
-2. Format complex fields (image XML, link XML) using sub-skill rules
-3. Combine ALL formatted values into a single `fields` object
-4. Make ONE `update_content` call with everything
-
-**Note:** A response with `updatedFields: {}` is **normal and expected** -- the update actually succeeded.
-
----
-
-## Step 6: Handle Child Components
+### Step 5: Handle Child Components
 
 If the component has children (e.g., Button inside HeroBanner):
 
-### 6a: Get Parent's Dynamic Placeholder ID
+#### 5a: Get Parent's Dynamic Placeholder ID
 
-```
-mcp__marketer-mcp__get_components_on_page({
-  pageId: pageId
-})
-// Find parent by datasource ID -> extract DynamicPlaceholderId
+```javascript
+// Query page to get parent component's dynamic ID
+const pageData = await marketer_get_components_on_page({
+	pageId: pageId,
+});
+
+// Find parent by datasource ID
+const parentComponent = pageData.components.find(
+	(c) => c.dataSource === parentDatasourceId,
+);
+
+// Extract dynamic placeholder ID
+const dynamicId = parentComponent?.parameters?.DynamicPlaceholderId || "1";
 ```
 
-### 6b: Construct Child Placeholder Path
+**Shortcut — Cumulative Counting:**
+Sitecore assigns a sequential ID to every component added to the page (parents and children alike). When you control the add order, the dynamic ID equals the cumulative count:
 
-Delegate to `sitecore-author-placeholder` rules:
-```
-childPlaceholderPath = "/" + parentPlaceholderPath + "/" + childKey + "-" + dynamicId
+| Order | Component               | ID  | Child Placeholder                       |
+| :---- | :---------------------- | :-- | :-------------------------------------- |
+| 1st   | HeroBanner              | 1   | `/headless-main/buttons-1`              |
+| 2nd   | Button (child of Hero)  | 2   | —                                       |
+| 3rd   | SplitBanner             | 3   | `/headless-main/buttons-3`              |
+| 4th   | Button (child of Split) | 4   | —                                       |
+| 5th   | Card                    | 5   | — (CTA maps to Card's own `link` field) |
+
+This avoids an MCP call when you know the add order. Use `marketer_get_components_on_page` when the order is uncertain.
+
+#### 5b: Construct Child Placeholder Path
+
+```javascript
+// Format: /{parentPlaceholder}/{childKey}-{dynamicId}
+const childPlaceholderPath = `/headless-main/buttons-${dynamicId}`;
 // Example: "/headless-main/buttons-1"
 ```
 
-**Common child placeholder keys** (from `references/placeholder-patterns.md`):
-
-| Parent Component | Placeholder Key | Child Component |
-|:-----------------|:----------------|:----------------|
+**Common child placeholder keys:**
+| Parent | Child Key | Child Component |
+|:-------|:----------|:----------------|
 | HeroBanner | `buttons` | Button |
 | SplitBanner | `buttons` | Button |
 | ContentBlock | `buttons` | Button |
-| CardGrid | `cards` or `grid-items` | Card |
+| CardGrid | `cards` | Card |
 | Card | `card-actions` | Button |
 
-### 6c: Add Child Component (Recursive)
+#### CTA Mapping Rules
 
-Repeat Steps 3-5 for each child, using the constructed placeholder path:
+| Component Type          | CTA Handling                                                                 |
+| :---------------------- | :--------------------------------------------------------------------------- |
+| HeroBanner, SplitBanner | Create a separate child `Button` component in the correct button placeholder |
+| Card                    | Do NOT create a child Button — map CTA data to the Card's own `link` field   |
 
-```
-mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: buttonRenderingId,
-  placeholderPath: "/headless-main/buttons-1",
-  componentItemName: "Button_1_1",
-  fields: {
-    "link": "<link text='Learn More' linktype='external' url='https://example.com' anchor='' target='_blank' />"
-  }
-})
-```
+#### 5c: Add Child Component (Recursive)
 
-### Cumulative Dynamic ID Counting
-
-Sitecore assigns dynamic placeholder IDs sequentially to ALL components added, including children:
-
-```
-1. HeroBanner (1st component added)  -> Dynamic ID: 1
-   +-- Button (2nd component added)  -> placed at /headless-main/buttons-1
-2. SplitBanner (3rd component added) -> Dynamic ID: 3
-   +-- Button (4th component added)  -> placed at /headless-main/buttons-3
-3. ContentBlock (5th component added) -> Dynamic ID: 5
-   +-- Button (6th component added)  -> placed at /headless-main/buttons-5
-```
-
-**Always query the actual dynamic ID after adding each parent -- do not guess.**
-
----
-
-## Special Character Handling
-
-### Quotation Marks in Content
-
-**NEVER use escaped double quotes (`\"`) in field values.** They render as literal backslash-quote on the published site.
-
-| Method | Result | Correct? |
-|:-------|:-------|:---------|
-| `\"Register\"` | Displays: `\"Register\"` | **WRONG** |
-| `&quot;Register&quot;` | Displays: `"Register"` | **CORRECT** |
-| `'Register'` | Displays: `'Register'` | **CORRECT** (single quotes) |
-
-**Rule:** Use `&quot;` for double quotes in all text fields. Never use `\"`.
-
-### Newline Handling
-
-**NEVER use literal `\n` in field values.** They render as the text "\n" on the published site.
-
-| Field Type | Solution | Example |
-|:-----------|:---------|:--------|
-| Multi-Line Text | `<br />` tags | `"Line one<br />Line two"` |
-| Rich Text | `<p>` tags for paragraphs | `"<p>Para one</p><p>Para two</p>"` |
-| Rich Text | `<br />` for soft breaks | `"<p>Line one<br />Line two</p>"` |
-| Single-Line Text | No line breaks allowed | `"Single line only"` |
-
-### Code Blocks in Rich Text
-
-When including code in rich text fields, use HTML entities:
-- Newlines: `&#10;` (NOT `\n`)
-- `<` -> `&lt;`
-- `>` -> `&gt;`
-- `&` -> `&amp;`
-- `"` -> `&quot;`
-
-**Example:**
-```
-"<pre><code>/Components&#10;  /EventCard&#10;    key-name</code></pre>"
+```javascript
+// Add child using same workflow (Step 3-4)
+await marketer_add_component_on_page({
+	pageId: pageId,
+	componentRenderingId: buttonRenderingId,
+	placeholderPath: "/headless-main/buttons-1", // With leading slash!
+	componentItemName: "Button_1_1",
+	fields: {
+		Link: "<link text='Learn More' linktype='external' url='https://example.com' anchor='' target='_blank' />",
+	},
+});
 ```
 
 ---
 
-## Complete Example: HeroBanner with Image and Child Button
+## Field Type Reference
 
-```
-// ================================================================
-// STEP 0: Gather info locally
-// ================================================================
-// Read references/component-registry.md:
-//   HeroBanner rendering ID: 5e9d7b60-f61b-407b-b04b-2eeba60b0ec0
-//   Button rendering ID: c152f7dc-6c01-4380-babb-97c9f080cf00
-//   HeroBanner child placeholder key: "buttons"
-// Read references/site-config.md:
-//   Home Page ID: b132d115-7893-49aa-a06f-f1719a8704e3
-
-// ================================================================
-// STEP 1: Classify fields
-// ================================================================
-// heading       -> Single-Line Text -> direct
-// subheading    -> Single-Line Text -> direct
-// backgroundImage -> Image -> sitecore-author-image rules
-// backgroundImageMobile -> Image -> sitecore-author-image rules
-// Button child: link -> General Link -> sitecore-author-link rules
-
-// ================================================================
-// STEP 2: Placeholder = root level -> "headless-main" (no slash)
-// ================================================================
-
-// ================================================================
-// STEP 3: Add HeroBanner to page
-// ================================================================
-mcp__marketer-mcp__add_component_on_page({
-  pageId: "b132d115-7893-49aa-a06f-f1719a8704e3",
-  componentRenderingId: "5e9d7b60-f61b-407b-b04b-2eeba60b0ec0",
-  placeholderPath: "headless-main",
-  componentItemName: "HeroBanner_1",
-  fields: {
-    "heading": "Welcome to Our Restaurant",
-    "subheading": "Experience fine dining"
-  }
-})
-// -> Returns: { datasourceId: "abc-123-...", placeholderId: "headless-main" }
-
-// ================================================================
-// STEP 4 + 5: Route and batch image field updates
-// ================================================================
-// Image fields: delegate formatting to sitecore-author-image rules
-// Search for asset if needed: search_assets -> get_asset_information
-// Format XML: <image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />
-// Batch both image fields into one update call:
-
-mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: "abc-123-...",
-  fields: {
-    "backgroundImage": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />",
-    "backgroundImageMobile": "<image mediaid='{CFD9E144-F974-4AA8-A552-CBF55E67E628}' />"
-  }
-})
-
-// ================================================================
-// STEP 6: Handle child Button
-// ================================================================
-// 6a: Get parent's dynamic placeholder ID
-mcp__marketer-mcp__get_components_on_page({
-  pageId: "b132d115-7893-49aa-a06f-f1719a8704e3"
-})
-// -> Find HeroBanner -> DynamicPlaceholderId: "1"
-
-// 6b: Construct child placeholder path (sitecore-author-placeholder rules)
-// "/headless-main/buttons-1" (WITH leading slash)
-
-// 6c: Add Button child (link field formatted via sitecore-author-link rules)
-mcp__marketer-mcp__add_component_on_page({
-  pageId: "b132d115-7893-49aa-a06f-f1719a8704e3",
-  componentRenderingId: "c152f7dc-6c01-4380-babb-97c9f080cf00",
-  placeholderPath: "/headless-main/buttons-1",
-  componentItemName: "Button_1_1",
-  fields: {
-    "link": "<link text='View Menu' linktype='external' url='https://example.com/menu' anchor='' target='_blank' />"
-  }
-})
-
-// ================================================================
-// STEP 7: Verify
-// ================================================================
-mcp__marketer-mcp__get_components_on_page({
-  pageId: "b132d115-7893-49aa-a06f-f1719a8704e3"
-})
-// Confirm HeroBanner + child Button appear correctly
-```
+| Field Type       | Skill/Method              | Format                                   |
+| :--------------- | :------------------------ | :--------------------------------------- |
+| Single-Line Text | `marketer_update_content` | `"Plain text value"`                     |
+| Multi-Line Text  | `marketer_update_content` | `"Line 1<br />Line 2"`                   |
+| Rich Text        | `marketer_update_content` | `"<p>HTML content</p>"`                  |
+| Image            | `/sitecore-author-image`  | `<image mediaid='{GUID}' />`             |
+| General Link     | `/sitecore-author-link`   | `<link text='...' linktype='...' ... />` |
+| Checkbox         | `marketer_update_content` | `"1"` or `"0"`                           |
+| Number           | `marketer_update_content` | `"123"`                                  |
+| Date             | `marketer_update_content` | `"20240115T120000Z"`                     |
 
 ---
 
-## Pre-Authoring Checklist
+## ⚠️ CRITICAL: Special Character Handling
 
-Before authoring any component, verify:
+**See `references/special-characters.md` for complete guide.**
 
-- [ ] Read local reference files (component-registry, site-config, page-templates)
-- [ ] Have page ID (from `references/site-config.md` or MCP search)
-- [ ] Have rendering ID (from `references/component-registry.md`)
-- [ ] Classified all fields by type (text, image, link, etc.)
-- [ ] Know correct placeholder path (root = no slash, nested = with slash)
-- [ ] Have unique component item name (e.g., `HeroBanner_1`)
-- [ ] Know all field names (case-sensitive -- from component registry)
-- [ ] Know field formats for each type (from sub-skill rules)
-- [ ] If has children: know child placeholder key from component registry
-- [ ] If needs media upload: have image source ready for `sitecore-upload-media`
+Quick reference:
+
+- **Quotes**: Use `&quot;` or single quotes `'` (NEVER `\"`)
+- **Newlines**: Use `<br />` or `<p>` tags (NEVER `\n`)
+- **Code blocks**: Use `&#10;` for line breaks (NEVER `\n`)
+
+---
+
+## Field Name Discovery
+
+Use `/sitecore-component-docs` or `/sitecore-field-validator` to verify exact field names (case-sensitive) before authoring.
 
 ---
 
 ## Error Handling
 
-| Error | Cause | Solution |
-|:------|:------|:---------|
-| "Item already exists" | Duplicate component name | Use unique suffix: `HeroBanner_2` |
-| Component not visible | Wrong placeholder path | Check leading slash rules (see `sitecore-author-placeholder`) |
-| "Cannot find field" | Wrong field name | Check component-registry.md for exact name (case-sensitive) |
-| Child not placed correctly | Missing dynamic ID | Query parent's `DynamicPlaceholderId` via `get_components_on_page` first |
-| Image not showing | Wrong XML format | Follow `sitecore-author-image` rules: single quotes, braces, uppercase GUID |
-| Link not working | Missing attributes | Follow `sitecore-author-link` rules: all attributes required |
-| `updatedFields: {}` response | Normal behavior | The update actually succeeded -- `update_content` returns empty on success |
-| JSON parsing error | Double quotes in XML | Always use single quotes for XML attributes inside JSON strings |
-| `\n` visible on site | Literal newline in field value | Use `<br />` or `<p>` tags, never `\n` |
-| `\"` visible on site | Escaped quotes in field value | Use `&quot;` HTML entity, never `\"` |
+| Error                 | Cause                    | Solution                                    |
+| :-------------------- | :----------------------- | :------------------------------------------ |
+| "Item already exists" | Duplicate component name | Use unique suffix: `HeroBanner_2`           |
+| Component not visible | Wrong placeholder path   | Check leading slash rules                   |
+| "Cannot find field"   | Wrong field name         | Check component docs for exact name         |
+| Child not placed      | Missing dynamic ID       | Query parent's DynamicPlaceholderId first   |
+| Image not showing     | Wrong XML format         | Use single quotes, braces around GUID       |
+| Link not working      | Missing attributes       | Include all: text, linktype, anchor, target |
+| `updatedFields: {}`   | Normal behavior          | Update actually succeeded                   |
 
 ---
 
-## Safety Rules
+## Usage Example
 
-- **Never publish** -- this skill creates drafts only. Publishing requires the `sitecore-content-publisher` skill and approval workflow.
-- **Always describe before executing** -- tell the user what you are about to do and wait for confirmation before making changes.
-- **Always verify after executing** -- use `get_components_on_page` to confirm the component tree is correct.
-- **If adding 4+ components**, present the full plan and get explicit approval before starting (bulk operation).
-
----
-
-## Confirmation Workflow
-
-### Before Executing
-
-Describe the operation:
 ```
-I am going to add a [Component Type] to [Page Name] in the [Placeholder] slot with:
-- Field: Value (type: text)
-- Field: Value (type: image -- will format via sitecore-author-image)
-- Field: Value (type: link -- will format via sitecore-author-link)
-
-Children:
-- [Child Component]: Field = Value
-
-Proceed? (yes/no)
+/sitecore-author
+Add HeroBanner with Button to /Home page
+- Heading: "Welcome"
+- BackgroundImage: {media-id}
+- Button CTA: "Learn More" → https://example.com
 ```
 
-### After Executing
+**Workflow**:
 
-Confirm with:
-```
-[Action completed]
-
-Result:
-- [What was created/modified]
-- [Key field values and their types]
-- [Children added]
-
-Preview: [URL]
-
-Note: This is a draft. Publishing requires separate approval via sitecore-content-publisher.
-```
-
-### Bulk Operations (Multiple Components)
-
-Present the full plan:
-```
-Plan for [Page Name]:
-1. Add [Component A] to [Slot] with fields...
-   - Child: [Component B] with fields...
-2. Add [Component C] to [Slot] with fields...
-3. Add [Component D] to [Slot] with fields...
-
-Total: [N] components ([M] parent + [K] children)
-Proceed with all? (yes/no)
-```
-
-Execute sequentially, verifying each parent-child group. Show final preview URL after all components are added.
-
----
-
-## Error Recovery
-
-- If page creation fails: report error, suggest checking parent path, template, and MCP connection
-- If component addition fails: report which component failed and which succeeded -- do not retry automatically
-- If `update_content` returns an error: check field name spelling (case-sensitive) and field format against sub-skill rules
-- If child component placement fails: verify the parent's dynamic placeholder ID was queried (not guessed) and the path has a leading slash
-- If media upload fails: check image source accessibility and auth credentials -- delegate troubleshooting to `sitecore-upload-media` skill
-- If preview URL is unavailable: note it but do not block the workflow
+1. Read component docs for rendering IDs
+2. Add HeroBanner to "headless-main"
+3. Update image field via /sitecore-author-image
+4. Get parent's dynamic ID
+5. Add Button to "/headless-main/buttons-1"
+6. Get preview URL (MANDATORY)
 
 ---
 
 ## Related Skills
 
-| Skill | Purpose | When Orchestrator Delegates |
-|:------|:--------|:---------------------------|
-| `sitecore-author-image` | Image field XML formatting and asset search | Formatting image fields (Step 4b) |
-| `sitecore-author-link` | Link field XML formatting (all link types) | Formatting link fields (Step 4c) |
-| `sitecore-author-placeholder` | Placeholder path construction and dynamic IDs | Determining placement path (Step 2, Step 6b) |
-| `sitecore-upload-media` | Upload new media to the Media Library | When image needs upload before assignment (Step 4b) |
-| `sitecore-content-reader` | Read-only content inspection and analysis | Verifying results (Step 7) |
-| `sitecore-content-publisher` | Publishing workflow and approval | NOT used by this skill -- drafts only |
+| Skill                          | Purpose                                                         |
+| :----------------------------- | :-------------------------------------------------------------- |
+| `/sitecore-component-docs`     | Component-specific field formats and MCP authoring instructions |
+| `/sitecore-author-placeholder` | Placeholder path construction rules                             |
+| `/sitecore-author-image`       | Image field XML formatting                                      |
+| `/sitecore-author-link`        | Link field XML formatting                                       |
+| `/sitecore-upload-media`       | Upload images to Media Library                                  |
+
+---
+
+---
+
+## Step 6: Get Preview URL (MANDATORY - NO EXCEPTIONS)
+
+**ALWAYS call `marketer_get_page_preview_url` after ANY Sitecore authoring operation.**
+
+```javascript
+// ⚠️ REQUIRED STEP - Do not skip this!
+const previewUrl = await marketer_get_page_preview_url({
+	pageId: pageId,
+	language: "en",
+});
+```
+
+**This is NOT optional:**
+
+- ✅ ALWAYS include after adding any component
+- ✅ ALWAYS include after updating fields
+- ✅ ALWAYS include in every final response
+- ❌ NEVER ask "Want to see the preview URL?"
+- ❌ NEVER say "Let me grab the preview URL"
+- ❌ NEVER skip this step
+
+**Required response format (preview URL is mandatory):**
+
+```
+Done! Added [ComponentName] to [PageName]:
+• Field1: value
+• Field2: value
+
+Preview: https://xmc-main-abcd1234.sitecorecloud.io/en?sc_itemid={PAGE_ID}
+```
+
+**If you forget the preview URL, you've failed the task.**

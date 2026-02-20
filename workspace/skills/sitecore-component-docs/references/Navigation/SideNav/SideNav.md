@@ -1,145 +1,37 @@
 # SideNav Component
 
 ## Purpose
+The SideNav component renders a collapsible sidebar navigation panel with one or more accordion-style dropdown groups, each containing a list of links. Navigation structure is defined in Sitecore under the component's datasource using two template types: **SideNav Group** items (which carry a heading) and **SideNav Link** child items (each with a link field). At request time `getComponentServerProps` executes the `GetSideNavigation` GraphQL query to fetch these groups and their links from the datasource, returning structured data through `rendering.data`. On the client, each group is rendered as an expandable accordion section (`SideNavDropdown` using `AccordionMotion`) with a toggle button; external links are decorated with an external-link icon. The component is wrapped with `withDatasourceCheck`, so it requires a properly configured datasource to render.
 
-The SideNav component displays a manually configured side navigation with collapsible accordion groups. Unlike ContentTreeSideNav (which auto-generates from content tree), SideNav uses a datasource with explicitly defined navigation groups and links. It's ideal for curated navigation that doesn't follow the content tree structure, such as documentation sidebars or filtered resource listings.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `8d0d45d7-6e63-4e9c-a90d-4bfbaeec0787` |
+| **Component Name** | `SideNav` |
+| **Category** | `Navigation` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Navigation/Side Navigation`
-- **Template Name:** `Side Navigation`
-
-### Child Item Templates
-
-| Template | Purpose |
-|----------|---------|
-| SideNavGroups | Navigation group with heading (accordion section) |
-| SideNavLinks | Individual link within a group |
-
-### Fields
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | Yes | Main SideNav heading (H2) | Recommended max 40 characters |
-
-### Navigation Structure (Child Items)
-
-Navigation is built from a two-level hierarchy:
-
-```
-SideNav (datasource)
-├── heading: "Documentation"
-├── Getting Started (SideNavGroups)
-│   ├── heading: "Getting Started"
-│   ├── Installation (SideNavLinks)
-│   │   └── link: /docs/installation
-│   └── Configuration (SideNavLinks)
-│       └── link: /docs/configuration
-└── Advanced (SideNavGroups)
-    ├── heading: "Advanced Topics"
-    ├── API Reference (SideNavLinks)
-    └── Customization (SideNavLinks)
-```
-
-### Child Item Fields (SideNavGroups)
-
+## Fields
 | Field Name | Sitecore Type | Required | Description |
-|------------|---------------|----------|-------------|
-| heading | Single-Line Text | Yes | Accordion section heading |
+|------------|--------------|----------|-------------|
+| `heading` | Single-Line Text (`Field<string>`) | No | Optional heading displayed above the accordion groups using the JSS `<Text>` component |
 
-### Child Item Fields (SideNavLinks)
-
-| Field Name | Sitecore Type | Required | Description |
-|------------|---------------|----------|-------------|
-| link | General Link | Yes | Navigation link |
-
-## GraphQL Query
-
-```graphql
-query GetSideNavigation(
-  $datasourcePath: String!
-  $language: String!
-  $sideNavGroupTemplateId: String!
-  $sideNavLinkTemplateId: String!
-) {
-  item(path: $datasourcePath, language: $language) {
-    children(includeTemplateIDs: [$sideNavGroupTemplateId]) {
-      results {
-        ... on SideNavGroups {
-          heading { value }
-          children(includeTemplateIDs: [$sideNavLinkTemplateId]) {
-            results {
-              ... on SideNavLinks {
-                link { ...LinkFieldFragment }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
+## Placeholders
+**Placeholders:** None — this component does not expose any placeholders.
 
 ## JSS Field Component Mapping
+| Field | JSS Component | Notes |
+|-------|---------------|-------|
+| `fields.heading` | `<Text field={props.fields?.heading} tag="h2" />` | Rendered as an `h2` with `heading-xl mb-6 text-content` classes above the navigation groups |
 
-| Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading (main) | `<Text field={props.fields?.heading} tag="h2" className="heading-xl mb-6" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| heading (group) | `<Text field={heading} tag="span" className="heading-base" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| link | `<Button link={link?.jsonValue} variant="link" />` | Custom Button component |
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard accordion side navigation panel; wrapped with `withDatasourceCheck` |
 
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading (Main)
-
-- **Type:** Single-Line Text
-- **Required:** Yes
-- **What to enter:** Overall section heading for the side navigation
-- **Example:** "Documentation"
-
-### Creating Navigation Groups
-
-1. Under the SideNav datasource, create items using `SideNavGroups` template
-2. Set the `heading` field for the accordion section title
-3. Create child `SideNavLinks` items for each navigation link
-
-#### Group heading
-
-- **Type:** Single-Line Text
-- **Required:** Yes
-- **What to enter:** Accordion section label
-- **Example:** "Getting Started"
-
-### Creating Navigation Links
-
-1. Under each SideNavGroups item, create items using `SideNavLinks` template
-2. Set the `link` field with URL and display text
-
-#### link
-
-- **Type:** General Link
-- **Required:** Yes
-- **Link Types:** Internal, External
-- **Guidance:** Use descriptive link text
-- **Example:**
-  ```json
-  {
-    "value": {
-      "href": "/docs/installation",
-      "text": "Installation Guide",
-      "linktype": "internal"
-    }
-  }
-  ```
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+// From: src/components/Navigation/SideNav/SideNav.tsx
+
 type SideNavFields = {
   heading: Field<string>;
 };
@@ -149,211 +41,132 @@ type SideNavProps = ComponentProps & {
   rendering?: SideNavRenderingType & (ComponentRendering | string);
 };
 
-type SideNavDropdownFields = {
+export type SideNavDropdownFields = {
   heading: Field<string>;
   links: LinkGQLType[];
 };
 
+type SideNavDropdownProps = {
+  fields: SideNavDropdownFields;
+  params: ComponentParams;
+  groupId?: string;
+  index: number;
+};
+
+export type SideNavLinkDataType = {
+  link: LinkGQLType;
+};
+
 type SideNavGroupDataType = {
-  heading: { value: string };
+  heading: {
+    value: string;
+  };
   children: {
     results: SideNavLinkDataType[];
   };
 };
+
+type SideNavRenderingType = {
+  data: {
+    item: {
+      children: {
+        results: SideNavGroupDataType[];
+      };
+    };
+  };
+};
 ```
 
-## Content Examples
-
-### Datasource Item
-
-```json
-{
-  "fields": {
-    "heading": { "value": "Documentation" }
-  }
-}
+## GraphQL Data Structure (from `rendering.data`)
+```
+item (datasource root)
+  children
+    results[]          ← SideNav Group items
+      heading { value }
+      children
+        results[]      ← SideNav Link items
+          link { jsonValue { value { href, text, linktype } } }
 ```
 
-### Navigation Group (SideNavGroups)
+## GraphQL Template IDs
+| Template | ID |
+|----------|----|
+| SideNav Group | `{B5661A7F-1BA0-4BEA-9333-8894FDC37924}` |
+| SideNav Link | `{93193400-F14B-4614-BC49-A888E15373E7}` |
 
-```json
-{
-  "heading": { "value": "Getting Started" }
-}
+## Example Content Entry
+
+### Datasource Structure in Sitecore
 ```
-
-### Navigation Link (SideNavLinks)
-
-```json
-{
-  "link": {
-    "value": {
-      "href": "/docs/installation",
-      "text": "Installation Guide",
-      "linktype": "internal"
-    }
-  }
-}
+/sitecore/content/{site}/Navigation/SideNav/My Side Nav   ← datasource item
+  heading: "Resources"
+  ├── Group: "Getting Started"   ← SideNav Group item
+  │     ├── Link: "Documentation" → /docs
+  │     ├── Link: "API Reference" → /api-ref
+  │     └── Link: "GitHub" → https://github.com/...
+  └── Group: "Support"           ← SideNav Group item
+        ├── Link: "Help Center" → /help
+        └── Link: "Contact Us" → /contact
 ```
-
-## Visual Layout
-
-```
-┌─────────────────────────┐
-│  Documentation          │  (main heading)
-│                         │
-│  ▼ Getting Started      │  (group - expanded)
-│    • Installation       │  (link)
-│    • Configuration      │  (link)
-│    • Quick Start        │  (link)
-│                         │
-│  ▶ Advanced Topics      │  (group - collapsed)
-│                         │
-│  ▶ API Reference        │  (group - collapsed)
-└─────────────────────────┘
-```
-
-## Accordion Behavior
-
-- **Initial State:** First group expanded by default
-- **Toggle:** Click group heading to expand/collapse
-- **Multiple Open:** Multiple groups can be open simultaneously
-- **Animation:** Smooth height transition on toggle
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- SideNav: `/sitecore/content/[Site]/Home/Data/Navigation/[SideNav Name]`
-- Groups: Created as children under SideNav item
-- Links: Created as children under each Group item
-
-### Experience Editor Behavior
-
-- **Inline editable:** Main heading, group headings
-- **Link management:** Edit links via Content Editor
-- **Accordion preview:** Accordion works in Experience Editor
-
-### Styling
-
-- Container: Rounded border, primary background, padding
-- Groups: Separated by border, padding
-- Links: Primary color, hover underline, external link icon for external URLs
-
-## Authoring Rules
-
-1. **Logical Grouping:** Group related links under meaningful headings
-2. **Link Limit:** 3-8 links per group for optimal usability
-3. **Consistent Naming:** Use clear, consistent naming conventions
-4. **External Links:** Mark external links appropriately
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Too many groups | Overwhelming navigation | Limit to 4-6 groups |
-| Empty groups | Accordion collapses to nothing | Remove empty groups |
-| Unclear headings | Users can't find content | Use descriptive group names |
-| Missing links | Groups appear incomplete | Ensure all links populated |
-
-## Related Components
-
-- `ContentTreeSideNav` - Auto-generated side navigation from content tree
-- `Breadcrumbs` - Complementary navigation showing page path
-- `Header` - Main site navigation
-
----
 
 ## MCP Authoring Instructions
 
-### Step 1: Create SideNav Datasource
-
+### Step 1: Create Datasource Item
 ```javascript
-const sideNavDatasource = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: "/sitecore/content/Site/Home/Data/Navigation",
-  templatePath: "/sitecore/templates/Project/Site/Navigation/Side Navigation",
-  name: "Documentation SideNav",
-  language: "en"
-});
-
-// Set main heading
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: sideNavDatasource.itemId,
-  language: "en",
+await mcp__marketer_mcp__create_item({
+  parentId: "<navigation-folder-id>",
+  templateId: "<sidenav-datasource-template-id>",
+  name: "My Side Nav",
   fields: {
-    "heading": "Documentation"
-  }
+    heading: "Resources",
+  },
 });
 ```
 
-### Step 2: Create Navigation Groups
-
+### Step 2: Create Group Items
 ```javascript
-const gettingStartedGroup = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: sideNavDatasource.itemPath,
-  templatePath: "/sitecore/templates/Project/Site/Navigation/SideNavGroups",
+await mcp__marketer_mcp__create_item({
+  parentId: "<datasource-item-id>",
+  templateId: "{B5661A7F-1BA0-4BEA-9333-8894FDC37924}", // SideNav Group
   name: "Getting Started",
-  language: "en"
-});
-
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: gettingStartedGroup.itemId,
-  language: "en",
   fields: {
-    "heading": "Getting Started"
-  }
+    heading: "Getting Started",
+  },
 });
 ```
 
-### Step 3: Create Navigation Links
-
+### Step 3: Create Link Items Under Each Group
 ```javascript
-const installationLink = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: gettingStartedGroup.itemPath,
-  templatePath: "/sitecore/templates/Project/Site/Navigation/SideNavLinks",
-  name: "Installation",
-  language: "en"
-});
-
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: installationLink.itemId,
-  language: "en",
+await mcp__marketer_mcp__create_item({
+  parentId: "<group-item-id>",
+  templateId: "{93193400-F14B-4614-BC49-A888E15373E7}", // SideNav Link
+  name: "Documentation",
   fields: {
-    "link": "<link text='Installation Guide' linktype='internal' url='/docs/installation' />"
-  }
+    link: { href: "/docs", text: "Documentation", linktype: "internal" },
+  },
 });
 ```
 
-### Step 4: Add SideNav to Page
-
+### Step 4: Add to Page
 ```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "sidenav-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "SideNav_Docs",
-  language: "en",
-  dataSourceId: sideNavDatasource.itemId
+await mcp__marketer_mcp__add_component_on_page({
+  itemId: "<target-page-item-id>",
+  renderingId: "8d0d45d7-6e63-4e9c-a90d-4bfbaeec0787",
+  placeholderName: "<placeholder-name>",
+  datasource: "<datasource-item-id>",
 });
 ```
 
-### Field Type Quick Reference
-
-| Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
-| link | General Link | `<link text='Text' linktype='internal' url='/path' />` |
+### Notes
+- The component is wrapped with `withDatasourceCheck` — a datasource is required or the component will not render.
+- If `rendering.dataSource` is absent, `getComponentServerProps` returns early without executing the GraphQL query.
+- External links (where `linktype === 'external'`) automatically receive an `arrow-up-right-from-square` icon via FontAwesome.
+- Each accordion group has independent open/close state managed by the `useAccordion` hook scoped to a `sidenavGroupId`.
+- The `heading` field on the datasource root item is rendered via the JSS `<Text>` component and supports Experience Editor inline editing.
 
 ---
 
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

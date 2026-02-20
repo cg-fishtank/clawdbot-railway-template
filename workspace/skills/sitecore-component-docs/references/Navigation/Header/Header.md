@@ -1,154 +1,43 @@
 # Header Component
 
 ## Purpose
+The Header component renders the primary site-wide navigation bar, supporting both desktop and mobile layouts. On desktop it displays a logo, a mega-menu/dropdown navigation powered by `PageList` and its child components (`DropdownMenu`, `MegaMenu`, `MenuItems`), a search button that opens `SearchModal`, and the tertiary navigation bar via a dynamic Placeholder. On mobile it collapses into a hamburger menu with an accordion-animated drawer (`AccordionMotion`) containing the full page list and tertiary nav items. Navigation link data is fetched server-side via `getComponentServerProps` using the `GetHeaderNavigation` GraphQL query against the component's datasource, and the `demo` field on the datasource allows the entire header to be hidden in demo/preview scenarios. An accessibility `BypassBlock` child component provides a skip-to-content link for keyboard users.
 
-The Header component provides the main site navigation, featuring a logo, mega menu navigation links (fetched via GraphQL from child items), search functionality, and responsive mobile menu with hamburger toggle. It includes placeholders for tertiary navigation and supports hiding via a demo field. The component uses a secondary theme (dark background) by default.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `ddd5f8c3-6e84-404a-b49d-43bbf28d00f4` |
+| **Component Name** | `Header` |
+| **Category** | `Navigation` |
 
-## Sitecore Template Requirements
+## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| `logo` | Image Field | No | Site logo image displayed in the header bar and linked to the home page (`/`) |
+| `searchLink` | Link Field | No | Reserved link field for search; currently search is triggered via the modal button rather than a direct link |
+| `demo` | Checkbox (`Field<string \| boolean>`) | No | When checked (`true`/`"1"`/`"true"`), hides the entire header — used to suppress display in demo/preview modes |
 
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Navigation/Header`
-- **Template Name:** `Header`
-
-### Child Item Templates
-
-The header navigation is built from a hierarchy of child items:
-
-| Template | Purpose |
-|----------|---------|
-| Header Child | Top-level nav item (may contain link groups) |
-| Header Link | Individual navigation link |
-| Header Link Group | Grouped links within a mega menu |
-
-### Fields
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| logo | Image | Yes | Site logo displayed in header | Recommended: SVG, height auto-scales |
-| searchLink | General Link | No | Link for search functionality | [VERIFY: May be deprecated] |
-| demo | Checkbox | No | When checked, hides the component | For staging/demo purposes |
-
-### Navigation Structure (Child Items)
-
-Navigation is built from child items under the Header datasource:
-
-```
-Header (datasource)
-├── Products (HeaderChild)
-│   ├── link: /products
-│   ├── Software (HeaderLinkGroup)
-│   │   ├── link: /products/software
-│   │   ├── Enterprise (HeaderLink)
-│   │   └── SMB (HeaderLink)
-│   └── Services (HeaderLinkGroup)
-│       ├── link: /products/services
-│       └── Consulting (HeaderLink)
-├── About Us (HeaderChild)
-│   └── link: /about
-└── Contact (HeaderChild)
-    └── link: /contact
-```
-
-## GraphQL Query
-
-```graphql
-query GetHeaderNavigation(
-  $datasourcePath: String!
-  $linkTemplateId: String!
-  $childTemplateId: String!
-  $linkGroupTemplateId: String!
-  $language: String = "en"
-) {
-  item(path: $datasourcePath, language: $language) {
-    id
-    name
-    links: children(includeTemplateIDs: [$childTemplateId]) {
-      results {
-        displayName
-        ... on HeaderChild {
-          ...LinkListFieldFragment
-          link { ...LinkFieldFragment }
-          linkGroup: children(includeTemplateIDs: [$linkGroupTemplateId]) {
-            results {
-              displayName
-              ... on HeaderLinkGroup {
-                ...LinkListFieldFragment
-                link { ...LinkFieldFragment }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-## Placeholder Configuration
-
-| Placeholder Key | Purpose | Allowed Components |
-|-----------------|---------|-------------------|
-| `tertiarynav` | Secondary navigation bar | TertiaryNav, LanguageSwitcher, Login |
+## Placeholders
+| Placeholder | Key Pattern | Accepted Components | Description |
+|-------------|-------------|---------------------|-------------|
+| Tertiary Navigation | `tertiarynav-{uid}` (generated via `placeholderGenerator`) | TertiaryNav | Rendered above the main nav bar on desktop; also rendered inside the mobile drawer |
 
 ## JSS Field Component Mapping
+| Field | JSS Component | Notes |
+|-------|---------------|-------|
+| `fields.logo` | `<Image field={fields?.logo} />` | Rendered as an `<img>` via the JSS `Image` component; inverted via CSS (`invert` class) |
+| Navigation links | Not JSS fields — fetched via GraphQL into `rendering.data.item.links.results` | Consumed by `PageList` child component |
 
-| Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| logo | `<Image className="h-6 w-auto invert lg:h-8" field={fields?.logo} />` | `import { Image } from '@sitecore-content-sdk/nextjs'` |
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Full site header with logo, mega-menu, search, and tertiary nav; wrapped with `withDatasourceCheck` |
 
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### logo
-
-- **Type:** Image
-- **Required:** Yes
-- **Recommended format:** SVG or transparent PNG
-- **Note:** Logo is automatically inverted (white) for dark background
-- **Dimensions:** Height auto-scales to 24px (mobile) / 32px (desktop)
-- **Media Library path:** `/sitecore/media library/Project/[Site]/Logos/`
-- **Example:**
-  ```json
-  {
-    "value": {
-      "src": "/-/media/Project/Site/Logos/logo.svg",
-      "alt": "Company Name"
-    }
-  }
-  ```
-
-#### demo
-
-- **Type:** Checkbox
-- **Required:** No
-- **Purpose:** When checked, hides the entire component
-- **Use case:** Hide component on production while testing
-
-### Creating Navigation Items
-
-#### Step 1: Create Header Child (Top-Level Nav)
-
-1. Under the Header datasource, create items using `Header Child` template
-2. Set the `link` field for the main navigation link
-3. Add display name for the nav label
-
-#### Step 2: Create Link Groups (Mega Menu Categories)
-
-1. Under each Header Child, create items using `Header Link Group` template
-2. Set the `link` field for the category link
-3. Add display name for the category label
-
-#### Step 3: Create Individual Links
-
-1. Under Link Groups or Header Children, create items using `Header Link` template
-2. Set the `link` field for each navigation link
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-type HeaderRenderingProps = {
+// From: src/components/Navigation/Header/Header.tsx
+
+export type HeaderRenderingProps = {
   rendering: ComponentRendering & {
     data?: {
       item?: {
@@ -170,201 +59,68 @@ type HeaderProps = ComponentProps &
   };
 ```
 
-## Content Examples
+## Child Component Summary
 
-### Header Datasource Fields
+| File | Role |
+|------|------|
+| `component-children/Navigation/Header/BypassBlock.tsx` | Accessibility skip-to-content link; appears on Tab key press, stays hidden otherwise |
+| `component-children/Navigation/Header/PageList.tsx` | Renders the list of top-level nav items; switches between `DesktopPageItem` and `MobilePageItem` based on `isMobile` prop |
+| `component-children/Navigation/Header/DropdownMenu.tsx` | Simple dropdown panel for nav items that have direct child links (no link groups) |
+| `component-children/Navigation/Header/MegaMenu.tsx` | Full mega-menu panel with link groups and column layout; handles overflow detection to prevent viewport clipping |
+| `component-children/Navigation/Header/MenuItems.tsx` | Renders an accessible `<ul>` list of navigation links; supports Tab-key focus management callbacks |
 
-```json
-{
-  "fields": {
-    "logo": {
-      "value": {
-        "src": "/-/media/Project/Site/Logos/logo.svg",
-        "alt": "Company Name"
-      }
-    },
-    "demo": { "value": false }
-  }
-}
+## GraphQL Data Structure (from `rendering.data`)
+```
+item
+  links
+    results[]
+      link { jsonValue { value { href, text, id, linktype } } }
+      links { results[] { link { jsonValue } } }           // simple dropdown items
+      linkGroup { results[] {                              // mega-menu columns
+        displayName
+        link { jsonValue }
+        links { results[] { link { jsonValue } } }
+      }}
 ```
 
-### Navigation Child Item (Header Child)
-
-```json
-{
-  "displayName": "Products",
-  "link": {
-    "value": {
-      "href": "/products",
-      "text": "Products"
-    }
-  }
-}
-```
-
-## Visual Layout
-
-### Desktop
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│  [Logo]    Products ▼    About Us    Contact              [🔍]          │
-│            ┌─────────────────────────────────────┐                       │
-│            │ Software          Services          │  (mega menu dropdown) │
-│            │  • Enterprise      • Consulting     │                       │
-│            │  • SMB             • Support        │                       │
-│            └─────────────────────────────────────┘                       │
-└──────────────────────────────────────────────────────────────────────────┘
-```
-
-### Mobile
-```
-┌──────────────────────────────────────┐
-│  [☰]        [Logo]           [🔍]    │
-├──────────────────────────────────────┤
-│  Products ▼                          │  (accordion menu)
-│    • Software                        │
-│    • Services                        │
-│  About Us                            │
-│  Contact                             │
-│  [Tertiary Nav items]                │
-└──────────────────────────────────────┘
-```
-
-## Responsive Behavior
-
-| Viewport | Navigation Style | Search |
-|----------|-----------------|--------|
-| Desktop (≥ 1024px) | Horizontal with mega menu dropdowns | Icon button |
-| Mobile (< 1024px) | Hamburger menu with accordion | Icon button |
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Header: `/sitecore/content/[Site]/Home/Data/Navigation/Header`
-- Navigation items: Created as children under Header item
-
-### Experience Editor Behavior
-
-- **Inline editable:** Logo selection
-- **Navigation editing:** Manage child items in Content Editor
-- **Mobile menu:** Not visible in Experience Editor
-- **Mega menu:** Hover states work in preview mode
-
-### Theme Configuration
-
-- Uses `secondary` theme (dark background, light text)
-- Logo is inverted for visibility
-
-## Authoring Rules
-
-1. **Logo Format:** Use SVG or transparent PNG
-2. **Nav Structure:** Keep top-level items to 5-7 for usability
-3. **Mega Menu:** Use link groups for complex navigation
-4. **Mobile Testing:** Test accordion behavior on mobile
-5. **Link Text:** Keep nav labels short and descriptive
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Non-transparent logo | White background on dark header | Use transparent PNG or SVG |
-| Too many top-level items | Navigation overwhelming | Limit to 5-7 items |
-| Missing links | Nav items not clickable | Set link field on all items |
-| Deep nesting | Complex mega menus confuse users | Keep to 2-3 levels max |
-
-## Related Components
-
-- `TertiaryNav` - Secondary navigation placed in header placeholder
-- `FooterMain` - Footer component (shares logo styling)
-- `LanguageSwitcher` - Language selector in tertiarynav placeholder
-- `Login` - Authentication component in tertiarynav placeholder
-
----
+## Example Content Entry
+1. Create a datasource item in Sitecore under the site's navigation folder (e.g., `/sitecore/content/{site}/Navigation/Header`).
+2. Upload a logo image and set it on the `logo` field.
+3. Create child items of type **Header Child** for each top-level nav entry.
+4. Each Header Child can contain child items of type **Header Link** (for dropdown) or **Header Link Group** (for mega-menu columns).
+5. Assign the datasource to the Header rendering in Page Builder.
 
 ## MCP Authoring Instructions
 
-### Step 1: Create Header Datasource
-
+### Step 1: Add to Page
 ```javascript
-const headerDatasource = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: "/sitecore/content/Site/Home/Data/Navigation",
-  templatePath: "/sitecore/templates/Project/Site/Navigation/Header",
-  name: "Main Header",
-  language: "en"
+await mcp__marketer_mcp__add_component_on_page({
+  itemId: "<target-page-item-id>",
+  renderingId: "ddd5f8c3-6e84-404a-b49d-43bbf28d00f4",
+  placeholderName: "<placeholder-name>",
+  datasource: "<header-datasource-item-id>",
 });
 ```
 
 ### Step 2: Set Logo Field
-
 ```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: headerDatasource.itemId,
-  language: "en",
+await mcp__marketer_mcp__update_component_fields({
+  itemId: "<datasource-item-id>",
   fields: {
-    "logo": "<image mediaid='{LOGO-MEDIA-GUID}' />"
-  }
+    logo: "<sitecore-media-item-id>",
+  },
 });
 ```
 
-### Step 3: Create Navigation Items
-
-```javascript
-// Create top-level nav item
-const productsNav = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: headerDatasource.itemPath,
-  templatePath: "/sitecore/templates/Project/Site/Navigation/Header Child",
-  name: "Products",
-  language: "en"
-});
-
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: productsNav.itemId,
-  language: "en",
-  fields: {
-    "link": "<link text='Products' linktype='internal' url='/products' />"
-  }
-});
-
-// Create link group under Products
-const softwareGroup = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: productsNav.itemPath,
-  templatePath: "/sitecore/templates/Project/Site/Navigation/Header Link Group",
-  name: "Software",
-  language: "en"
-});
-```
-
-### Step 4: Add Header to Page
-
-```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "header-rendering-id",
-  placeholderPath: "headless-header",
-  componentItemName: "Header_Main",
-  language: "en",
-  dataSourceId: headerDatasource.itemId
-});
-```
-
-### Field Type Quick Reference
-
-| Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| logo | Image | `<image mediaid='{GUID}' />` |
-| demo | Checkbox | `"1"` (checked) or `""` (unchecked) |
-| link (child items) | General Link | `<link text='Text' linktype='internal' url='/path' />` |
+### Notes
+- The component is wrapped with `withDatasourceCheck` — a datasource item is required or the component will not render.
+- The `demo` checkbox field can be toggled to hide the header during content review/demo sessions.
+- The tertiary nav placeholder (`tertiarynav-{uid}`) accepts `TertiaryNav` components and is rendered both above the desktop header and inside the mobile drawer.
+- Search is hidden automatically on the search results page (path matched against `SEARCH_CONFIG.searchPageUrl`).
 
 ---
 
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

@@ -1,160 +1,93 @@
 # Login Component
 
 ## Purpose
+The Login component renders an authentication UI element in the site header, allowing users to sign in and view their account details. The component shell (`Default` / `LoginDefault`) first checks the `NEXT_PUBLIC_ENABLE_AUTH` environment variable via `isAuthEnabled()` — if authentication is disabled it returns `null` and logs an error. When auth is enabled it renders the child `Login` component, which uses `next-auth/react` (`useSession`, `signIn`, `signOut`) together with an Auth0 OAuth provider. The child rendering shows a "Log in" button for unauthenticated users, and for authenticated users shows the user's avatar and name with a dropdown drawer (`AuthDrawer`) providing links to account management and sign-out. Auth configuration (account page URL, sign-out redirect URL) is fetched server-side per site via `fetchAuthConfig` in `getComponentServerProps`.
 
-The Login component provides user authentication functionality, displaying login/logout states and user information. It integrates with the application's authentication system (when enabled) and renders nothing if authentication is not configured. This is a system component with no CMS-authored fields.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `1b6ddc7a-d7cf-4137-8b2d-95d40de82d79` |
+| **Component Name** | `Login` |
+| **Category** | `Navigation` |
 
-## Sitecore Template Requirements
+## Fields
+**Fields:** None — this is a system component. Authentication state and configuration are managed through NextAuth.js session handling and server-side config fetching, not through Sitecore datasource fields.
 
-### Data Source
+## Placeholders
+**Placeholders:** None — this component does not expose any placeholders.
 
-**Important:** This component does NOT use a datasource or CMS fields. Authentication behavior is controlled by environment configuration.
+## JSS Field Component Mapping
+This component has no JSS field bindings. Runtime data sources:
 
-### Fields
+| Data | Source |
+|------|--------|
+| Auth enabled | `process.env.NEXT_PUBLIC_ENABLE_AUTH` via `isAuthEnabled()` |
+| Session / user info | `useSession()` from `next-auth/react` |
+| Auth config (account/sign-out URLs) | `fetchAuthConfig(siteName)` called in `getComponentServerProps` |
+| Site name | `layoutData.sitecore.context.site.name` from layout data |
+| Editing mode | `useSitecore()` → `page.mode.isEditing` |
 
-None - This is a code-driven component.
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Auth-gated login/account button; renders nothing if auth is disabled |
 
-## Configuration
-
-### Authentication Setup
-
-Authentication is controlled by environment variables:
-
-```env
-NEXT_PUBLIC_ENABLE_AUTH=true
-```
-
-When `NEXT_PUBLIC_ENABLE_AUTH` is not set or set to `false`, the component renders nothing and logs an error.
-
-### Authentication Provider
-
-The actual authentication logic is implemented in:
-- `component-children/Navigation/Login/Login.tsx` - UI rendering
-- `lib/helpers/auth.ts` - Authentication helpers
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-import { GetComponentServerProps } from '@sitecore-content-sdk/nextjs';
-import { fetchAuthConfig, AuthConfig } from 'lib/helpers/site-config-helpers';
+// From: src/components/Navigation/Login/Login.tsx
 
 type LoginDefaultProps = {
   authConfig?: AuthConfig | null;
 };
 
-const LoginDefault: React.FC<LoginDefaultProps> = ({ authConfig }) => {
-  if (!isAuthEnabled()) {
-    console.error('Auth is not enabled...');
-    return null;
-  }
-  return <Login authConfig={authConfig} />;
+// From: src/component-children/Navigation/Login/Login.tsx
+
+type LoginProps = {
+  authConfig?: AuthConfig | null;
 };
 
-// Server-side props: fetches auth config by site name
-export const getComponentServerProps: GetComponentServerProps = async (_, layoutData) => {
-  const siteName = layoutData.sitecore?.context?.site?.name;
-  const authConfig = siteName ? await fetchAuthConfig(siteName) : null;
-  return { authConfig };
+// AuthConfig (from lib/helpers/site-config-helpers):
+// {
+//   accountPageLink: string;   // URL for the account management page
+//   signOutPageLink: string;   // URL to redirect to after sign-out
+// }
+
+type AuthCommonProps = {
+  session: Session | null;
+  isOpen: boolean;
+  theme?: ThemeType;
+};
+
+type AuthButtonProps = AuthCommonProps & {
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 ```
 
-## Content Authoring Instructions
-
-### No CMS Configuration Required
-
-The Login component is fully configured in code and environment variables. Content authors do not need to create or configure any Sitecore items.
-
-### Placement
-
-The Login component is typically placed in:
-- Header's `tertiarynav` placeholder
-- TertiaryNav's `tertiarynavcomponents` placeholder
-
-## Visual Layout
-
-### Logged Out State
-```
-┌─────────────────┐
-│  [Login]        │
-└─────────────────┘
-```
-
-### Logged In State
-```
-┌─────────────────────────┐
-│  Welcome, John  [▼]     │
-│  ├── Profile            │
-│  └── Logout             │
-└─────────────────────────┘
-```
-
-## Sitecore XM Cloud Specifics
-
-### Experience Editor Behavior
-
-- **Not editable:** Component has no CMS fields
-- **Authentication state:** May not reflect actual auth state in editing mode
-- **Testing:** Test authentication flows in preview/live mode
-
-### Partial Design Placement
-
-Add to partial designs that include the header:
-
-1. Select the header/tertiary nav area
-2. Add Login component to appropriate placeholder
-3. Publish partial design
-
-## Authoring Rules
-
-1. **Environment Config:** Ensure auth is properly configured in deployment
-2. **Placeholder Position:** Place consistently across all pages
-3. **Styling Consistency:** Works with header's theme
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Auth not enabled | Component doesn't render | Set NEXT_PUBLIC_ENABLE_AUTH=true |
-| Wrong placeholder | Component misaligned | Use tertiarynav placeholder |
-| Missing auth config | Login fails | Configure full auth stack |
-
-## Related Components
-
-- `Header` - Parent component containing Login in placeholder
-- `TertiaryNav` - Often contains Login component
-- `PersonaSwitcher` - Alternative/complementary user component
-
----
+## Example Content Entry
+No content entry is required. This is a system/infrastructure component. It is typically placed inside the `tertiarynavcomponents` placeholder of a `TertiaryNav` component.
 
 ## MCP Authoring Instructions
 
-### Adding Login to Page
-
-Since this component has no datasource:
-
+### Step 1: Add to Page (via TertiaryNav placeholder)
 ```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "login-rendering-id",
-  placeholderPath: "tertiarynavcomponents-{dynamic-id}",
-  componentItemName: "Login_1",
-  language: "en",
-  fields: {}  // No fields to set
+await mcp__marketer_mcp__add_component_on_page({
+  itemId: "<target-page-item-id>",
+  renderingId: "1b6ddc7a-d7cf-4137-8b2d-95d40de82d79",
+  placeholderName: "tertiarynavcomponents-{uid}",
+  // No datasource required
 });
 ```
 
-### Prerequisites
-
-Before the Login component will work:
-
-1. Set `NEXT_PUBLIC_ENABLE_AUTH=true` in environment
-2. Configure authentication provider (OAuth, OIDC, etc.)
-3. Deploy with authentication enabled
+### Notes
+- **Critical:** This component will render `null` and log a console error unless `NEXT_PUBLIC_ENABLE_AUTH=true` is set in the environment.
+- Authentication uses Auth0 as the OAuth provider (hardcoded `'auth0'` provider string in `AuthButton`).
+- The `AuthDrawer` links are driven by `authConfig.accountPageLink` and `authConfig.signOutPageLink`, which are fetched from Sitecore site configuration via `fetchAuthConfig`. If these are not configured, fallbacks of `/account` and `/` are used.
+- In Experience Editor (`page.mode.isEditing`), the sign-in button is non-functional (click is suppressed) to prevent navigation away from the editor.
+- The auth dropdown closes when the user clicks outside the component (`useClickOutside` hook).
 
 ---
 
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

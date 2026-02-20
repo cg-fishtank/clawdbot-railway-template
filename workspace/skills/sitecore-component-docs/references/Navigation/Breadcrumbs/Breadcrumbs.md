@@ -1,62 +1,36 @@
 # Breadcrumbs Component
 
 ## Purpose
+The Breadcrumbs component renders a contextual navigation trail showing the current page's position within the site hierarchy. It uses a `getComponentServerProps` function to execute a dynamic GraphQL query that traverses the Sitecore content tree upward from the current page, building a parent chain of display names. The component delegates its visual rendering to four child components: `BreadcrumbsRendering` (the root display logic), `BackButton` (a mobile-only back link), `SimplePageTitle` (for top-level pages), and `SubRoutes` (for deep multi-level paths showing intermediate breadcrumb links with caret separators).
 
-The Breadcrumbs component displays a hierarchical navigation path showing the user's current location within the site structure. It automatically builds the breadcrumb trail from the page hierarchy in Sitecore, using page display names and URLs. The component reads from route context rather than a datasource, making it fully automatic based on content tree structure.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `dbc13b39-e3ea-4974-9623-50116bda8feb` |
+| **Component Name** | `Breadcrumbs` |
+| **Category** | `Navigation` |
 
-## Sitecore Template Requirements
+## Fields
+**Fields:** None — this component has no datasource fields. It derives all data automatically from the current page's route and content tree position via `getComponentServerProps`.
 
-### Data Source
+## Placeholders
+**Placeholders:** None — this component does not expose any placeholders.
 
-**Important:** This component does NOT use a datasource. It reads the page hierarchy from the **route context** and layout service data automatically.
+## JSS Field Component Mapping
+This component has no JSS field bindings. Data is derived from the layout service route and a dynamic GraphQL query:
+- `route.fields.heading` is read from `RouteData` to populate the page title
+- `pathList` is a recursively built parent chain returned from the `getPagePathList` helper
 
-### Template Path
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard breadcrumb trail with home link, intermediate path links, and current page title |
 
-- No dedicated template required
-- Uses page item `displayName` fields for breadcrumb labels
-- Uses page URLs for navigation
-
-### Route Context Fields
-
-| Field Name | Source | Description |
-|------------|--------|-------------|
-| heading | Page item fields | Used for current page title (optional override) |
-| displayName | Page item | Default breadcrumb label |
-| path | URL path | Navigation URL for each breadcrumb level |
-
-## Content Authoring Instructions
-
-### Automatic Behavior
-
-Breadcrumbs are **automatically generated** from the Sitecore content tree structure:
-
-1. **Display Names:** Each breadcrumb uses the page's `displayName` or `name` field
-2. **URLs:** Links are built from the content tree path
-3. **Current Page:** The last item shows only the page title (not clickable)
-
-### Optimizing Breadcrumbs
-
-To customize breadcrumb display:
-
-1. **Set Display Names:** Edit each page's `displayName` field for user-friendly labels
-2. **Content Structure:** Organize content tree logically for meaningful paths
-3. **Page Titles:** Ensure `heading` field on pages is set for proper current page display
-
-### Example Path Generation
-
-For a page at `/sitecore/content/Site/Home/Products/Software/Enterprise`:
-
-```
-Home > Products > Software > Enterprise
-  ↓        ↓         ↓          ↓
-  /     /products  /products   (current
-                   /software    page)
-```
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-type BreadcrumbPathType = {
+// From: src/components/Navigation/Breadcrumbs/Breadcrumbs.tsx
+
+export type BreadcrumbPathType = {
   name: string;
   path: string;
 };
@@ -73,119 +47,39 @@ type BreadcrumbsProps = ComponentProps & {
 };
 ```
 
-## Content Examples
+## Child Component Summary
 
-### Generated Output Example
+| File | Role |
+|------|------|
+| `component-children/Navigation/Breadcrumbs/Breadcrumbs.tsx` | Root rendering — assembles HomeButton, BackButton, CaretIcon, SubRoutes/SimplePageTitle; also contains `getPagePathList` which executes the dynamic GraphQL query |
+| `component-children/Navigation/Breadcrumbs/BackButton.tsx` | Mobile-only anchor tag that navigates to the previous breadcrumb path |
+| `component-children/Navigation/Breadcrumbs/SimplePageTitle.tsx` | Renders the page title as a static span for top-level (depth-1) pages |
+| `component-children/Navigation/Breadcrumbs/SubRoutes.tsx` | Renders intermediate path segments as clickable links with caret separators for deep pages |
 
-For URL `/products/software/enterprise`:
-
-```json
-{
-  "breadcrumbs": [
-    { "name": "Products", "path": "/products" },
-    { "name": "Software", "path": "/products/software" }
-  ],
-  "currentPage": "Enterprise Solutions"
-}
-```
-
-## Visual Layout
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│  Products  >  Software  >  Enterprise Solutions                        │
-│     ↑            ↑              ↑                                      │
-│   (link)      (link)       (current - no link)                         │
-└────────────────────────────────────────────────────────────────────────┘
-```
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- No dedicated item path - uses page hierarchy
-- Configure page display names at each level
-
-### Experience Editor Behavior
-
-- **Not directly editable:** Breadcrumbs are auto-generated
-- **Updating breadcrumbs:** Edit page `displayName` fields in Content Editor
-- **Theming:** Inherits theme from parent/Frame context
-
-### Rendering Parameters (Styles)
-
-| Parameter | Type | Options | Default | Description |
-|-----------|------|---------|---------|-------------|
-| theme | Droplist | primary, secondary, tertiary | (inherited) | Background/text theme |
-
-## Authoring Rules
-
-1. **Display Names:** Always set meaningful display names on pages
-2. **Avoid Deep Nesting:** Keep content tree reasonably shallow (4-5 levels max)
-3. **Consistent Naming:** Use consistent naming conventions across sections
-4. **Home Page:** Home page is excluded from visible breadcrumbs (implicit)
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Missing display names | Shows item names (technical) | Set displayName on all pages |
-| Deep nesting | Long, unwieldy breadcrumbs | Restructure content tree |
-| Confusing page names | Users get lost | Use clear, descriptive names |
-| Inconsistent capitalization | Unprofessional appearance | Use title case consistently |
-
-## Related Components
-
-- `Header` - Main navigation typically appears above breadcrumbs
-- `ContentTreeSideNav` - Alternative navigation showing sibling pages
-- `SideNav` - Manual side navigation component
-
----
+## Example Content Entry
+No content entry is required. The Breadcrumbs component is a structural/system component that automatically reads from the current page's layout data and content tree hierarchy. Place it on a shared layout or page design.
 
 ## MCP Authoring Instructions
 
-### Adding Breadcrumbs to Page
-
-Since Breadcrumbs has no datasource, simply add the component:
-
+### Step 1: Add to Page
 ```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "breadcrumbs-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "Breadcrumbs_1",
-  language: "en",
-  fields: {}  // No fields to set
+await mcp__marketer_mcp__add_component_on_page({
+  itemId: "<target-page-item-id>",
+  renderingId: "dbc13b39-e3ea-4974-9623-50116bda8feb",
+  placeholderName: "<placeholder-name>",
+  // No datasource required — component is self-contained
 });
 ```
 
-### Updating Breadcrumb Labels
-
-To change breadcrumb labels, update page display names:
-
-```javascript
-// Update a parent page's display name
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: parentPageId,
-  language: "en",
-  fields: {
-    "displayName": "Products & Services"  // Standard Sitecore field
-  }
-});
-```
-
-### MCP Authoring Checklist
-
-- [ ] Have page ID for component placement
-- [ ] Have Breadcrumbs rendering ID
-- [ ] Verify parent pages have appropriate displayName values
-- [ ] Test breadcrumb trail after deployment
+### Notes
+- No datasource is needed. The component reads the current route from layout data.
+- The dynamic GraphQL query depth is calculated from the URL path depth. Pages only one level deep render `SimplePageTitle`; deeper pages render the full `SubRoutes` chain.
+- The `heading` field on the current route item is used as the final breadcrumb segment (page title).
+- The `NEXT_PUBLIC_API_URL` environment variable must be set for the GraphQL client.
 
 ---
 
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

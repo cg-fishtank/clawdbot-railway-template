@@ -1,142 +1,73 @@
 # PersonaSwitcher Component
 
 ## Purpose
+The PersonaSwitcher component renders a button in the navigation bar that opens a persona selection popup, allowing content authors and demo operators to simulate personalized visitor experiences on the site. It is a thin wrapper that delegates entirely to the `PersonaSwitcher` child component from `component-children/Navigation/PersonaSwitcher/PersonaSwitcher.tsx`. The child component reads the current editing mode from `useSitecore()` (`page.mode.isEditing`) to disable the popup trigger in the Experience Editor, and it integrates with the application's persona system via the `usePersona` hook. While personas are loading the component renders nothing; once loaded, clicking the button opens a `PersonaSelectionPopup` modal overlay.
 
-The PersonaSwitcher component provides a UI for switching between different visitor personas, typically used for demonstrating personalization features in Sitecore. It allows users to simulate different audience segments to see how personalized content changes. This is a system/demo component with no CMS-authored fields.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `e1c34e3c-f878-46f1-8453-7cd18c796585` |
+| **Component Name** | `PersonaSwitcher` |
+| **Category** | `Navigation` |
 
-## Sitecore Template Requirements
+## Fields
+**Fields:** None — this is a system/demo component. It has no datasource and no Sitecore fields.
 
-### Data Source
+## Placeholders
+**Placeholders:** None — this component does not expose any placeholders.
 
-**Important:** This component does NOT use a datasource or CMS fields. Persona definitions are managed in code or fetched from Sitecore's personalization system.
+## JSS Field Component Mapping
+This component has no JSS field bindings. Runtime data sources:
 
-### Fields
+| Data | Source |
+|------|--------|
+| Persona loading state | `usePersona()` hook → `isLoading` |
+| Editing mode | `useSitecore()` → `page.mode.isEditing` |
+| Theme | `useFrame()` → `effectiveTheme` |
 
-None - This is a code-driven component.
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Persona trigger button with popup; typically used in demo or authoring environments |
 
-## Configuration
-
-The PersonaSwitcher component is implemented in:
-- `component-children/Navigation/PersonaSwitcher/PersonaSwitcher.tsx`
-
-Personas are typically defined based on:
-- Sitecore personalization rules
-- Marketing automation segments
-- Custom persona definitions in code
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-// No props required - component manages its own state
-const PersonaSwitcher: React.FC = () => {
+// From: src/components/Navigation/PersonaSwitcher/PersonaSwitcher.tsx
+// The Default export takes no props:
+export const Default = (): JSX.Element => {
   return <PersonaSwitcher />;
 };
+
+// From: src/component-children/Navigation/PersonaSwitcher/PersonaSwitcher.tsx
+// The child component also takes no props:
+export const PersonaSwitcher: React.FC = () => { ... };
 ```
 
-## Content Authoring Instructions
-
-### No CMS Configuration Required
-
-The PersonaSwitcher is fully configured in code. Content authors do not need to create or configure any Sitecore items for this component.
-
-### Setting Up Personalization
-
-To leverage the PersonaSwitcher effectively:
-
-1. **Define Personas:** Configure personas in Sitecore's Marketing Control Panel
-2. **Create Rules:** Set up personalization rules on components
-3. **Create Variants:** Create personalized content variants
-4. **Test with Switcher:** Use PersonaSwitcher to preview different experiences
-
-## Visual Layout
-
-```
-┌────────────────────────┐
-│  Persona: Default  ▼   │
-├────────────────────────┤
-│  ○ Default             │
-│  ○ Business User       │
-│  ○ Developer           │
-│  ○ Marketing Manager   │
-└────────────────────────┘
-```
-
-## Sitecore XM Cloud Specifics
-
-### Personalization Setup
-
-1. Navigate to Marketing Control Panel
-2. Define visitor personas and segments
-3. Set up personalization rules on components
-4. Create personalized content variants
-
-### Experience Editor Behavior
-
-- **Persona simulation:** May work in Experience Editor for preview
-- **Testing:** Full testing recommended in preview mode
-- **Production:** Often hidden in production via conditional rendering
-
-### Use Cases
-
-| Scenario | Description |
-|----------|-------------|
-| Demo environments | Show personalization capabilities |
-| Content preview | Preview content for different audiences |
-| QA testing | Verify personalization rules work correctly |
-| Training | Teach content authors about personalization |
-
-## Authoring Rules
-
-1. **Demo Only:** Consider hiding in production environments
-2. **Placement:** Place in header/utility area for easy access
-3. **Persona Alignment:** Ensure personas match marketing definitions
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| No personas defined | Switcher has no options | Define personas in Sitecore |
-| Left in production | Confuses real users | Conditionally hide in prod |
-| No personalized content | Switching has no effect | Create personalized variants |
-
-## Related Components
-
-- `Header` - May contain PersonaSwitcher in tertiary nav
-- `TertiaryNav` - Placeholder for PersonaSwitcher
-- `Login` - Related user/session component
-
----
+## Example Content Entry
+No content entry is required. This is a system/demo utility component with no datasource. It is typically placed inside the `tertiarynavcomponents` placeholder of a `TertiaryNav` component, visible only in non-production or demo environments.
 
 ## MCP Authoring Instructions
 
-### Adding PersonaSwitcher to Page
-
-Since this component has no datasource:
-
+### Step 1: Add to Page (via TertiaryNav placeholder)
 ```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "persona-switcher-rendering-id",
-  placeholderPath: "tertiarynavcomponents-{dynamic-id}",
-  componentItemName: "PersonaSwitcher_1",
-  language: "en",
-  fields: {}  // No fields to set
+await mcp__marketer_mcp__add_component_on_page({
+  itemId: "<target-page-item-id>",
+  renderingId: "e1c34e3c-f878-46f1-8453-7cd18c796585",
+  placeholderName: "tertiarynavcomponents-{uid}",
+  // No datasource required
 });
 ```
 
-### Setting Up Personalization Rules
-
-After adding PersonaSwitcher, set up personalization on content:
-
-1. Edit a component in Sitecore
-2. Add personalization rules
-3. Create variants for different personas
-4. Test using PersonaSwitcher
+### Notes
+- This component is intended for **demo and authoring use only** and is typically hidden or removed in production deployments.
+- The component renders `null` while the persona system is initializing (`personaLoading === true`).
+- In Experience Editor (`page.mode.isEditing`), the popup is suppressed (button click is a no-op) to prevent disruption during editing.
+- The `PersonaSelectionPopup` modal is rendered from `component-children/Persona/PersonaSelectionPopup` — ensure that component and the persona configuration are properly set up.
+- Theme styling is inherited via the `useFrame()` hook (`effectiveTheme`), allowing it to adopt the secondary theme used inside the TertiaryNav/Header area.
 
 ---
 
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

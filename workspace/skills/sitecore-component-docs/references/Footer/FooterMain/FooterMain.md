@@ -1,111 +1,52 @@
 # FooterMain Component
 
 ## Purpose
+FooterMain is the primary branded footer band that sits above the legal strip. It renders three columns separated by vertical rules: a logo + scroll-to-top section, a newsletter/CTA column, and a link column driven by a `footermenu` placeholder (intended for `FooterMenu` or `FooterCol` components). The component forces the secondary theme via `FrameProvider`. A `demo` field allows the entire component to be hidden from production while keeping it visible in the CMS for demonstration purposes. The datasource item name is resolved at server time and surfaced as a `data-source-name` attribute for debugging.
 
-The FooterMain component displays a comprehensive footer section featuring a logo, newsletter signup area with heading/body/CTA, and a placeholder for footer menu columns. It includes a "scroll to top" button and serves as the primary footer layout when a newsletter call-to-action is desired. The component uses a secondary theme (dark background) and supports hiding via a demo field.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `d63f334e-d240-47da-87b6-2c61c6413f8a` |
+| **Component Name** | `FooterMain` |
+| **Category** | `Footer` |
 
-## Sitecore Template Requirements
+## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| `logo` | Image | No | Site logo displayed in the left column; rendered inverted and links to `/` |
+| `newsletterHeading` | Single-Line Text | No | Heading above the newsletter/CTA section |
+| `newsletterBody` | Rich Text | No | Body copy below the newsletter heading |
+| `newsletterLink` | General Link | No | CTA button link in the newsletter section (rendered in tertiary theme) |
+| `demo` | Checkbox | No | When checked (`true` / `"1"`), adds `hidden` class to hide the component on the page |
 
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Footer/Footer Main`
-- **Template Name:** `Footer Main`
-
-### Fields
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| logo | Image | Yes | Company/brand logo displayed in footer | Recommended: SVG or transparent PNG |
-| newsletterHeading | Single-Line Text | Yes | Newsletter section heading | Recommended max 50 characters |
-| newsletterBody | Rich Text | No | Newsletter description/supporting text | Brief, compelling copy |
-| newsletterLink | General Link | Yes | CTA button link for newsletter signup | Internal or external link |
-| demo | Checkbox | No | When checked, hides the component | For staging/demo purposes |
-
-## Placeholder Configuration
-
-The FooterMain component includes a placeholder for footer navigation:
-
-| Placeholder Key | Purpose | Allowed Components |
+## Placeholders
+| Placeholder Name | Pattern | Allowed Components |
 |-----------------|---------|-------------------|
-| `footermenu` | Footer navigation columns | FooterCol |
+| `footermenu` | `placeholderGenerator(params, 'footermenu')` | `FooterMenu`, `FooterCol` |
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| logo | `<Image className="h-5 w-auto invert lg:h-8" field={fields?.logo} />` | `import { Image } from '@sitecore-content-sdk/nextjs'` |
-| newsletterHeading | `<Text field={fields?.newsletterHeading} tag="h3" className="heading-base text-center" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| newsletterBody | `<RichText field={fields?.newsletterBody} className="richtext text-center" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
-| newsletterLink | `<Button link={fields?.newsletterLink} variant="button" color="tertiary" />` | Custom Button component |
+|---------------|--------------|--------|
+| `logo` | `Image` | `@sitecore-content-sdk/nextjs` |
+| `newsletterHeading` | `Text` | `@sitecore-content-sdk/nextjs` |
+| `newsletterBody` | `RichText` | `@sitecore-content-sdk/nextjs` |
+| `newsletterLink` | `Button` (variant: `"button"`, color: `"tertiary"`) | `component-children/Shared/Button/Button` |
 
-## Content Authoring Instructions
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard footer main with `withDatasourceCheck` |
 
-### Field-by-Field Guidance
-
-#### logo
-
-- **Type:** Image
-- **Required:** Yes
-- **Recommended format:** SVG or transparent PNG
-- **Note:** Logo is automatically inverted (white) for dark background
-- **Dimensions:** Height auto-scales to 20px (mobile) / 32px (desktop)
-- **Media Library path:** `/sitecore/media library/Project/[Site]/Logos/`
-- **Example:**
-  ```json
-  {
-    "value": {
-      "src": "/-/media/Project/Site/Logos/logo-white.svg",
-      "alt": "Company Name"
-    }
-  }
-  ```
-
-#### newsletterHeading
-
-- **Type:** Single-Line Text
-- **Required:** Yes
-- **What to enter:** Compelling newsletter signup headline
-- **Character limit:** 50 characters recommended
-- **Example:** "Stay Connected"
-
-#### newsletterBody
-
-- **Type:** Rich Text
-- **Required:** No
-- **What to enter:** Brief description of newsletter value proposition
-- **Tone/Style:** Engaging, benefit-focused
-- **Example:**
-  ```html
-  <p>Subscribe to our newsletter for the latest updates, insights, and exclusive content delivered to your inbox.</p>
-  ```
-
-#### newsletterLink
-
-- **Type:** General Link
-- **Required:** Yes
-- **Guidance:** Link to newsletter signup page or modal trigger
-- **Button styling:** Displays as tertiary (accent color) button
-- **Example:**
-  ```json
-  {
-    "value": {
-      "href": "/newsletter-signup",
-      "text": "Subscribe Now",
-      "title": "Sign up for our newsletter"
-    }
-  }
-  ```
-
-#### demo
-
-- **Type:** Checkbox
-- **Required:** No
-- **Purpose:** When checked (value "1" or true), hides the entire component
-- **Use case:** Hide component on production while testing
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+import {
+  ComponentRendering,
+  Field,
+  ImageField,
+  LinkField,
+  GetComponentServerProps,
+} from '@sitecore-content-sdk/nextjs';
+
 type FooterMainFields = {
   newsletterHeading: Field<string>;
   newsletterBody: Field<string>;
@@ -119,53 +60,69 @@ type FooterMainProps = ComponentProps & {
 };
 ```
 
-## Content Examples
+## Server Props
+`getComponentServerProps` fetches the datasource item's name from Sitecore via `GetItemById` for use as a `data-source-name` debug attribute.
 
-### Minimal (Required Fields Only)
+```typescript
+export const getComponentServerProps: GetComponentServerProps = async (rendering) => {
+  const graphQLClient = getGraphQlClient();
+  let itemName = null;
 
+  if (rendering.dataSource) {
+    const itemData = await graphQLClient.request(GetItemById.loc?.source.body || '', {
+      itemId: rendering.dataSource,
+      language: 'en',
+    });
+    itemName = (itemData as { item?: { name?: string } })?.item?.name || null;
+  }
+
+  return {
+    rendering: { ...rendering, itemName },
+  };
+};
+```
+
+## Scroll-to-Top Button
+A `ScrollUpButton` is rendered in both the left column (mobile, shows on small screens) and the right/link column (desktop, shows only on large screens). Clicking it calls `window.scrollTo({ top: 0, behavior: 'smooth' })`.
+
+## Demo Field Behavior
+When `fields.demo.value === '1'` or `=== true`, the Tailwind class `hidden` is applied to the root element, hiding it from site visitors while keeping it in the page HTML for preview/authoring purposes.
+
+## Example Content Entry
+
+### Minimum Viable Content
 ```json
 {
   "fields": {
     "logo": {
       "value": {
-        "src": "/-/media/Project/Site/Logos/logo.svg",
-        "alt": "Company Logo"
-      }
-    },
-    "newsletterHeading": { "value": "Stay Connected" },
-    "newsletterLink": {
-      "value": {
-        "href": "/newsletter",
-        "text": "Subscribe"
+        "src": "/-/media/Global/logo.svg",
+        "alt": "Acme Corp"
       }
     }
   }
 }
 ```
 
-### Complete (All Fields)
-
+### Full Content Example
 ```json
 {
   "fields": {
     "logo": {
       "value": {
-        "src": "/-/media/Project/Site/Logos/logo-white.svg",
-        "alt": "Acme Corporation",
-        "width": "200",
-        "height": "50"
+        "src": "/-/media/Global/logo.svg",
+        "alt": "Acme Corp",
+        "width": 200,
+        "height": 50
       }
     },
-    "newsletterHeading": { "value": "Stay Connected With Us" },
-    "newsletterBody": {
-      "value": "<p>Subscribe to our newsletter for the latest updates, insights, and exclusive content delivered directly to your inbox.</p>"
-    },
+    "newsletterHeading": { "value": "Stay Connected" },
+    "newsletterBody": { "value": "<p>Subscribe to our newsletter for the latest news.</p>" },
     "newsletterLink": {
       "value": {
         "href": "/newsletter-signup",
         "text": "Subscribe Now",
-        "title": "Sign up for our newsletter",
-        "class": ""
+        "target": "_self"
       }
     },
     "demo": { "value": false }
@@ -173,129 +130,41 @@ type FooterMainProps = ComponentProps & {
 }
 ```
 
-## Visual Layout
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│ [Logo]  │    📞                    │  [Scroll to Top]                  │
-│         │    Stay Connected         │  ┌──────────────┐                │
-│         │    Subscribe to our...    │  │ Footer Col 1 │                │
-│         │    [Subscribe Now]        │  │ Footer Col 2 │                │
-│         │                           │  │ Footer Col 3 │                │
-│         │                           │  └──────────────┘                │
-└────────────────────────────────────────────────────────────────────────┘
-```
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Footer Main: `/sitecore/content/[Site]/Home/Data/Footer/Footer Main`
-- Logo media: `/sitecore/media library/Project/[Site]/Logos/`
-
-### Experience Editor Behavior
-
-- **Inline editable:** newsletterHeading, newsletterBody
-- **Forms panel:** logo (image picker), newsletterLink
-- **Placeholder editing:** Add FooterCol components to footermenu placeholder
-
-### Theme Configuration
-
-- Uses `secondary` theme (dark background, light text)
-- Logo is inverted for visibility on dark background
-- CTA button uses `tertiary` color (accent)
-
-## Authoring Rules
-
-1. **Logo Format:** Use SVG or transparent PNG for best quality
-2. **Newsletter Copy:** Keep body text concise (2-3 sentences max)
-3. **CTA Text:** Use action-oriented button text
-4. **Placeholder Content:** Add FooterCol components for navigation links
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Non-transparent logo | White background shows on dark footer | Use transparent PNG or SVG |
-| Too much body text | Clutters the footer | Keep to 2-3 sentences |
-| Generic CTA text | Lower engagement | Use specific action words |
-| Demo field checked | Component hidden unintentionally | Verify demo field before publishing |
-
-## Related Components
-
-- `FooterMenu` - Alternative footer layout for navigation-only footers
-- `FooterCol` - Navigation column placed in footermenu placeholder
-- `FooterLegal` - Legal section typically placed below FooterMain
-
----
-
 ## MCP Authoring Instructions
 
-### Step 1: Add FooterMain Component to Page
-
+### Step 1: Add to Global Footer
 ```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "footer-main-rendering-id",
-  placeholderPath: "headless-footer",  // Or appropriate footer placeholder
-  componentItemName: "FooterMain_1",
-  language: "en",
-  fields: {
-    "newsletterHeading": "Stay Connected",
-    "newsletterBody": "<p>Subscribe to our newsletter for updates.</p>"
-  }
-});
-
-const datasourceId = result.datasourceId;
-```
-
-### Step 2: Update Image Field
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "logo": "<image mediaid='{LOGO-MEDIA-GUID}' />"
-  }
+await mcp__marketer_mcp__add_component_on_page({
+  itemPath: "/sitecore/content/MySite/Global/Footer-Page",
+  componentName: "FooterMain",
+  placeholderName: "footer-main",
+  dataSource: "/sitecore/content/MySite/Global/Footer/FooterMain-Data"
 });
 ```
 
-### Step 3: Update Link Field
-
+### Step 2: Set Fields
 ```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
+await mcp__marketer_mcp__update_component_fields({
+  itemPath: "/sitecore/content/MySite/Global/Footer/FooterMain-Data",
   fields: {
-    "newsletterLink": "<link text='Subscribe Now' linktype='internal' url='/newsletter-signup' />"
+    "newsletterHeading": { "value": "Stay Connected" },
+    "newsletterBody": { "value": "<p>Get our latest updates.</p>" },
+    "newsletterLink": { "value": { "href": "/newsletter", "text": "Subscribe" } }
   }
 });
 ```
 
 ### Field Type Quick Reference
-
 | Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| logo | Image | `<image mediaid='{GUID}' />` |
-| newsletterHeading | Single-Line Text | `"Plain text value"` |
-| newsletterBody | Rich Text | `"<p>HTML content</p>"` |
-| newsletterLink | General Link | `<link text='Text' linktype='internal' url='/path' />` |
-| demo | Checkbox | `"1"` (checked) or `""` (unchecked) |
-
-### MCP Authoring Checklist
-
-- [ ] Have page ID for footer placement
-- [ ] Have FooterMain rendering ID
-- [ ] Have logo media GUID
-- [ ] Add FooterCol components to footermenu placeholder after FooterMain
+|-------|------|-----------|
+| `logo` | Image | `{ "value": { "src": "...", "alt": "..." } }` |
+| `newsletterHeading` | Single-Line Text | `{ "value": "Stay Connected" }` |
+| `newsletterBody` | Rich Text | `{ "value": "<p>...</p>" }` |
+| `newsletterLink` | General Link | `{ "value": { "href": "...", "text": "..." } }` |
+| `demo` | Checkbox | `{ "value": false }` |
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

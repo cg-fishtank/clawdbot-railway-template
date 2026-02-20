@@ -1,47 +1,44 @@
 # SimplePageListingWithFilters Component
 
 ## Purpose
+Renders a filterable listing of general site pages powered by Sitecore Search (Reflektion). It is the most generic of the listing-with-filters components, using `SimplePageListingWithFiltersWidget` without any template ID constraint, making it suitable for pages that do not belong to a more specific content type such as News or Insights. The current page item ID is passed as a React key to reset the widget during client-side navigation. If no widget ID is configured the component shows `NoWidgetIdError` in Experience Editor.
 
-The SimplePageListingWithFilters component displays a searchable, filterable listing of generic page content using Sitecore Search (RFK). It provides faceted filtering, keyword search, and pagination for any page type that doesn't fit into specialized categories like articles, events, or news. This component is typically used for product listings, resource libraries, or general page collections.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `bdeab144-1774-4171-b9b5-9cb4133e4400` |
+| **Component Name** | `SimplePageListingWithFilters` |
+| **Category** | `Search` |
 
-## Sitecore Template Requirements
-
-### Data Source Template
-
-- **Template Path:** `/sitecore/templates/Project/[Site]/Search/Simple Page Listing With Filters`
-- **Template Name:** `Simple Page Listing With Filters`
-
-### Fields
-
+## Fields
 | Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | No | Main heading displayed above the listing | Recommended max 80 characters |
-| tagsHeading | Single-Line Text | No | Label for the tags/filter section | e.g., "Filter by category" |
-| noResultsText | Single-Line Text | No | Message shown when no results match filters | e.g., "No pages found" |
-| widgetId | Single-Line Text | Yes | Sitecore Search widget ID (RFK ID) | Must match configured Search widget |
-| PageSizeCount | Number | No | Number of results per page | Default varies by widget config |
-| filterByKeyword | Treelist | No | Pre-configured keyword filters | Links to tag items |
-| tags | Treelist | No | Category/tag filter options | Links to tag or category items |
+|------------|--------------|----------|-------------|----------------------|
+| `widgetId` | Single-Line Text (`Field<string>`) | Yes | Sitecore Search widget ID (`rfkId`) | Must match a configured widget in the Sitecore Search portal |
+| `heading` | Single-Line Text (`Field<string>`) | No | Optional heading rendered above the widget | — |
+| `tagsHeading` | Single-Line Text (`Field<string>`) | No | Label displayed above the tag filter group | — |
+| `noResultsText` | Single-Line Text (`Field<string>`) | No | Message shown when search returns zero results | — |
+| `PageSizeCount` | Integer (`Field<number>`) | No | Number of results per page | Positive integer |
+| `filterByKeyword` | Treelist (`TagType[]`) | No | Pre-selected keyword filter items | Treelist of Tag items |
+| `tags` | Treelist (`TagType[] \| CategoryType[]`) | No | Pre-selected tag/category filter items | Treelist of Tag/Category items |
 
-### Rendering Parameters (Styles)
-
-| Parameter | Type | Options | Default | Description |
-|-----------|------|---------|---------|-------------|
-| theme | Droplist | primary, secondary, tertiary | primary | Color theme for the component |
-| padding (top) | Droplist | top-none, top-xs, top-sm, top-md, top-lg, top-xl | none | Top padding |
-| padding (bottom) | Droplist | bottom-none, bottom-xs, bottom-sm, bottom-md, bottom-lg, bottom-xl | none | Bottom padding |
+## Placeholders
+**Placeholders:** None
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text field={fields?.heading} tag="h2" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| tagsHeading | `<Text field={fields?.tagsHeading} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| noResultsText | `<Text field={fields?.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+|---------------|--------------|--------|
+| `widgetId` | `props.fields?.widgetId?.value` (raw string) | — |
+| `heading` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `noResultsText` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
 
-## Component Props Interface
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Generic page listing with filters, not constrained to any specific template |
 
+## Props Interface
 ```typescript
+// lib/types/components/Search/search-listing-filters.ts
 import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { CategoryType } from 'lib/helpers/page-category';
@@ -62,230 +59,34 @@ export type SearchListingWithFiltersProps = ComponentProps & {
 };
 ```
 
-## Differences from Article Listing Components
-
-Unlike `ArticleListingWithFilters`, `InsightsListingWithFilters`, and `NewsListingWithFilters`:
-
-- **No template ID filtering:** Does not filter by a specific content type template
-- **Generic card display:** Uses a simpler card layout without article-specific styling
-- **Flexible content:** Can display any page type indexed in Sitecore Search
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The main title for the page listing section
-- **Tone/Style:** Clear, descriptive
-- **Character limit:** 80 characters recommended
-- **Example:** "Browse Resources" or "All Products"
-
-#### tagsHeading
-
-- **What to enter:** Label text for the filter/tags section
-- **Tone/Style:** Instructional, concise
-- **Example:** "Filter by category" or "Browse by type"
-
-#### noResultsText
-
-- **What to enter:** Message displayed when no pages match the current filters
-- **Tone/Style:** Helpful, encouraging
-- **Example:** "No pages found. Try adjusting your filters." or "No results match your criteria."
-
-#### widgetId (Required)
-
-- **What to enter:** The Sitecore Search (Discover) widget ID
-- **How to obtain:** Get from Sitecore Search portal under Widgets configuration
-- **Format:** Alphanumeric string (e.g., "rfkid_pages")
-- **Important:** This field MUST be configured for the component to function
-
-#### PageSizeCount
-
-- **What to enter:** Number of pages to display per page
-- **Recommended values:** 9, 12, or 15 (multiples of 3 for grid layout)
-- **Example:** `12`
-
-#### filterByKeyword
-
-- **What to select:** Keyword items that enable pre-filtering
-- **Selection path:** `/sitecore/content/[Site]/Data/Keywords/`
-
-#### tags
-
-- **What to select:** Category or tag items for filter facets
-- **Selection path:** `/sitecore/content/[Site]/Data/Page Categories/` or `/sitecore/content/[Site]/Data/Tags/`
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields | Optional Fields | Use Case |
-|-----------|-----------------|-----------------|----------|
-| Minimal | widgetId | - | Basic page listing |
-| Standard | widgetId, heading | tagsHeading, noResultsText | Typical resource page |
-| Full | widgetId, heading, tagsHeading | noResultsText, tags, filterByKeyword, PageSizeCount | Complete filterable library |
-
 ## Example Content Entry
 
 ### Minimum Viable Content
-
-```json
-{
-  "fields": {
-    "widgetId": { "value": "rfkid_pages" }
-  }
-}
-```
+| Field | Value |
+|-------|-------|
+| `widgetId` | `rfkid_simple_page_listing` |
 
 ### Full Content Example
-
-```json
-{
-  "fields": {
-    "heading": { "value": "Browse Resources" },
-    "tagsHeading": { "value": "Filter by category" },
-    "noResultsText": { "value": "No resources found. Try adjusting your filters." },
-    "widgetId": { "value": "rfkid_pages" },
-    "PageSizeCount": { "value": 12 },
-    "tags": [
-      {
-        "displayName": "Guides",
-        "fields": { "pageCategory": { "value": "Guides" } }
-      },
-      {
-        "displayName": "Tools",
-        "fields": { "pageCategory": { "value": "Tools" } }
-      },
-      {
-        "displayName": "Templates",
-        "fields": { "pageCategory": { "value": "Templates" } }
-      }
-    ]
-  }
-}
-```
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Component datasources: `/sitecore/content/[Site]/Home/Data/Page Listings/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading, tagsHeading, noResultsText
-- **Forms panel required:** widgetId, PageSizeCount, tags, filterByKeyword
-- **Search widget:** Requires Sitecore Search configuration to be active
-
-### Sitecore Search Integration
-
-This component integrates with Sitecore Search (formerly Discover/RFK). Prerequisites:
-
-1. Sitecore Search account configured
-2. Search widget created in Sitecore Search portal
-3. API keys configured in environment variables (SEARCH_CONFIG)
-4. Page content indexed in Sitecore Search
-
-## Use Cases
-
-- **Resource Library:** List downloadable resources, guides, templates
-- **Product Catalog:** Display product pages (non-commerce)
-- **Service Listings:** Browse available services
-- **Documentation Index:** List technical documentation pages
-- **General Page Collection:** Any collection of pages needing search/filter
-
-## Common Mistakes to Avoid
-
-1. **Missing widgetId:** The component will show an error message in editing mode if widgetId is not configured.
-
-2. **Wrong widget for content:** Ensure the widget ID points to a widget that indexes the correct page types.
-
-3. **Using for articles:** For article-specific content, use ArticleListingWithFilters, InsightsListingWithFilters, or NewsListingWithFilters instead.
-
-4. **Forgetting Search configuration:** The SEARCH_CONFIG environment variables must be set with valid API keys.
-
-## Related Components
-
-- `ArticleListingWithFilters` - Listing for article content with styling
-- `SearchResults` - Global search results page
-- `KnowledgeCenterSearch` - Specialized for help content
-
-## Troubleshooting
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| "No widget id configured" error | widgetId field is empty | Add valid Sitecore Search widget ID |
-| No results displayed | Search not configured or content not indexed | Verify SEARCH_CONFIG and index status |
-| Wrong content appearing | Widget indexing wrong content types | Verify widget configuration |
-| Missing filtering options | tags/filterByKeyword empty | Add filter items |
-
----
+| Field | Value |
+|-------|-------|
+| `widgetId` | `rfkid_simple_page_listing` |
+| `heading` | `Resources` |
+| `tagsHeading` | `Filter by Topic` |
+| `noResultsText` | `No pages found matching your criteria.` |
+| `PageSizeCount` | `9` |
+| `filterByKeyword` | _(Treelist: Tag items)_ |
+| `tags` | _(Treelist: Category items)_ |
 
 ## MCP Authoring Instructions
-
-### Prerequisites
-
-Before authoring this component via MCP:
-
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the SimplePageListingWithFilters rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"`)
-4. Have a valid Sitecore Search widget ID
-
-### Step 1: Add Component to Page
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "simple-page-listing-with-filters-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "SimplePageListingWithFilters_1",
-  language: "en",
-  fields: {
-    "heading": "Browse Resources",
-    "tagsHeading": "Filter by category",
-    "noResultsText": "No resources found.",
-    "widgetId": "rfkid_pages"
-  }
-});
-```
-
-### Step 2: Update Configuration (Optional)
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "PageSizeCount": "12"
-  }
-});
-```
-
-### Field Type Quick Reference
-
-| Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
-| tagsHeading | Single-Line Text | `"Plain text value"` |
-| noResultsText | Single-Line Text | `"Plain text value"` |
-| widgetId | Single-Line Text | `"rfkid_pages"` |
-| PageSizeCount | Number | `"12"` |
-| tags | Treelist | `"{GUID1}|{GUID2}"` |
-| filterByKeyword | Treelist | `"{GUID1}|{GUID2}"` |
-
-### MCP Authoring Checklist
-
-- [ ] Have page ID from search
-- [ ] Have rendering ID from component manifest
-- [ ] Placeholder is `"headless-main"` (no leading slash)
-- [ ] Component name is unique
-- [ ] widgetId is a valid Sitecore Search widget ID
+To add this component to a page:
+1. Insert the `SimplePageListingWithFilters` rendering onto the page in the desired placeholder.
+2. Set the **datasource** to an item with the fields above (typically under `/sitecore/content/{Site}/Data/Search`).
+3. The **`widgetId`** field is mandatory — obtain the correct `rfkId` from the Sitecore Search portal for the Simple Page Listing widget.
+4. Unlike News or Insights variants, this component does not filter by a specific Sitecore template — configure the scope via the Sitecore Search portal widget settings.
+5. `filterByKeyword` and `tags` Treelist fields accept items from the site taxonomy to pre-apply filters on page load.
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

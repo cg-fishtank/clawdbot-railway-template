@@ -1,357 +1,164 @@
 # EventListing Component
 
 ## Purpose
+EventListing automatically fetches and displays all Event Pages under the current site's content root using a server-side two-step GraphQL query (`getEventListingWithDetails`). It renders a paginated, filterable grid of `EventCard` items via the `EventListGrid` child component. A toggle switch lets users switch between upcoming/current and past events. The component also supports tag-based filtering: when `filterByTags` is enabled, it reads page-level SXA tags from context and filters the event set accordingly, falling back to the full list if no matching results are found.
 
-The EventListing component displays a grid of event cards, automatically fetching all events from the site's content tree. It supports optional tag-based filtering to show only events matching specific SxaTags. The component features a section heading, filter status display, and a responsive grid layout with EventCard child components. It includes toggle functionality to switch between current/upcoming events and past events.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `d5c1d2d5-959b-478b-be7d-50b1cd6b5ab9` |
+| **Component Name** | `EventListing` |
+| **Category** | `Events` |
 
-## Sitecore Template Requirements
+## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| `heading` | Single-Line Text | Yes | Section heading rendered above the event grid |
+| `filterByTags` | Checkbox | No | When checked, filters events by the current page's SXA tags |
+| `tagsHeading` | Single-Line Text | No | Label displayed before the active tag list (default: "Filtering by tags:") |
+| `noResultsText` | Single-Line Text | No | Message shown when tag filtering yields no matches (before falling back to full list) |
+| `PageSizeCount` | Number | No | Number of events per paginated page (passed to `EventListGrid`) |
 
-### Data Source
+## Placeholders
+**Placeholders:** None — the event grid is populated entirely from server-fetched data, not from CMS-placed components.
 
-This component uses a **datasource** for configuration fields (heading, filter settings, labels). Event data is fetched automatically via GraphQL at build/request time based on the site's content root.
-
-### Template Path
-
-- **Component Datasource Template:** `/sitecore/templates/Project/[Site]/Components/Event Listing`
-- **Event Pages:** Fetched automatically from `/sitecore/content/[Site]/Home/Events/`
-
-### Fields (Datasource)
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | Yes | Section heading above the event grid | Recommended max 60 characters |
-| filterByTags | Checkbox | No | Enable tag-based filtering | When true, filters by page SxaTags |
-| tagsHeading | Single-Line Text | No | Label shown before active filter tags | Default: "Filtering by tags:" |
-| noResultsText | Single-Line Text | No | Message when no events match filters | Default: "No event pages found." |
-
-### Rendering Parameters
-
-| Parameter | Type | Options | Default | Description |
-|-----------|------|---------|---------|-------------|
-| filter / tagFilteringEnabled | String | "1", "true" | - | Alternative way to enable tag filtering |
-| theme | Droplist | primary, secondary, tertiary | primary | Color theme for component |
-| padding (top) | Droplist | top-none, top-xs, top-sm, top-md, top-lg, top-xl | none | Top padding |
-| padding (bottom) | Droplist | bottom-none, bottom-xs, bottom-sm, bottom-md, bottom-lg, bottom-xl | none | Bottom padding |
+## Child Components
+| File | Purpose |
+|------|---------|
+| `component-children/Events/EventListing/EventListing.tsx` | Rendering shell: applies `ContainedWrapper`, tag filtering logic, and renders `EventListGrid` |
+| `component-children/Events/EventListing/EventListGrid.tsx` | Paginated grid with current/past toggle, smooth transition animations, and `EventCard` mapping |
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text tag="h2" field={fields?.heading} className="heading-lg mb-6" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| tagsHeading | `<Text field={fields.tagsHeading} tag="span" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| noResultsText | `<Text field={fields.noResultsText} />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+|---------------|--------------|--------|
+| `heading` | `Text` | `@sitecore-content-sdk/nextjs` |
+| `tagsHeading` | `Text` | `@sitecore-content-sdk/nextjs` |
+| `noResultsText` | `Text` | `@sitecore-content-sdk/nextjs` |
 
 ## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard event listing with `withDatasourceCheck` |
 
-The EventListing exports a single default variant:
-
-| Variant | Export Name | Description | Use Case |
-|---------|-------------|-------------|----------|
-| Default | `Default` | Standard event grid listing | Events landing page, homepage sections |
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** Section title for the event listing
-- **Tone/Style:** Clear, descriptive
-- **Character limit:** 60 characters recommended
-- **Examples:** "Upcoming Events", "Events & Conferences", "What's Happening"
-
-#### filterByTags (Checkbox)
-
-- **What to set:** Check to enable tag-based filtering
-- **Behavior when enabled:**
-  - Reads SxaTags from the current page context
-  - Filters events to only show those with matching tags
-  - Displays active filter tags below heading
-  - If no matches found, shows all events with warning message
-
-#### tagsHeading
-
-- **What to enter:** Label shown before the list of active filter tags
-- **Default:** "Filtering by tags:"
-- **Example:** "Showing events tagged with:"
-- **Only visible when:** filterByTags is enabled AND page has tags
-
-#### noResultsText
-
-- **What to enter:** Message displayed when no events match the active filters
-- **Default:** "No event pages found."
-- **Example:** "No matching events found. Showing all events instead."
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields | Optional Fields | Use Case |
-|-----------|-----------------|-----------------|----------|
-| Basic | heading | - | Simple event listing without filtering |
-| Filtered | heading, filterByTags=true | tagsHeading, noResultsText | Tag-filtered event display |
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
-import { ComponentProps } from 'lib/component-props';
-import { Field, ComponentRendering } from '@sitecore-content-sdk/nextjs';
-import { EventDataType } from 'lib/types';
+import { Field } from '@sitecore-content-sdk/nextjs';
+import { EventListingProps } from 'lib/types/components/Events/event-listing';
 
+// EventListingProps (from lib/types/components/Events/event-listing)
 type EventListingFields = {
   heading: Field<string>;
   filterByTags?: Field<boolean>;
   tagsHeading?: Field<string>;
   noResultsText?: Field<string>;
+  PageSizeCount?: Field<number>;
 };
 
-type EventListingRenderingType = {
-  rendering: ComponentRendering & {
-    data: EventDataType[];  // Populated at build/request time
-  };
+type EventListingProps = ComponentProps & {
+  fields: EventListingFields;
+  // rendering.data is injected by getComponentServerProps:
+  // EventDataType[] — the full fetched event list
 };
-
-export type EventListingProps = ComponentProps &
-  EventListingRenderingType & {
-    fields: EventListingFields;
-  };
 ```
+
+## Server Props
+`getComponentServerProps` fetches all event pages under the current site's content root before the component renders. Results are attached to `rendering.data`.
+
+```typescript
+export const getComponentServerProps: GetComponentServerProps = async (rendering, layoutData) => {
+  const language = getLayoutLanguage(layoutData);
+  const siteName = getSiteName(layoutData);
+  const { contentRoot } = await fetchSiteRootInfo(siteName, language);
+
+  const eventListingData = await getEventListingWithDetails(
+    contentRootIdNullChecker(contentRoot?.id),
+    language
+  );
+
+  return {
+    rendering: { ...rendering, data: eventListingData.results },
+    route: layoutData?.sitecore?.route,
+  };
+};
+```
+
+## Key Behaviors
+
+### Toggle (Current vs Past Events)
+`EventListGrid` compares each event's `endDate` (or `startDate` as fallback) against the current UTC date. The toggle switches between:
+- **On (default)**: shows events whose end date is today or in the future
+- **Off**: shows events whose end date has already passed
+
+The toggle is hidden if no events exist in one of the two buckets.
+
+### Tag Filtering
+When `filterByTags` is `true` (or `"1"`), the component reads `pageTags` from `useContextPageTags()` and keeps only events that share at least one SXA tag. If filtering produces zero results, it falls back to the full event list and shows `noResultsText`.
+
+### Pagination
+`EventListGrid` paginates results using `PageSizeCount` (validated via `getValidPageSize`). A `Pagination` component is rendered below the grid when there is more than one page. Page changes scroll the user back to the top of the listing via `searchRef`.
+
+### Edit Mode
+`EditModeClickDisabler` wraps the grid in Experience Editor to prevent accidental card-link navigation while editing.
 
 ## Example Content Entry
 
-### Datasource Content
-
+### Minimum Viable Content
 ```json
 {
   "fields": {
-    "heading": { "value": "Upcoming Events" },
-    "filterByTags": { "value": false },
-    "tagsHeading": { "value": "Filtering by tags:" },
-    "noResultsText": { "value": "No events found matching your criteria." }
+    "heading": { "value": "Upcoming Events" }
   }
 }
 ```
 
-### With Tag Filtering Enabled
-
+### Full Content Example
 ```json
 {
   "fields": {
-    "heading": { "value": "Related Events" },
+    "heading": { "value": "All Events" },
     "filterByTags": { "value": true },
-    "tagsHeading": { "value": "Showing events for:" },
-    "noResultsText": { "value": "No related events found. Displaying all events." }
+    "tagsHeading": { "value": "Showing events tagged:" },
+    "noResultsText": { "value": "No events matched your current tags. Showing all events." },
+    "PageSizeCount": { "value": 9 }
   }
 }
 ```
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Component datasources: `/sitecore/content/[Site]/Home/Data/Event Listings/`
-- Event pages (auto-fetched): `/sitecore/content/[Site]/Home/Events/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading, tagsHeading, noResultsText
-- **Forms panel required:** filterByTags checkbox
-- **Dynamic data:** Event cards are fetched dynamically; add new Event Pages to populate
-
-### Data Fetching
-
-The component uses `getComponentServerProps` to:
-1. Fetch site content root via `fetchSiteRootInfo`
-2. Query all Event Pages under the content root
-3. Pass event data to the rendering via `rendering.data`
-
-### Tag Filtering Behavior
-
-When `filterByTags` is enabled:
-1. Component reads `pageTags` from page context
-2. Filters events by matching `sxaTags.targetItems`
-3. Uses `hasMatchingTags` helper for comparison
-4. Falls back to showing all events if no matches found
-
-## Common Mistakes to Avoid
-
-1. **Missing heading:** Always provide a heading for accessibility and context.
-
-2. **Enabling filters without page tags:** If `filterByTags` is true but the current page has no SxaTags, filtering effectively does nothing.
-
-3. **Expecting manual event selection:** Events are fetched automatically from the Events folder. You cannot manually select which events appear.
-
-4. **No Event Pages exist:** If no Event Pages exist under the site's content root, the listing will be empty.
-
-5. **Wrong tag taxonomy:** Ensure Event Pages and the current page use the same SxaTags taxonomy for filtering to work.
-
-## Related Components
-
-- `EventCard` - Child component rendered for each event
-- `EventListingByAuthor` - Similar component filtered by author profile
-- `EventDetails` - Full event detail page component
-- `EventListGrid` - Child component managing the grid display and toggle
-
----
 
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the EventListing component using the Marketer MCP tools.
-
-### Important: Auto-Fetching Component
-
-The EventListing component:
-1. Uses a datasource only for configuration (heading, filter settings)
-2. Automatically fetches all Event Pages from the site's Events folder
-3. Does NOT require manual event selection
-
-To populate the event grid, create Event Pages under `/sitecore/content/[Site]/Home/Events/`.
-
-### Step 1: Find Target Page for Placement
-
+### Step 1: Add to Page
 ```javascript
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Events Landing"
-});
-const pageId = pageSearch.results[0].itemId;
-```
-
-### Step 2: Add EventListing Component
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "event-listing-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "EventListing_Main",
-  language: "en",
-  fields: {
-    "heading": "Upcoming Events"
-  }
-});
-
-const datasourceId = result.datasourceId;
-```
-
-### Step 3: Configure Filter Settings (Optional)
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "filterByTags": "1",  // Enable tag filtering
-    "tagsHeading": "Events for:",
-    "noResultsText": "No matching events found."
-  }
+await mcp__marketer_mcp__add_component_on_page({
+  itemPath: "/sitecore/content/MySite/Events/Events-Landing",
+  componentName: "EventListing",
+  placeholderName: "main",
+  dataSource: "/sitecore/content/MySite/Events/Events-Landing/EventListing-Data"
 });
 ```
 
-### Step 4: Create Event Pages (to Populate Grid)
-
+### Step 2: Configure Fields
 ```javascript
-// Create individual Event Pages to populate the listing
-const newEvent = await mcp__marketer-mcp__create_page({
-  siteName: "main",
-  pageName: "Annual Conference 2024",
-  parentItemId: "{EVENTS-FOLDER-GUID}",
-  pageTemplateId: "{EVENT-PAGE-TEMPLATE-GUID}",
-  language: "en"
-});
-
-// Then update the event page fields
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: newEvent.itemId,
-  language: "en",
+await mcp__marketer_mcp__update_component_fields({
+  itemPath: "/sitecore/content/MySite/Events/Events-Landing/EventListing-Data",
   fields: {
-    "heading": "Annual Conference 2024",
-    "startDate": "20240315T090000Z",
-    "location": "{LOCATION-GUID}"
+    "heading": { "value": "Upcoming Events" },
+    "filterByTags": { "value": false },
+    "PageSizeCount": { "value": 9 }
   }
 });
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find the events landing page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Events"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add EventListing component
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "event-listing-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "EventListing_Main",
-  language: "en",
-  fields: {
-    "heading": "Upcoming Events"
-  }
-});
-
-const datasourceId = addResult.datasourceId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 3: (Optional) Enable tag filtering
-// ═══════════════════════════════════════════════════════════════
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "filterByTags": "1",
-    "tagsHeading": "Showing events tagged:",
-    "noResultsText": "No matching events. Showing all events."
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: EventListing configured
-// Events are auto-fetched from /Home/Events/ folder
-// ═══════════════════════════════════════════════════════════════
 ```
 
 ### Field Type Quick Reference
-
-| Field | Type | Location | MCP Format |
-|:------|:-----|:---------|:-----------|
-| heading | Single-Line Text | Datasource | `"Plain text value"` |
-| filterByTags | Checkbox | Datasource | `"1"` (true) or `""` (false) |
-| tagsHeading | Single-Line Text | Datasource | `"Plain text value"` |
-| noResultsText | Single-Line Text | Datasource | `"Plain text value"` |
-
-### MCP Authoring Checklist
-
-Before authoring EventListing via MCP, verify:
-
-- [ ] Have target page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have EventListing rendering ID (from component manifest)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] heading field has content (required)
-- [ ] Event Pages exist under `/Home/Events/` folder to display
-
-### MCP Error Handling
-
-| Error | Cause | Solution |
-|:------|:------|:---------|
-| "Item already exists" | Duplicate component name | Use unique suffix: `EventListing_2` |
-| No events displayed | No Event Pages exist | Create Event Pages under Events folder |
-| Filter not working | Page has no SxaTags | Add SxaTags to the current page |
-| `updatedFields: {}` | Normal response | Update succeeded despite empty response |
+| Field | Type | MCP Format |
+|-------|------|-----------|
+| `heading` | Single-Line Text | `{ "value": "Upcoming Events" }` |
+| `filterByTags` | Checkbox | `{ "value": true }` |
+| `tagsHeading` | Single-Line Text | `{ "value": "Filtering by:" }` |
+| `noResultsText` | Single-Line Text | `{ "value": "No matching events found." }` |
+| `PageSizeCount` | Number | `{ "value": 9 }` |
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

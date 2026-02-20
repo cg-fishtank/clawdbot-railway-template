@@ -1,110 +1,55 @@
 # IconFeatureCard Component
 
 ## Purpose
+IconFeatureCard displays a single feature card combining a circular icon badge, a heading, a rich-text subheading, and an optional CTA button. In delivery mode, when a `link` field value is set, the entire card becomes a clickable `<Link>` with hover shadow; in Experience Editor the card renders as a static `<div>` to allow inline editing. The icon background color and button icon variant adapt automatically to the parent `effectiveTheme` from `useFrame()` (secondary theme → tertiary icon background; otherwise → secondary icon background). The visual rendering logic lives in the `IconFeatureCard` child component (`component-children/IconFeatureCards/IconFeatureCard/IconFeatureCard.tsx`).
 
-The IconFeatureCard component displays a single feature card with an icon, heading, subheading (rich text), and optional CTA link. It's designed to be placed within an IconFeatureCardGrid placeholder to create feature highlight sections. The card supports smart theming that automatically adjusts based on the parent grid's theme, and the entire card can be clickable when a link is provided.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `a4f9ff7a-3b2f-46b5-a2ca-ee9aee97fac7` |
+| **Component Name** | `IconFeatureCard` |
+| **Category** | `IconFeatureCards` |
 
-## Sitecore Template Requirements
+## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| `heading` | Single-Line Text | Yes | Card heading rendered as `<h3>` with `heading-2xl` style |
+| `subheading` | Rich Text | No | Body copy below the heading |
+| `imageIcon` | Icon (custom `IconFieldType`) | No | FontAwesome icon identifier (e.g. `"fa-star"`) displayed in the circular badge |
+| `link` | General Link | No | Optional CTA button URL; also wraps the entire card when set |
 
-### Data Source Template
+**Note on field naming discrepancy:** The TSX interface names the icon field `imageIcon` (typed as `IconFieldType`), while the task description refers to it as `icon`. The source file uses `imageIcon` — use this name in Sitecore templates.
 
-- **Template Path:** `/sitecore/templates/Project/[Site]/Feature Cards/Icon Feature Card`
-- **Template Name:** `Icon Feature Card`
+## Placeholders
+**Placeholders:** None
 
-### Fields
-
-| Field Name | Sitecore Type | Required | Description | Validation/Constraints |
-|------------|---------------|----------|-------------|------------------------|
-| heading | Single-Line Text | Yes | Card title/heading | Recommended max 50 characters |
-| subheading | Rich Text | No | Card description/body text | Keep concise, 2-3 sentences |
-| imageIcon | Single-Line Text | Yes | FontAwesome icon name | Use FontAwesome solid icon names |
-| link | General Link | No | CTA button link (also makes card clickable) | Internal or external link |
+## Child Components
+| File | Purpose |
+|------|---------|
+| `component-children/IconFeatureCards/IconFeatureCard/IconFeatureCard.tsx` | Full rendering: icon badge, heading, subheading, conditional link wrapper, CTA button |
 
 ## JSS Field Component Mapping
-
 | Sitecore Field | JSS Component | Import |
-|----------------|---------------|--------|
-| heading | `<Text field={fields.heading} tag="h3" className="heading-2xl" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
-| subheading | `<RichText field={fields.subheading} className="richtext copy-lg" />` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
-| imageIcon | `<IconFas icon={fields.imageIcon?.name} />` | Custom Icon component |
-| link | `<Button link={link} variant="button" />` or wrapper `<Link>` | Custom Button / Next.js Link |
+|---------------|--------------|--------|
+| `heading` | `Text` | `@sitecore-content-sdk/nextjs` |
+| `subheading` | `RichText` | `@sitecore-content-sdk/nextjs` |
+| `imageIcon` | `IconFas` (via `fields.imageIcon?.name`) | `component-children/Shared/Icon/Icon` |
+| `link` | `Link` (card wrapper) + `Button` (CTA) | `@sitecore-content-sdk/nextjs` / `Shared/Button/Button` |
 
-## Content Authoring Instructions
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard icon feature card with `withDatasourceCheck` |
 
-### Field-by-Field Guidance
-
-#### heading
-
-- **Type:** Single-Line Text
-- **Required:** Yes
-- **What to enter:** Feature name or benefit title
-- **Tone/Style:** Clear, benefit-focused
-- **Character limit:** 50 characters recommended
-- **Example:** "24/7 Support"
-
-#### subheading
-
-- **Type:** Rich Text
-- **Required:** No
-- **What to enter:** Brief description of the feature
-- **Tone/Style:** Informative, concise
-- **Formatting:** Keep simple - avoid complex HTML
-- **Example:**
-  ```html
-  <p>Our dedicated support team is available around the clock to help you with any questions or issues.</p>
-  ```
-
-#### imageIcon
-
-- **Type:** Single-Line Text (mapped to IconFieldType)
-- **Required:** Yes
-- **What to enter:** FontAwesome solid icon name (without "fa-" prefix)
-- **Common icons:**
-  | Icon Name | Display | Use Case |
-  |-----------|---------|----------|
-  | `headset` | 🎧 | Support/Contact |
-  | `shield-halved` | 🛡️ | Security |
-  | `rocket` | 🚀 | Speed/Performance |
-  | `clock` | ⏰ | Time/Availability |
-  | `chart-line` | 📈 | Analytics/Growth |
-  | `users` | 👥 | Team/Community |
-  | `cog` | ⚙️ | Settings/Config |
-  | `bolt` | ⚡ | Power/Fast |
-- **Example:** `"headset"`
-
-#### link
-
-- **Type:** General Link
-- **Required:** No
-- **Behavior:** When set, entire card becomes clickable, and button displays
-- **Guidance:** Use descriptive link text for the button
-- **Example:**
-  ```json
-  {
-    "value": {
-      "href": "/support",
-      "text": "Get Support",
-      "title": "Contact our support team"
-    }
-  }
-  ```
-
-## Smart Theming Behavior
-
-The card automatically adjusts its theme based on the parent grid:
-
-| Parent Grid Theme | Card Theme | Icon Background |
-|-------------------|------------|-----------------|
-| `primary` (light) | `secondary` (dark) | `tertiary` (accent) |
-| `tertiary` (accent) | `secondary` (dark) | `tertiary` (accent) |
-| `secondary` (dark) | `tertiary` (accent) | `secondary` (dark) |
-| No theme set | `primary` (light) | `secondary` (dark) |
-
-Cards can also have explicit themes set via rendering parameters to override this behavior.
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+import {
+  Field,
+  LinkField,
+  RichTextField,
+} from '@sitecore-content-sdk/nextjs';
+import { IconFieldType } from 'lib/types';
+
 type IconFeatureCardFields = {
   heading: Field<string>;
   subheading: RichTextField;
@@ -120,169 +65,82 @@ export type IconFeatureCardProps = ComponentProps &
   IconFeatureCardFieldsProps & {
     parent?: boolean;
   };
-
-// IconFieldType definition:
-type IconFieldType = {
-  name: IconType;  // FontAwesome icon name
-};
 ```
 
-## Content Examples
+## Theme-Driven Icon Colors
+| Parent Theme | Icon Background | Icon Variant |
+|-------------|-----------------|-------------|
+| `secondary` | `bg-tertiary` | `default` (dark icon) |
+| Any other | `bg-secondary` | `white` (light icon) |
 
-### Minimal (Required Fields Only)
+## CTA Button Behavior
+- In Experience Editor: the `Button` is always rendered with the JSS `link` field prop (for inline editing).
+- In delivery: the `Button` only renders if `link.value.text` is non-empty; it renders as a static child element (not a JSS Link) since the entire card is already wrapped in a link.
 
+## Example Content Entry
+
+### Minimum Viable Content
 ```json
 {
   "fields": {
-    "heading": { "value": "24/7 Support" },
-    "imageIcon": { "name": "headset" }
+    "heading": { "value": "Fast Delivery" }
   }
 }
 ```
 
-### Complete (All Fields)
-
+### Full Content Example
 ```json
 {
   "fields": {
-    "heading": { "value": "24/7 Support" },
-    "subheading": {
-      "value": "<p>Our dedicated support team is available around the clock to help you with any questions or issues.</p>"
-    },
-    "imageIcon": { "name": "headset" },
+    "heading": { "value": "Fast Delivery" },
+    "subheading": { "value": "<p>We ship your order within 24 hours, guaranteed.</p>" },
+    "imageIcon": { "name": "truck-fast" },
     "link": {
       "value": {
-        "href": "/support",
-        "text": "Get Support",
-        "title": "Contact our support team"
+        "href": "/shipping-info",
+        "text": "Learn More",
+        "target": "_self"
       }
     }
   }
 }
 ```
 
-## Visual Layout
-
-```
-┌─────────────────────────────┐
-│  ┌────┐                     │
-│  │ 🎧 │  (icon in circle)   │
-│  └────┘                     │
-│                             │
-│  24/7 Support               │  (heading)
-│                             │
-│  Our dedicated support      │  (subheading)
-│  team is available...       │
-│                             │
-│  [Get Support]              │  (button, if link set)
-└─────────────────────────────┘
-```
-
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- Icon Feature Cards: `/sitecore/content/[Site]/Home/Data/Feature Cards/[Card Name]`
-
-### Experience Editor Behavior
-
-- **Inline editable:** heading, subheading
-- **Forms panel:** imageIcon (dropdown/text), link
-- **Card click behavior:** Disabled in editing mode for easier editing
-
-### Rendering Parameters (Styles)
-
-| Parameter | Type | Options | Default | Description |
-|-----------|------|---------|---------|-------------|
-| theme | Droplist | primary, secondary, tertiary | (auto) | Override automatic theme |
-
-## Authoring Rules
-
-1. **Icon Selection:** Use recognizable icons that relate to the feature
-2. **Heading Length:** Keep headings short and scannable
-3. **Subheading Brevity:** 2-3 sentences maximum
-4. **Consistent Style:** Use same icon style across all cards in a grid
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Wrong icon name | Icon won't display | Verify FontAwesome solid icon names |
-| Long headings | Text wraps awkwardly | Keep under 50 characters |
-| Missing imageIcon | Card looks empty | Always provide an icon |
-| Inconsistent icons | Visual discord | Use same icon style/weight |
-
-## Related Components
-
-- `IconFeatureCardGrid` - Parent container that holds IconFeatureCard components
-- `CardGrid` - Alternative grid for image-based cards
-
----
-
 ## MCP Authoring Instructions
 
-### Step 1: Create IconFeatureCard Datasource
-
+### Step 1: Add to IconFeatureCardGrid
 ```javascript
-const datasource = await mcp__marketer-mcp__create_content_item({
-  siteName: "main",
-  parentPath: "/sitecore/content/Site/Home/Data/Feature Cards",
-  templatePath: "/sitecore/templates/Project/Site/Feature Cards/Icon Feature Card",
-  name: "Support Card",
-  language: "en"
+await mcp__marketer_mcp__add_component_on_page({
+  itemPath: "/sitecore/content/MySite/Home",
+  componentName: "IconFeatureCard",
+  placeholderName: "iconfeaturecardgrid",
+  dataSource: "/sitecore/content/MySite/Data/IconFeatureCards/FastDelivery"
 });
 ```
 
 ### Step 2: Set Fields
-
 ```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasource.itemId,
-  language: "en",
+await mcp__marketer_mcp__update_component_fields({
+  itemPath: "/sitecore/content/MySite/Data/IconFeatureCards/FastDelivery",
   fields: {
-    "heading": "24/7 Support",
-    "subheading": "<p>Our dedicated support team is available around the clock.</p>",
-    "imageIcon": "headset",
-    "link": "<link text='Get Support' linktype='internal' url='/support' />"
+    "heading": { "value": "Fast Delivery" },
+    "subheading": { "value": "<p>Ships within 24 hours.</p>" },
+    "imageIcon": { "name": "truck-fast" },
+    "link": { "value": { "href": "/shipping-info", "text": "Learn More" } }
   }
 });
 ```
 
-### Step 3: Add to IconFeatureCardGrid Placeholder
-
-```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "icon-feature-card-rendering-id",
-  placeholderPath: "iconfeaturecardgrid-{dynamic-id}",
-  componentItemName: "IconFeatureCard_Support",
-  language: "en",
-  dataSourceId: datasource.itemId
-});
-```
-
 ### Field Type Quick Reference
-
 | Field | Type | MCP Format |
-|:------|:-----|:-----------|
-| heading | Single-Line Text | `"Plain text value"` |
-| subheading | Rich Text | `"<p>HTML content</p>"` |
-| imageIcon | Single-Line Text | `"icon-name"` (FontAwesome name) |
-| link | General Link | `<link text='Text' linktype='internal' url='/path' />` |
-
-### Common FontAwesome Icons
-
-```
-headset, shield-halved, rocket, clock, chart-line, users, cog, bolt,
-star, heart, check-circle, globe, lock, envelope, phone, calendar,
-briefcase, graduation-cap, lightbulb, wrench, database, cloud
-```
+|-------|------|-----------|
+| `heading` | Single-Line Text | `{ "value": "Card Title" }` |
+| `subheading` | Rich Text | `{ "value": "<p>Description</p>" }` |
+| `imageIcon` | Icon | `{ "name": "fa-icon-name" }` (FontAwesome icon name) |
+| `link` | General Link | `{ "value": { "href": "...", "text": "CTA label" } }` |
 
 ---
-
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

@@ -1,80 +1,40 @@
 # ContentTreeSideNav Component
 
 ## Purpose
+The ContentTreeSideNav component renders a contextual sidebar navigation panel that auto-generates its link structure from the Sitecore content tree hierarchy — no datasource configuration is required by authors. At render time, `getComponentServerProps` executes a `GetContentTreeNavigation` GraphQL query using the current page's item ID to fetch the current page, its parent page, and all sibling pages (children of the parent) as well as the current page's own children. The sidebar displays the parent page as a bold back-link at the top, lists all sibling pages below it (highlighting the active page in bold), and expands a sub-list of the current page's children beneath the active sibling.
 
-The ContentTreeSideNav component displays a contextual side navigation based on the current page's position in the Sitecore content tree. It shows the parent page, sibling pages, and child pages of the current page, creating an automatic navigation structure without manual datasource configuration. This is ideal for documentation sites, product catalogs, or any hierarchical content structure.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `ee2de1d3-7190-4265-b528-f6d8f9c82fcf` |
+| **Component Name** | `ContentTreeSideNav` |
+| **Category** | `Navigation` |
 
-## Sitecore Template Requirements
+## Fields
+**Fields:** None — this component has no datasource fields. All navigation data is automatically derived from the content tree using the current page's item ID.
 
-### Data Source
+## Placeholders
+**Placeholders:** None — this component does not expose any placeholders.
 
-**Important:** This component does NOT use a datasource. It reads the page hierarchy from the **route context** via GraphQL, automatically building navigation from the content tree structure.
+## JSS Field Component Mapping
+This component has no JSS field bindings. All data is fetched via GraphQL and passed through the `rendering.data` object:
 
-### GraphQL Query
+| Data Path | Description |
+|-----------|-------------|
+| `rendering.data.item` | Current page node (`id`, `name`, `displayName`, `url.path`) |
+| `rendering.data.item.children.results` | Direct children of the current page |
+| `rendering.data.item.parent` | Parent page node (used as the top back-link) |
+| `rendering.data.item.parent.children.results` | Sibling pages (all children of parent, used as the peer list) |
 
-```graphql
-query GetContentTreeNavigation($pageID: String!, $language: String!, $templateId: String!) {
-  item(path: $pageID, language: $language) {
-    ...PageFieldsFragment
-    children(includeTemplateIDs: [$templateId]) {
-      total
-      results {
-        ...PageFieldsFragment
-      }
-    }
-    parent {
-      ...PageFieldsFragment
-      children(includeTemplateIDs: [$templateId]) {
-        total
-        results {
-          ...PageFieldsFragment
-        }
-      }
-    }
-  }
-}
-```
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|-------------|----------|
+| Default | `Default` | Standard content-tree sidebar panel rendered inside a `Frame` wrapper |
 
-### Template Filtering
-
-The component filters pages by template ID (Base Page template), ensuring only proper page items appear in navigation.
-
-## Content Authoring Instructions
-
-### Automatic Behavior
-
-Navigation is **automatically generated** from the Sitecore content tree:
-
-1. **Parent Section:** Displays the parent page as the section heading
-2. **Sibling Pages:** Lists all pages at the same level as the current page
-3. **Child Pages:** When viewing a page, its children appear nested below it
-4. **Current Page:** Highlighted (bold, not linked)
-
-### Optimizing Navigation
-
-To customize the navigation display:
-
-1. **Display Names:** Edit each page's `displayName` field for user-friendly labels
-2. **Page Order:** Adjust sort order in Sitecore for proper sequencing
-3. **Content Structure:** Organize content tree logically for meaningful navigation
-4. **Template Assignment:** Only pages using the Base Page template appear
-
-### Example Navigation Structure
-
-For a page at `/documentation/getting-started/installation`:
-
-```
-Documentation (parent link)
-  ├── Quick Start          (sibling)
-  ├── Getting Started      (current - bold)
-  │   ├── Installation     (child - if viewing Getting Started)
-  │   └── Configuration    (child)
-  └── Advanced Topics      (sibling)
-```
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+// From: src/components/Navigation/ContentTreeSideNav/ContentTreeSideNav.tsx
+
 type TreePageType = {
   id: string;
   name: string;
@@ -100,126 +60,45 @@ type ContentTreeSideNavProps = ComponentProps & {
     };
   };
 };
+
+type TreeNavItemProps = {
+  page: TreePageType;
+  isCurrentPage: boolean;
+};
 ```
 
-## Visual Layout
-
-```
-┌─────────────────────────────┐
-│  Documentation              │  (parent - link)
-│  ├── Quick Start            │  (sibling - link)
-│  ├── Getting Started        │  (current - bold)
-│  │   ├── Installation       │  (child - link)
-│  │   └── Configuration      │  (child - link)
-│  └── Advanced Topics        │  (sibling - link)
-└─────────────────────────────┘
+## Server-Side Data Fetching
+```typescript
+// getComponentServerProps fetches content tree data using:
+const BASE_PAGE_ID = '{F34E99C9-9782-4E4B-AA95-9FF88394F3F2}'; // Base page template filter
+// Query: GetContentTreeNavigation
+// Variables: { pageID, language, templateId: BASE_PAGE_ID }
 ```
 
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- No dedicated item path - uses page hierarchy
-- Configure page display names and sort order at each level
-
-### Experience Editor Behavior
-
-- **Not directly editable:** Navigation is auto-generated
-- **Updating navigation:** Edit page `displayName` fields in Content Editor
-- **Adding pages:** Create new pages under the appropriate parent
-- **Removing pages:** Delete or unpublish pages
-
-### Styling
-
-- Container: Rounded border, primary theme background, padding
-- Parent link: Accent background, bold text
-- Current page: Bold black text (not linked)
-- Sibling/child links: Blue links with hover underline
-
-## Authoring Rules
-
-1. **Display Names:** Always set meaningful display names on pages
-2. **Consistent Structure:** Maintain consistent depth across sections
-3. **Logical Grouping:** Group related pages under common parents
-4. **Sort Order:** Configure sort order for logical navigation flow
-
-## Common Mistakes
-
-| Mistake | Why It's Wrong | Correct Approach |
-|---------|----------------|------------------|
-| Missing display names | Shows item names (technical) | Set displayName on all pages |
-| Orphan pages | Missing from navigation | Place under appropriate parent |
-| Wrong template | Page excluded from nav | Use Base Page template |
-| No children | Shows empty parent | Add child pages or use different nav |
-
-## Related Components
-
-- `Breadcrumbs` - Shows hierarchical path to current page
-- `SideNav` - Manually configured side navigation
-- `Header` - Main navigation header
-
----
+## Example Content Entry
+No content entry is required. This is a fully structural/system component. Place it on any page or layout design where a contextual sidebar is needed — the navigation items are populated automatically from the content tree at request time.
 
 ## MCP Authoring Instructions
 
-### Adding ContentTreeSideNav to Page
-
-Since this component has no datasource, simply add it to the page:
-
+### Step 1: Add to Page
 ```javascript
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "content-tree-side-nav-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "ContentTreeSideNav_1",
-  language: "en",
-  fields: {}  // No fields to set
+await mcp__marketer_mcp__add_component_on_page({
+  itemId: "<target-page-item-id>",
+  renderingId: "ee2de1d3-7190-4265-b528-f6d8f9c82fcf",
+  placeholderName: "<placeholder-name>",
+  // No datasource required
 });
 ```
 
-### Optimizing Navigation Display
-
-Update page display names for better navigation labels:
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: pageId,
-  language: "en",
-  fields: {
-    "displayName": "Getting Started Guide"
-  }
-});
-```
-
-### Creating Navigation Structure
-
-Create child pages to build navigation hierarchy:
-
-```javascript
-// Create parent section
-const parentPage = await mcp__marketer-mcp__create_page({
-  siteName: "main",
-  parentPath: "/sitecore/content/Site/Home",
-  pageName: "Documentation",
-  templateId: "base-page-template-id",
-  language: "en"
-});
-
-// Create child pages
-await mcp__marketer-mcp__create_page({
-  siteName: "main",
-  parentPath: parentPage.path,
-  pageName: "Getting Started",
-  templateId: "base-page-template-id",
-  language: "en"
-});
-```
+### Notes
+- No datasource is needed. The component uses the current page's item ID from layout data.
+- Pages that do not inherit from the base page template (`F34E99C9-9782-4E4B-AA95-9FF88394F3F2`) are excluded from sibling/child results.
+- If the current page has no parent or its GraphQL data cannot be fetched, the component renders `null` silently.
+- Theme styling is inherited from the `useFrame` hook (`effectiveTheme`).
 
 ---
 
 ## Change Log
-
 | Date | Change | Author |
 |------|--------|--------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| 2026-02-19 | Initial documentation | Claude Code |

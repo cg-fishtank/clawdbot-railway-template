@@ -1,73 +1,40 @@
-# Callout
+# Callout Component
 
 ## Purpose
+Callout renders a highlighted aside box with a left border accent, heading, rich-text body, and an optional arrow link. It is designed to draw attention to supplementary information on a page without taking full-width prominence. The component inherits its colour scheme from the parent `Frame` via `useFrame()`, so the left-border accent and background tint automatically match the surrounding theme.
 
-The Callout component displays a highlighted content block with a distinctive left border accent. It includes a heading, body text, and an optional link rendered as a subtle text link with an arrow icon. The component is ideal for drawing attention to important information, quotes, or key points within page content without overwhelming the layout.
+The inner `Callout` sub-component wraps content in a `ContainedWrapper` for consistent horizontal spacing, uses semantic `role="region"` and `aria-labelledby` for accessibility, and renders the link via the shared `Button` child with the `link` variant and a right-pointing arrow icon.
 
-## Sitecore Configuration
-
-### Template Path
-
-`/sitecore/templates/Project/[Site]/Page Content/Callout`
-
-### Data Source Location
-
-`/sitecore/content/[Site]/Home/Data/Callouts/`
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `a5968db4-1d40-437e-9e9d-23733660f793` |
+| **Component Name** | `Callout` |
+| **Category** | `Page Content` |
 
 ## Fields
+| Field Name | Sitecore Type | Required | Description |
+|------------|--------------|----------|-------------|
+| `heading` | Single-Line Text (`Field<string>`) | Yes | The callout headline, rendered as `<h2>` with `heading-2xl` styling |
+| `body` | Rich Text (`RichTextField`) | No | Supporting body content rendered as formatted rich text |
+| `link` | General Link (`LinkField`) | No | Optional CTA link rendered as an underlined arrow-link below the body |
 
-| Field   | Sitecore Type | Required | Constraints                  | Description                              |
-| ------- | ------------- | -------- | ---------------------------- | ---------------------------------------- |
-| heading | Single-Line Text | Yes   | Max 100 characters           | Callout headline                         |
-| body    | Rich Text     | Yes      | Basic formatting supported   | Main callout content                     |
-| link    | General Link  | Yes      | Internal or External         | Action link with arrow icon              |
+## Placeholders
+**Placeholders:** None
 
-### Field Details
+## JSS Field Component Mapping
+| Sitecore Field | JSS Component | Import |
+|---------------|--------------|--------|
+| `heading` | `<Text tag="h2">` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| `body` | `<RichText>` | `import { RichText } from '@sitecore-content-sdk/nextjs'` |
+| `link` | Shared `<Button variant="link">` | `import { Button } from 'component-children/Shared/Button/Button'` |
 
-#### heading
+## Component Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Standard callout box with heading, body, and optional link |
 
-- **Type:** Single-Line Text
-- **Required:** Yes
-- **Constraints:** Maximum 100 characters recommended
-- **Guidance:** Create a clear, attention-grabbing headline that summarizes the callout's purpose.
-- **Example:** `Important Update`
-
-#### body
-
-- **Type:** Rich Text
-- **Required:** Yes
-- **Constraints:** Supports basic formatting (bold, italic, lists, links)
-- **Guidance:** Provide the key information or message. Keep it concise and focused.
-- **Example:**
-  ```html
-  <p>Our annual maintenance window has been moved to accommodate holiday schedules. <strong>Please note the new date below.</strong></p>
-  ```
-
-#### link
-
-- **Type:** General Link
-- **Required:** Yes
-- **Link Types:** Internal, External
-- **Guidance:** Provide a clear action link. Displayed as text link with arrow icon.
-- **Example:**
-  ```json
-  {
-    "value": {
-      "href": "/updates/maintenance-schedule",
-      "text": "View Updated Schedule",
-      "target": ""
-    }
-  }
-  ```
-
-## Rendering Parameters
-
-| Parameter | Type     | Options                      | Default | Description                     |
-| --------- | -------- | ---------------------------- | ------- | ------------------------------- |
-| theme     | Droplist | primary, secondary, tertiary | primary | Callout background/border theme |
-
-## Component Interface
-
+## Props Interface
 ```typescript
 type CalloutFields = {
   heading: Field<string>;
@@ -80,27 +47,27 @@ type CalloutProps = {
 } & ComponentProps;
 ```
 
-## JSS Field Mapping
+## Example Content Entry
 
-| Field   | JSS Component                                | Usage                             |
-| ------- | -------------------------------------------- | --------------------------------- |
-| heading | `<Text tag="h2" field={fields.heading} />`   | Rendered with heading-2xl class   |
-| body    | `<RichText field={fields.body} />`           | Rendered with richtext class      |
-| link    | `<Button link={fields.link} variant="link" iconRight="arrow-right-long" />` | Text link with arrow |
-
-## Content Examples
-
-### Complete (All Fields Required)
-
+### Minimum Viable Content
 ```json
 {
   "fields": {
-    "heading": { "value": "Important Policy Update" },
-    "body": { "value": "<p>Effective January 1st, our return policy will be updated to provide you with more flexibility. <strong>All purchases made after this date</strong> will qualify for the extended 60-day return window.</p>" },
+    "heading": { "value": "Did you know?" }
+  }
+}
+```
+
+### Full Content Example
+```json
+{
+  "fields": {
+    "heading": { "value": "Important Notice" },
+    "body": { "value": "<p>Please review the updated policy document before proceeding with your application.</p>" },
     "link": {
       "value": {
-        "href": "/policies/returns",
-        "text": "Read Full Policy",
+        "href": "/policies/updated-policy",
+        "text": "Read the full policy",
         "target": ""
       }
     }
@@ -108,177 +75,43 @@ type CalloutProps = {
 }
 ```
 
-## Authoring Rules
-
-1. **All fields required:** Unlike some components, the Callout requires heading, body, and link to display properly.
-2. **Focused content:** Keep the callout focused on a single topic or announcement.
-3. **Action-oriented link:** The link should lead to more detailed information or a relevant action.
-4. **Visual hierarchy:** The callout's border accent draws attention—use sparingly to maintain impact.
-
-## Common Mistakes
-
-| Mistake                   | Why It's Wrong                               | Correct Approach                           |
-| ------------------------- | -------------------------------------------- | ------------------------------------------ |
-| Missing link field        | Link is visually expected in the design      | Always provide a link with descriptive text|
-| Overusing callouts        | Diminishes the attention-drawing effect      | Use 1-2 per page maximum                   |
-| Very long body content    | Callouts should be scannable                 | Keep to 2-3 sentences, link for details    |
-| Generic link text         | "Click here" provides no context             | Use descriptive: "View Updated Policy"     |
-
-## Related Components
-
-- `CTABlock` - For more prominent call-to-action with button
-- `AlertBanner` - For site-wide dismissable alerts
-- `ContentBlock` - For detailed content with image
-
-## Visual Layout
-
-```
-┌────────────────────────────────────────────────────┐
-│ ▌                                                  │
-│ ▌  Heading Text                                    │
-│ ▌                                                  │
-│ ▌  Body text content that provides important      │
-│ ▌  information to the user...                     │
-│ ▌                                                  │
-│ ▌  Link Text →                                    │
-│ ▌                                                  │
-└────────────────────────────────────────────────────┘
-```
-
-The left border (▌) provides visual accent based on the theme color.
-
----
-
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the Callout component using the Marketer MCP tools.
-
-### Prerequisites
-
-Before authoring this component via MCP:
-1. Have the target page ID (use `mcp__marketer-mcp__search_site`)
-2. Have the Callout rendering ID from the component manifest
-3. Know the target placeholder (typically `"headless-main"` for root placement)
-
-### Step 1: Find the Target Page
-
+### Step 1: Add to Page
 ```javascript
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "About Page"
-});
-const pageId = pageSearch.results[0].itemId;
-```
-
-### Step 2: Add Callout to Page
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: "page-guid",
-  componentRenderingId: "callout-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "Callout_1",
-  language: "en",
-  fields: {
-    "heading": "Important Policy Update",
-    "body": "<p>Effective January 1st, our return policy will be updated.</p>"
-  }
-});
-
-const datasourceId = result.datasourceId;
-```
-
-### Step 3: Update Link Field
-
-```javascript
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "link": "<link linktype=\"internal\" url=\"/policies/returns\" text=\"Read Full Policy\" />"
-  }
+await mcp__marketer-mcp__add_component_on_page({
+  itemId: "<page-item-id>",
+  renderingId: "a5968db4-1d40-437e-9e9d-23733660f793",
+  placeholderName: "<target-placeholder>",
+  datasource: "<callout-datasource-item-id>"
 });
 ```
 
-### Complete Authoring Example
-
+### Step 2: Set Fields
 ```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Policies"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add Callout component
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "callout-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "Callout_PolicyUpdate",
-  language: "en",
+await mcp__marketer-mcp__edit_item_fields({
+  itemId: "<callout-datasource-item-id>",
   fields: {
-    "heading": "Important Policy Update",
-    "body": "<p>Effective January 1st, our return policy will be updated to provide you with more flexibility. <strong>All purchases made after this date</strong> will qualify for the extended 60-day return window.</p>"
+    "heading": "Important Notice",
+    "body": "<p>Supporting information here.</p>",
+    "link": {
+      "href": "/target-page",
+      "text": "Learn more",
+      "target": ""
+    }
   }
 });
-
-const datasourceId = addResult.datasourceId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 3: Update link field
-// ═══════════════════════════════════════════════════════════════
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: datasourceId,
-  language: "en",
-  fields: {
-    "link": "<link linktype=\"internal\" url=\"/policies/returns\" text=\"Read Full Policy\" />"
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: Callout with heading, body, and link
-// ═══════════════════════════════════════════════════════════════
 ```
 
 ### Field Type Quick Reference
-
-| Field   | Type             | MCP Format                                              |
-|:--------|:-----------------|:--------------------------------------------------------|
-| heading | Single-Line Text | `"Plain text value"`                                    |
-| body    | Rich Text        | `"<p>HTML content</p>"`                                 |
-| link    | General Link     | `<link linktype="internal" url="/path" text="Text" />`  |
-
-### MCP Authoring Checklist
-
-Before authoring Callout via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have Callout rendering ID (from component manifest)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] Component item name is unique (e.g., `Callout_1`)
-- [ ] All three fields (heading, body, link) are populated
-- [ ] Link XML uses correct syntax with linktype attribute
-
-### MCP Error Handling
-
-| Error                 | Cause                    | Solution                                |
-|:----------------------|:-------------------------|:----------------------------------------|
-| "Item already exists" | Duplicate component name | Use unique suffix: `Callout_2`          |
-| Component not visible | Wrong placeholder path   | Use `"headless-main"` without leading slash |
-| Link not rendering    | Invalid XML format       | Verify linktype attribute and syntax    |
-| Missing arrow icon    | Link variant issue       | Component handles variant automatically  |
+| Field | Type | MCP Format |
+|-------|------|-----------|
+| `heading` | Single-Line Text | Plain string |
+| `body` | Rich Text | HTML string |
+| `link` | General Link | `{ "href": string, "text": string, "target": string }` |
 
 ---
-
 ## Change Log
-
-| Date       | Change                | Author      |
-|------------|----------------------|-------------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| Date | Change | Author |
+|------|--------|--------|
+| 2026-02-19 | Initial documentation | Claude Code |

@@ -1,83 +1,53 @@
 # CardCarousel Component
 
 ## Purpose
+CardCarousel renders a horizontally scrollable carousel of Card components powered by `react-slick`. It displays a section heading alongside previous/next arrow buttons (shown only when there are more cards than the current `slidesToShow` value). The number of visible slides is responsive: 1 on mobile (< 768px), 2 on tablet (768–1023px), and 3 on desktop (≥ 1024px). In Experience Editor mode, the carousel degrades gracefully to a wrapped flex grid so authors can still add and manage cards without the carousel interaction getting in the way.
 
-The CardCarousel component displays a collection of Card components in a responsive slider/carousel format with navigation controls. It features a heading, previous/next arrow buttons, and dot pagination. The carousel automatically adjusts the number of visible slides based on viewport width (1 on mobile, 2 on tablet, 3 on desktop). It's ideal for showcasing multiple cards when horizontal space needs to be conserved.
+## Rendering Information
+| Property | Value |
+|----------|-------|
+| **Rendering ID** | `4180edc5-2601-4b67-bea5-586bdd311311` |
+| **Component Name** | `CardCarousel` |
+| **Category** | `Cards` |
 
-## Sitecore Template Requirements
+## Fields
+| Field Name | Sitecore Type | Required | Description | Validation / Constraints |
+|------------|--------------|----------|-------------|--------------------------|
+| `heading` | Single-Line Text (`Field<string>`) | Yes | Section heading displayed above the carousel controls | Non-empty; displayed at `heading-4xl` in display mode, `heading-2xl` in edit mode |
 
-### Data Source Template
+## Placeholders
+| Placeholder Key | Allowed Components | Notes |
+|----------------|--------------------|-------|
+| `cardcarousel` | Card | Placeholder key includes the dynamic placeholder suffix: `cardcarousel-{DynamicPlaceholderId}` |
 
-- **Template Path:** `/sitecore/templates/Project/[Site]/Cards/Card Carousel`
-- **Template Name:** `Card Carousel`
-
-### Fields
-
-| Field Name | Sitecore Type    | Required | Description               | Validation/Constraints       |
-| ---------- | ---------------- | -------- | ------------------------- | ---------------------------- |
-| heading    | Single-Line Text | Yes      | Carousel section heading  | Recommended max 80 characters|
-
-### Rendering Parameters (Styles)
-
-| Parameter | Type     | Options                      | Default | Description                         |
-| --------- | -------- | ---------------------------- | ------- | ----------------------------------- |
-| theme     | Droplist | primary, secondary, tertiary | none    | Color theme affecting dots styling  |
-
-## Placeholder Configuration
-
-The CardCarousel exposes a placeholder for child components:
-
-| Placeholder Key       | Allowed Components | Description                    |
-| --------------------- | ------------------ | ------------------------------ |
-| `cardcarousel-{*}`    | Card               | Container for Card components  |
-
-**Dynamic Placeholder:** The placeholder uses the pattern `cardcarousel-{DynamicPlaceholderId}` where `{DynamicPlaceholderId}` is replaced with the component's unique identifier.
+> Unlike most components that use `placeholderGenerator`, CardCarousel constructs its placeholder key directly as `` `cardcarousel-${props.params.DynamicPlaceholderId}` ``. This means `DynamicPlaceholderId` must be set in the rendering parameters for the placeholder to resolve correctly.
 
 ## JSS Field Component Mapping
-
-| Sitecore Field | JSS Component                              | Import                                              |
-| -------------- | ------------------------------------------ | --------------------------------------------------- |
-| heading        | `<Text field={fields.heading} tag="h3" />` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| Sitecore Field | JSS Component | Import |
+|---------------|--------------|--------|
+| `heading` | `<Text>` | `import { Text } from '@sitecore-content-sdk/nextjs'` |
+| Edit-mode check | `useSitecore()` → `page.mode.isEditing` | `import { useSitecore } from '@sitecore-content-sdk/nextjs'` |
 
 ## Component Variants
+| Variant | Export Name | Use Case |
+|---------|------------|----------|
+| Default | `Default` | Responsive sliding carousel with arrow navigation and dot indicators |
 
-The CardCarousel component exports a single Default variant:
+## Carousel Behaviour Details
+| Breakpoint | Slides Shown |
+|-----------|-------------|
+| < 768px (mobile) | 1 |
+| 768–1023px (tablet) | 2 |
+| ≥ 1024px (desktop) | 3 |
 
-| Variant | Export Name | Description                           | Use Case                  |
-| ------- | ----------- | ------------------------------------- | ------------------------- |
-| Default | `Default`   | Responsive carousel with navigation   | Card collections (4+)     |
+- **Infinite scroll:** Disabled (`infinite: false`) — carousel stops at the last slide.
+- **Dot indicators:** Enabled; dot colour theme adapts to the effective Frame theme.
+- **Arrow buttons:** Only rendered when there are more cards than `slidesToShow`.
+- **Accessibility:** Hidden slides have their focusable child elements set to `tabindex="-1"` and `aria-hidden="true"` via a `MutationObserver` to prevent keyboard focus on off-screen cards.
 
-## Responsive Behavior
-
-| Viewport        | Slides Visible | Navigation                    |
-| --------------- | -------------- | ----------------------------- |
-| Mobile (<768px) | 1              | Arrows + Dots                 |
-| Tablet (768-1023px) | 2          | Arrows + Dots                 |
-| Desktop (1024px+) | 3            | Arrows + Dots                 |
-
-**Note:** Navigation arrows are hidden when all slides are visible at once.
-
-## Content Authoring Instructions
-
-### Field-by-Field Guidance
-
-#### heading
-
-- **What to enter:** The section title that introduces the carousel content
-- **Tone/Style:** Clear, descriptive of the content collection
-- **Character limit:** 80 characters recommended
-- **Example:** "Related Articles" or "Featured Products"
-
-### Content Matrix (Variations)
-
-| Variation | Required Fields | Child Components | Use Case                      |
-| --------- | --------------- | ---------------- | ----------------------------- |
-| Minimal   | heading         | 3+ Cards         | Basic carousel with title     |
-| Full      | heading         | 4-8 Cards        | Full carousel with pagination |
-
-## Component Props Interface
-
+## Props Interface
 ```typescript
+// Defined in component-children/Cards/CardCarousel/CardCarousel.tsx
 import { Field } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 
@@ -93,295 +63,80 @@ export type CardCarouselProps = ComponentProps & {
 ## Example Content Entry
 
 ### Minimum Viable Content
-
 ```json
 {
+  "componentName": "CardCarousel",
+  "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCarousel",
+  "params": {
+    "DynamicPlaceholderId": "1"
+  },
   "fields": {
-    "heading": { "value": "Related Articles" }
+    "heading": { "value": "Browse Our Range" }
+  },
+  "placeholders": {
+    "cardcarousel-1": [
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard1" },
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard2" },
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard3" }
+    ]
   }
 }
 ```
 
-## Sitecore XM Cloud Specifics
-
-### Content Editor Path
-
-- CardCarousel data sources: `/sitecore/content/[Site]/Home/Data/Card Carousels/`
-
-### Experience Editor Behavior
-
-- **Inline editable fields:** heading
-- **Carousel display:** In Experience Editor, cards display in a flex-wrap layout (not carousel) for easier editing
-- **Placeholder editing:** Click within the cards area to add/edit child Card components
-
-### Accessibility Features
-
-- Arrow buttons include proper `aria-label` attributes ("Previous Card", "Next Card")
-- Hidden slides have `tabindex="-1"` and `aria-hidden="true"` to prevent focus
-- Carousel container has `aria-roledescription="carousel"`
-
-## Common Mistakes to Avoid
-
-1. **Too few cards:** Carousels work best with 4+ cards. For 3 or fewer cards, consider using CardGrid instead.
-
-2. **Missing heading:** Always provide a heading to give context to the card collection.
-
-3. **Inconsistent card content:** Ensure all cards in the carousel have similar content lengths for visual consistency.
-
-4. **Too many cards:** While technically unlimited, carousels with 10+ cards can be cumbersome. Consider pagination or filtering instead.
-
-5. **Wrong component choice:** If all cards should be visible at once, use CardGrid instead of CardCarousel.
-
-## Related Components
-
-- `Card` - Child component placed inside CardCarousel's placeholder
-- `CardGrid` - Alternative container displaying all cards in a grid (no carousel)
-- `CardBanner` - Alternative container with background image and cards
-
----
+### Full Content Example
+```json
+{
+  "componentName": "CardCarousel",
+  "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCarousel",
+  "params": {
+    "DynamicPlaceholderId": "1"
+  },
+  "fields": {
+    "heading": { "value": "Browse Our Range" }
+  },
+  "placeholders": {
+    "cardcarousel-1": [
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard1" },
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard2" },
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard3" },
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard4" },
+      { "componentName": "Card", "dataSource": "/sitecore/content/MySite/Data/Cards/ProductCard5" }
+    ]
+  }
+}
+```
 
 ## MCP Authoring Instructions
 
-This section provides instructions for programmatically authoring the CardCarousel component using the Marketer MCP tools.
+### Step 1: Add to Page
+1. Open the target page in Sitecore Pages or Experience Editor.
+2. Click **Add component** in the desired layout slot.
+3. Search for **CardCarousel** and select it.
+4. Assign or create a datasource under the site's Data/Cards folder.
 
-### Step 1: Find the Target Page
+### Step 2: Populate Fields
+| Field | Action |
+|-------|--------|
+| `heading` | Enter the carousel section heading (required). |
 
-```javascript
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Page Name"
-});
-const pageId = pageSearch.results[0].itemId;
-```
+### Step 3: Add Cards
+1. In the `cardcarousel` placeholder, click **Add component** and select **Card**.
+2. Assign a Card datasource item.
+3. Repeat for each additional card. A minimum of 4 cards is recommended to make the carousel controls visible on desktop (where 3 slides are shown simultaneously).
 
-### Step 2: Add CardCarousel to Page
-
-```javascript
-const result = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-carousel-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "CardCarousel_Related",
-  language: "en",
-  fields: {
-    "heading": "Related Articles"
-  }
-});
-
-const datasourceId = result.datasourceId;
-const dynamicPlaceholderId = result.placeholderId;  // Needed for adding child cards
-```
-
-### Step 3: Add Child Card Components
-
-```javascript
-// Add cards to the CardCarousel's placeholder
-const cardPlaceholder = `headless-main/cardcarousel-{${dynamicPlaceholderId}}`;
-
-// Card 1
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-rendering-id",
-  placeholderPath: cardPlaceholder,
-  componentItemName: "Card_Article1",
-  language: "en",
-  fields: {
-    "heading": "Article One Title",
-    "body": "<p>Brief description of article one.</p>"
-  }
-});
-
-// Card 2
-await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-rendering-id",
-  placeholderPath: cardPlaceholder,
-  componentItemName: "Card_Article2",
-  language: "en",
-  fields: {
-    "heading": "Article Two Title",
-    "body": "<p>Brief description of article two.</p>"
-  }
-});
-
-// Continue adding more cards as needed (4+ recommended for carousel)
-```
-
-### Complete Authoring Example
-
-```javascript
-// ═══════════════════════════════════════════════════════════════
-// STEP 1: Find target page
-// ═══════════════════════════════════════════════════════════════
-const pageSearch = await mcp__marketer-mcp__search_site({
-  site_name: "main",
-  search_query: "Blog Page"
-});
-const pageId = pageSearch.results[0].itemId;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 2: Add CardCarousel component
-// ═══════════════════════════════════════════════════════════════
-const addResult = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-carousel-rendering-id",
-  placeholderPath: "headless-main",
-  componentItemName: "CardCarousel_RelatedPosts",
-  language: "en",
-  fields: {
-    "heading": "Related Posts"
-  }
-});
-
-const dynamicId = addResult.placeholderId;
-const cardPlaceholder = `headless-main/cardcarousel-{${dynamicId}}`;
-
-// ═══════════════════════════════════════════════════════════════
-// STEP 3: Add child Card components (4+ recommended)
-// ═══════════════════════════════════════════════════════════════
-
-// Card 1
-const card1 = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-rendering-id",
-  placeholderPath: cardPlaceholder,
-  componentItemName: "Card_Post1",
-  language: "en",
-  fields: {
-    "heading": "Understanding Digital Transformation",
-    "body": "<p>A deep dive into modern digital strategies.</p>"
-  }
-});
-
-// Update Card 1 image
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: card1.datasourceId,
-  language: "en",
-  fields: {
-    "image": "<image mediaid='{IMAGE1-GUID}' />"
-  }
-});
-
-// Card 2
-const card2 = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-rendering-id",
-  placeholderPath: cardPlaceholder,
-  componentItemName: "Card_Post2",
-  language: "en",
-  fields: {
-    "heading": "Cloud Migration Best Practices",
-    "body": "<p>Essential tips for a smooth cloud transition.</p>"
-  }
-});
-
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: card2.datasourceId,
-  language: "en",
-  fields: {
-    "image": "<image mediaid='{IMAGE2-GUID}' />"
-  }
-});
-
-// Card 3
-const card3 = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-rendering-id",
-  placeholderPath: cardPlaceholder,
-  componentItemName: "Card_Post3",
-  language: "en",
-  fields: {
-    "heading": "AI in Enterprise Applications",
-    "body": "<p>How AI is reshaping business software.</p>"
-  }
-});
-
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: card3.datasourceId,
-  language: "en",
-  fields: {
-    "image": "<image mediaid='{IMAGE3-GUID}' />"
-  }
-});
-
-// Card 4
-const card4 = await mcp__marketer-mcp__add_component_on_page({
-  pageId: pageId,
-  componentRenderingId: "card-rendering-id",
-  placeholderPath: cardPlaceholder,
-  componentItemName: "Card_Post4",
-  language: "en",
-  fields: {
-    "heading": "Security in the Modern Web",
-    "body": "<p>Protecting your digital assets today.</p>"
-  }
-});
-
-await mcp__marketer-mcp__update_content({
-  siteName: "main",
-  itemId: card4.datasourceId,
-  language: "en",
-  fields: {
-    "image": "<image mediaid='{IMAGE4-GUID}' />"
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-// COMPLETE: CardCarousel with 4 child cards
-// ═══════════════════════════════════════════════════════════════
-```
+### Important Notes
+- Arrow navigation only appears when the total number of cards exceeds the current `slidesToShow` count for the viewport.
+- In Experience Editor mode, cards render as a flat wrapped grid instead of the carousel to enable authoring. Preview or CD delivery mode shows the carousel behaviour.
+- The `DynamicPlaceholderId` rendering parameter must be set to ensure the placeholder key is unique when multiple CardCarousels appear on the same page.
 
 ### Field Type Quick Reference
-
-| Field   | Type             | MCP Format           |
-|:--------|:-----------------|:---------------------|
-| heading | Single-Line Text | `"Plain text value"` |
-
-### Placeholder Path Pattern
-
-For CardCarousel's child placeholder:
-```
-headless-main/cardcarousel-{DYNAMIC_PLACEHOLDER_ID}
-```
-
-The `DYNAMIC_PLACEHOLDER_ID` is returned when you add the CardCarousel component.
-
-### MCP Authoring Checklist
-
-Before authoring CardCarousel via MCP, verify:
-
-- [ ] Have page ID (from `mcp__marketer-mcp__search_site`)
-- [ ] Have CardCarousel rendering ID (from component manifest)
-- [ ] Have Card rendering ID (for child cards)
-- [ ] Placeholder path is `"headless-main"` (no leading slash for root)
-- [ ] Save the dynamic placeholder ID returned when adding CardCarousel
-- [ ] Plan to add 4+ cards for optimal carousel experience
-
-### MCP Error Handling
-
-| Error                  | Cause                        | Solution                                      |
-|:-----------------------|:-----------------------------|:----------------------------------------------|
-| "Item already exists"  | Duplicate component name     | Use unique suffix: `CardCarousel_2`           |
-| Component not visible  | Wrong placeholder path       | Use `"headless-main"` without leading slash   |
-| Cards not appearing    | Wrong child placeholder path | Use dynamic ID from CardCarousel response     |
-| No carousel controls   | Too few cards                | Add 4+ cards so slides exceed visible count   |
-| `updatedFields: {}`    | Normal response              | Update succeeded despite empty response       |
-
-### Related Skills for MCP Authoring
-
-| Skill                         | Purpose                                |
-|:------------------------------|:---------------------------------------|
-| `/sitecore-author-placeholder`| Placeholder path construction rules    |
-| `/sitecore-author-image`      | Image field XML formatting for cards   |
-| `/sitecore-upload-media`      | Upload images to Media Library first   |
+| Field | Sitecore Template Field Type | Notes |
+|-------|------------------------------|-------|
+| `heading` | Single-Line Text | Renders as `<h3>`; plain text only |
 
 ---
 
 ## Change Log
-
-| Date       | Change                | Author      |
-|------------|----------------------|-------------|
-| 2026-02-09 | Initial documentation | Claude Code |
+| Date | Change | Author |
+|------|--------|--------|
+| 2026-02-19 | Initial documentation | Claude Code |
