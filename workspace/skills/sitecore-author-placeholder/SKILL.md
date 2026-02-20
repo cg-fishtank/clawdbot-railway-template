@@ -361,8 +361,7 @@ async function getComponentWithRetry(pageId, datasourceId, placeholder, maxRetri
 This skill works alongside:
 - `/sitecore-author-link` - For link field formatting
 - `/sitecore-author-image` - For image field formatting
-- `/pagebuilder` - For understanding component structure
-- `/content-page-auto-populator` - For automated page population
+- `/sitecore-author` - For orchestrating page creation and component authoring
 
 ---
 

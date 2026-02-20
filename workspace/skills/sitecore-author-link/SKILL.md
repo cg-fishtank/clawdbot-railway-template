@@ -370,7 +370,7 @@ function detectLinkType(url) {
 
 ### Example 1: Simple External Link
 ```
-/link-authoring
+/sitecore-author-link
 Update the Button component on /Hospitality/Dining page
 Field: Link
 Text: "View Full Menu"
@@ -381,7 +381,7 @@ Target: _blank
 
 ### Example 2: Internal Link with Path
 ```
-/link-authoring
+/sitecore-author-link
 Update the HeroBanner link on /Home page
 Field: Link
 Text: "Learn More"
@@ -392,7 +392,7 @@ Target: _self
 
 ### Example 3: Multiple Link Fields
 ```
-/link-authoring
+/sitecore-author-link
 Update the ContentBlock on /Services page
 Component has 2 link fields:
 - PrimaryLink: "Get Started" → https://example.com/signup (external, _blank)
@@ -493,8 +493,8 @@ await marketer_search_site({
 ## Integration Notes
 
 This skill works alongside:
-- `/image-authoring` - For updating image fields
-- `/media-uploader` - For uploading assets
-- `/pagebuilder` - For understanding component structure
+- `/sitecore-author-image` - For updating image fields
+- `/sitecore-upload-media` - For uploading assets
+- `/sitecore-author` - For orchestrating page creation and component authoring
 
 All skills use the same MCP authentication and site structure.

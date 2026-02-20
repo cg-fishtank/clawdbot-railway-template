@@ -60,7 +60,7 @@ All tools are registered as OpenClaw tools via the sitecore-mcp extension plugin
 - `list_available_insertoptions` — Available child templates
 
 ### Component Management (4)
-- `list_components` — List all components (~13k tokens — **use component-registry.md instead**)
+- `list_components` — List all components (~13k tokens — **use per-component docs in sitecore-component-docs/references/ instead**)
 - `get_component` — Component details
 - `create_component_datasource` — Create datasource
 - `search_component_datasources` — Search datasources
@@ -83,10 +83,9 @@ These files save thousands of tokens per session. **Check them before making MCP
 
 | File | Replaces | Savings |
 |:-----|:---------|:--------|
-| `/data/workspace/skills/*/references/component-registry.md` | `list_components` | ~13k tokens |
-| `/data/workspace/skills/*/references/site-config.md` | `search_site` | ~1.2k tokens |
-| `/data/workspace/skills/*/references/page-templates.md` | `list_available_insertoptions` | ~600 tokens |
-| `/data/workspace/skills/*/references/placeholder-patterns.md` | Manual lookup | Reference |
+| `/data/workspace/skills/sitecore-component-docs/references/**/{Component}/{Component}.md` | `list_components` + `get_component` | ~13k tokens |
+| `/data/workspace/skills/sitecore-author/references/page-templates.md` | `list_available_insertoptions` | ~600 tokens |
+| `/data/workspace/skills/sitecore-author/references/special-characters.md` | Trial and error | Reference |
 
 ## Slack
 
