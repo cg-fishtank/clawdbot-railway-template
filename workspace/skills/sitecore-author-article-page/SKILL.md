@@ -10,8 +10,9 @@ description: Use when user wants to create/edit/author article pages, blog posts
 ## What I do
 
 - Create new Article Pages under `/Articles` with the correct template
+  - **Article Page template uses a page branch that auto-creates ArticleHeader, ArticleBody, and ArticleFooter**
 - Populate article-specific fields (heading, subheading, images, dates, tags, categories)
-- Add article components (ArticleHeader, ArticleBody, ArticleFooter)
+- Update existing article component fields if needed
 - Update tags, personas, and page categories
 - Handle article metadata (publish dates, author info)
 - **ALWAYS provide preview URL** in final response
@@ -87,7 +88,7 @@ Read `references/article-page-template.md`
 
 ## Article Components
 
-Standard article layout uses these components in order:
+**IMPORTANT:** Article Pages use a **page branch** that automatically creates these components:
 
 ### 1. ArticleHeader
 **Rendering ID:** `3fb16cce-b455-4a98-8610-a025e9f96c6c`
@@ -101,7 +102,9 @@ Standard article layout uses these components in order:
 **Rendering ID:** `07b66e75-e473-4f15-8880-509e6a6ff54c`
 **Placeholder:** `headless-main`
 
-For component field details, use `/sitecore-component-docs` before authoring.
+**These components are automatically added when you create a new Article Page. DO NOT manually add them.**
+
+If you need to populate fields on these components, use `marketer_get_components_on_page` to get their datasource IDs, then update fields with `marketer_update_content`.
 
 ---
 
@@ -111,8 +114,12 @@ For component field details, use `/sitecore-component-docs` before authoring.
 
 1. **Get parent location** (search for /Articles folder)
 2. **Create page** with Article Page template (ID: `f201f27e-c1ca-4949-be52-539bcc3b89d0`)
-3. **Populate fields** (heading, subheading, datePublished)
-4. **Add components** (ArticleHeader → ArticleBody → ArticleFooter)
+   - **Page branch automatically creates ArticleHeader, ArticleBody, and ArticleFooter components**
+   - DO NOT manually add these components - they're already there!
+3. **Populate page fields** (heading, subheading, datePublished, image, tags)
+4. **(Optional) Update component fields** if needed:
+   - Use `marketer_get_components_on_page` to get component datasource IDs
+   - Update fields with `marketer_update_content`
 5. **Get preview URL (MANDATORY)**
 
 **For detailed code examples:**

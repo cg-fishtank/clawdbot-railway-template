@@ -105,7 +105,8 @@ Create article "The Future of AI" under /Articles
 **Steps:**
 1. Search for /Articles folder
 2. Create page with Article Page template
-3. Populate fields (heading, subheading, datePublished)
+   - **Page branch automatically creates ArticleHeader, ArticleBody, ArticleFooter components**
+3. Populate page fields (heading, subheading, datePublished)
 4. Use `/sitecore-author-tags` to add tags
 5. Get preview URL
 
@@ -124,22 +125,40 @@ Update "The Art of Mindful Living" article
 3. Use `/sitecore-author-tags` to add tags
 4. Get preview URL
 
-### Add Article Components
+### Update Article Component Fields
 
-```
-/sitecore-author-article-page
-Add article layout to page [page-id]:
-- ArticleHeader with title
-- ArticleBody with content
-- ArticleFooter with social sharing
-```
+**IMPORTANT:** Article Pages use a page branch that automatically creates ArticleHeader, ArticleBody, and ArticleFooter. DO NOT manually add these components.
+
+If you need to update fields on these existing components:
 
 **Steps:**
-1. Use `/sitecore-component-docs` for component details
-2. Add ArticleHeader to `headless-main`
-3. Add ArticleBody to `headless-main`
-4. Add ArticleFooter to `headless-main`
+1. Use `marketer_get_components_on_page` to get component list
+2. Find the component by rendering name (ArticleHeader, ArticleBody, or ArticleFooter)
+3. Extract the datasource ID from the component
+4. Update fields using `marketer_update_content` with the datasource ID
 5. Get preview URL
+
+**Example:**
+```javascript
+// Get all components on the page
+const pageData = await marketer_get_components_on_page({
+  pageId: pageId,
+  language: "en"
+});
+
+// Find ArticleHeader component
+const articleHeader = pageData.components.find(c => c.renderingName === "ArticleHeader");
+const headerDatasourceId = articleHeader.dataSource;
+
+// Update ArticleHeader fields
+await marketer_update_content({
+  itemId: headerDatasourceId,
+  siteName: "main",
+  fields: {
+    title: "Custom Header Title"
+  }
+});
+```
 
 ## Multi-Language Fields
 
