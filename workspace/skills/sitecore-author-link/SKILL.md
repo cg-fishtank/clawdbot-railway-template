@@ -1,5 +1,5 @@
 ---
-name: link-authoring
+name: sitecore-author-link
 description: Authors link fields in Sitecore XM Cloud components using marketer-mcp
 ---
 
@@ -8,6 +8,7 @@ description: Authors link fields in Sitecore XM Cloud components using marketer-
 **Version:** 1.0
 
 ## What I do
+
 - Find pages and components in Sitecore using MCP
 - Identify link fields on components
 - Update link fields with properly formatted Sitecore link XML
@@ -15,7 +16,9 @@ description: Authors link fields in Sitecore XM Cloud components using marketer-
 - Support both internal and external links
 
 ## When to use
+
 Use this skill when:
+
 - Updating link fields on existing Sitecore components
 - Changing a component's CTA link, navigation link, etc.
 - You need to author one or more link fields on a component
@@ -39,22 +42,24 @@ Use `marketer_search_site` to find the page containing the component:
 
 ```javascript
 await marketer_search_site({
-  site_name: "main",
-  search_query: "Hospitality-01-28"
+	site_name: "main",
+	search_query: "Hospitality-01-28",
 });
 ```
 
 **Response includes:**
+
 ```json
 {
-  "itemId": "1cf58fee-32e4-45e6-ac86-905883f3b2b6",
-  "name": "Hospitality-01-28",
-  "path": "/sitecore/content/Sites/main/Home/Landrysv2/Hospitality-01-28"
+	"itemId": "1cf58fee-32e4-45e6-ac86-905883f3b2b6",
+	"name": "Hospitality-01-28",
+	"path": "/sitecore/content/Sites/main/Home/Landrysv2/Hospitality-01-28"
 }
 ```
 
 **User Input Required:**
 Ask the user: "What page contains the component you want to update?"
+
 - Accept page name (e.g., "Hospitality-01-28")
 - Accept partial path (e.g., "Landrysv2/Hospitality")
 - Accept full path
@@ -67,31 +72,33 @@ Use `marketer_get_components_on_page` to list all components and their datasourc
 
 ```javascript
 await marketer_get_components_on_page({
-  site_name: "main",
-  page_id: "1cf58fee-32e4-45e6-ac86-905883f3b2b6"
+	site_name: "main",
+	page_id: "1cf58fee-32e4-45e6-ac86-905883f3b2b6",
 });
 ```
 
 **Response includes components with datasource IDs:**
+
 ```json
 {
-  "components": [
-    {
-      "componentName": "HeroBanner",
-      "dataSource": "a788f16f-d42e-4689-9975-f9a5bdde6757",
-      "placeholder": "headless-main"
-    },
-    {
-      "componentName": "Button",
-      "dataSource": "b899c27g-e53f-522c-c086-g8a6ceee7868",
-      "placeholder": "/headless-main/buttons-1"
-    }
-  ]
+	"components": [
+		{
+			"componentName": "HeroBanner",
+			"dataSource": "a788f16f-d42e-4689-9975-f9a5bdde6757",
+			"placeholder": "headless-main"
+		},
+		{
+			"componentName": "Button",
+			"dataSource": "b899c27g-e53f-522c-c086-g8a6ceee7868",
+			"placeholder": "/headless-main/buttons-1"
+		}
+	]
 }
 ```
 
 **Present to User:**
 Display a numbered list of components:
+
 ```
 Components on this page:
 1. HeroBanner (headless-main)
@@ -114,16 +121,21 @@ Load the component manifest to identify link fields:
 
 ```javascript
 // Read manifest
-const manifest = JSON.parse(fs.readFileSync('.opencode/output/component-manifest.json'));
+const manifest = JSON.parse(
+	fs.readFileSync(".opencode/output/component-manifest.json"),
+);
 
 // Find component
-const componentDef = manifest.components.find(c => c.name === selectedComponentName);
+const componentDef = manifest.components.find(
+	(c) => c.name === selectedComponentName,
+);
 
 // Filter for link fields
-const linkFields = componentDef.fields.filter(f => 
-  f.type === 'LinkField' || 
-  f.type === 'Field<Link>' ||
-  f.name.toLowerCase().includes('link')
+const linkFields = componentDef.fields.filter(
+	(f) =>
+		f.type === "LinkField" ||
+		f.type === "Field<Link>" ||
+		f.name.toLowerCase().includes("link"),
 );
 ```
 
@@ -132,6 +144,7 @@ If component has only one link field, proceed to check existing values.
 
 **Multiple Link Fields:**
 If component has multiple link fields (e.g., `PrimaryLink`, `SecondaryLink`):
+
 1. List all link fields by name
 2. Ask user: "Which link field(s) do you want to update?"
    - Options: "All" or specific field names
@@ -146,19 +159,20 @@ Use `marketer_get_content_item` to read current field values:
 
 ```javascript
 await marketer_get_content_item({
-  siteName: "main",
-  itemId: "a788f16f-d42e-4689-9975-f9a5bdde6757"
+	siteName: "main",
+	itemId: "a788f16f-d42e-4689-9975-f9a5bdde6757",
 });
 ```
 
 **Response includes current field values:**
+
 ```json
 {
-  "itemId": "a788f16f-d42e-4689-9975-f9a5bdde6757",
-  "fields": {
-    "Link": "<link text='Existing Link' linktype='external' url='https://old-url.com' anchor='' target='_blank' />",
-    "Heading": "Welcome"
-  }
+	"itemId": "a788f16f-d42e-4689-9975-f9a5bdde6757",
+	"fields": {
+		"Link": "<link text='Existing Link' linktype='external' url='https://old-url.com' anchor='' target='_blank' />",
+		"Heading": "Welcome"
+	}
 }
 ```
 
@@ -168,22 +182,22 @@ If a link field has a value, extract and display it to the user:
 
 ```javascript
 function parseExistingLink(linkXml) {
-  if (!linkXml || linkXml.trim() === '') {
-    return null; // No existing value
-  }
-  
-  // Extract attributes from XML
-  const textMatch = linkXml.match(/text='([^']*)'/);
-  const urlMatch = linkXml.match(/url='([^']*)'/);
-  const typeMatch = linkXml.match(/linktype='([^']*)'/);
-  const targetMatch = linkXml.match(/target='([^']*)'/);
-  
-  return {
-    text: textMatch ? textMatch[1] : '',
-    url: urlMatch ? urlMatch[1] : '',
-    type: typeMatch ? typeMatch[1] : 'external',
-    target: targetMatch ? targetMatch[1] : ''
-  };
+	if (!linkXml || linkXml.trim() === "") {
+		return null; // No existing value
+	}
+
+	// Extract attributes from XML
+	const textMatch = linkXml.match(/text='([^']*)'/);
+	const urlMatch = linkXml.match(/url='([^']*)'/);
+	const typeMatch = linkXml.match(/linktype='([^']*)'/);
+	const targetMatch = linkXml.match(/target='([^']*)'/);
+
+	return {
+		text: textMatch ? textMatch[1] : "",
+		url: urlMatch ? urlMatch[1] : "",
+		type: typeMatch ? typeMatch[1] : "external",
+		target: targetMatch ? targetMatch[1] : "",
+	};
 }
 ```
 
@@ -192,6 +206,7 @@ function parseExistingLink(linkXml) {
 For each link field with an existing value:
 
 1. **Display current value:**
+
    ```
    The 'Link' field currently has:
    - Text: "Existing Link"
@@ -201,6 +216,7 @@ For each link field with an existing value:
    ```
 
 2. **Ask for confirmation:**
+
    ```
    Do you want to override this existing link? (yes/no)
    ```
@@ -211,6 +227,7 @@ For each link field with an existing value:
 
 **Multiple Fields with Values:**
 If updating multiple fields and some have existing values:
+
 - Check each field individually
 - Ask for confirmation for each field that has a value
 - Only gather new details for fields the user confirms
@@ -248,23 +265,26 @@ Use `marketer_update_content` with properly formatted link XML:
 
 ```javascript
 await marketer_update_content({
-  siteName: "main",
-  itemId: "a788f16f-d42e-4689-9975-f9a5bdde6757",
-  fields: {
-    "Link": "<link text='View Menu' linktype='external' url='https://example.com/menu' anchor='' target='_blank' />"
-  }
+	siteName: "main",
+	itemId: "a788f16f-d42e-4689-9975-f9a5bdde6757",
+	fields: {
+		Link: "<link text='View Menu' linktype='external' url='https://example.com/menu' anchor='' target='_blank' />",
+	},
 });
 ```
 
 **Multiple Fields Example:**
+
 ```javascript
 await marketer_update_content({
-  siteName: "main",
-  itemId: "a788f16f-d42e-4689-9975-f9a5bdde6757",
-  fields: {
-    "PrimaryLink": "<link text='Learn More' linktype='internal' url='/about' anchor='' target='_self' />",
-    "SecondaryLink": "<link text='Contact' linktype='external' url='https://example.com/contact' anchor='' target='_blank' />"
-  }
+	siteName: "main",
+	itemId: "a788f16f-d42e-4689-9975-f9a5bdde6757",
+	fields: {
+		PrimaryLink:
+			"<link text='Learn More' linktype='internal' url='/about' anchor='' target='_self' />",
+		SecondaryLink:
+			"<link text='Contact' linktype='external' url='https://example.com/contact' anchor='' target='_blank' />",
+	},
 });
 ```
 
@@ -277,30 +297,33 @@ await marketer_update_content({
 Sitecore Link fields use XML format with specific attributes:
 
 ### External Link Format
+
 ```xml
 <link text='Visit Website' linktype='external' url='https://example.com/' anchor='' target='_blank' />
 ```
 
 ### Internal Link Format (with Sitecore Item ID)
+
 ```xml
 <link text='About Us' linktype='internal' url='' anchor='' target='' id='{B1BBF454-6060-4596-9D2C-0EA4AA414A9D}' />
 ```
 
 ### Internal Link Format (with Path)
+
 ```xml
 <link text='About Us' linktype='internal' url='/about' anchor='' target='_self' />
 ```
 
 ### Format Requirements
 
-| Requirement | Details |
-|:------------|:--------|
-| **Quotes** | MUST use **single quotes** for all attributes |
-| **Link Type** | Must be `'internal'` or `'external'` |
-| **External Links** | Must include `url` attribute with full URL including `https://` |
-| **Internal Links** | Can use `url='/path'` OR `id='{GUID}'` |
-| **Required Attributes** | `text`, `linktype`, `anchor`, `target` |
-| **GUID Format** | If using ID, MUST include braces: `'{GUID}'` and UPPERCASE |
+| Requirement             | Details                                                         |
+| :---------------------- | :-------------------------------------------------------------- |
+| **Quotes**              | MUST use **single quotes** for all attributes                   |
+| **Link Type**           | Must be `'internal'` or `'external'`                            |
+| **External Links**      | Must include `url` attribute with full URL including `https://` |
+| **Internal Links**      | Can use `url='/path'` OR `id='{GUID}'`                          |
+| **Required Attributes** | `text`, `linktype`, `anchor`, `target`                          |
+| **GUID Format**         | If using ID, MUST include braces: `'{GUID}'` and UPPERCASE      |
 
 ### Correct vs Wrong
 
@@ -329,25 +352,25 @@ Use this logic to auto-detect link type:
 
 ```javascript
 function detectLinkType(url) {
-  if (!url) return 'external';
-  
-  // External if starts with http/https
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return 'external';
-  }
-  
-  // Internal if starts with /
-  if (url.startsWith('/')) {
-    return 'internal';
-  }
-  
-  // If it's a GUID pattern, it's internal
-  if (/^[{]?[0-9a-fA-F-]{36}[}]?$/.test(url)) {
-    return 'internal';
-  }
-  
-  // Default to external
-  return 'external';
+	if (!url) return "external";
+
+	// External if starts with http/https
+	if (url.startsWith("http://") || url.startsWith("https://")) {
+		return "external";
+	}
+
+	// Internal if starts with /
+	if (url.startsWith("/")) {
+		return "internal";
+	}
+
+	// If it's a GUID pattern, it's internal
+	if (/^[{]?[0-9a-fA-F-]{36}[}]?$/.test(url)) {
+		return "internal";
+	}
+
+	// Default to external
+	return "external";
 }
 ```
 
@@ -355,20 +378,21 @@ function detectLinkType(url) {
 
 ## Common Errors
 
-| Error | Cause | Solution |
-|:------|:------|:---------|
-| `AUTH_NOT_AUTHENTICATED` | Token expired | Run `dotnet sitecore cloud login` and update `.env` |
-| "Cannot find a field with name X" | Wrong field name | Check component manifest for exact field name (case-sensitive) |
-| JSON escaping issues | Double quotes in XML | Use single quotes: `text='...'` not `text="..."` |
-| `updatedFields: {}` | Normal behavior | Update actually succeeded - this is expected |
-| "Invalid link format" | Missing required attributes | Ensure all attributes present: `text`, `linktype`, `anchor`, `target` |
-| "Cannot read item" | Invalid datasource ID | Verify component has a datasource (not shared) |
+| Error                             | Cause                       | Solution                                                              |
+| :-------------------------------- | :-------------------------- | :-------------------------------------------------------------------- |
+| `AUTH_NOT_AUTHENTICATED`          | Token expired               | Run `dotnet sitecore cloud login` and update `.env`                   |
+| "Cannot find a field with name X" | Wrong field name            | Check component manifest for exact field name (case-sensitive)        |
+| JSON escaping issues              | Double quotes in XML        | Use single quotes: `text='...'` not `text="..."`                      |
+| `updatedFields: {}`               | Normal behavior             | Update actually succeeded - this is expected                          |
+| "Invalid link format"             | Missing required attributes | Ensure all attributes present: `text`, `linktype`, `anchor`, `target` |
+| "Cannot read item"                | Invalid datasource ID       | Verify component has a datasource (not shared)                        |
 
 ---
 
 ## Usage Examples
 
 ### Example 1: Simple External Link
+
 ```
 /sitecore-author-link
 Update the Button component on /Hospitality/Dining page
@@ -380,6 +404,7 @@ Target: _blank
 ```
 
 ### Example 2: Internal Link with Path
+
 ```
 /sitecore-author-link
 Update the HeroBanner link on /Home page
@@ -391,6 +416,7 @@ Target: _self
 ```
 
 ### Example 3: Multiple Link Fields
+
 ```
 /sitecore-author-link
 Update the ContentBlock on /Services page
@@ -422,20 +448,23 @@ Component has 2 link fields:
 If the user wants to link to a specific Sitecore item by ID:
 
 **Step 1:** Get the target item ID (if user doesn't provide it):
+
 ```javascript
 await marketer_search_site({
-  site_name: "main",
-  search_query: "About Us"
+	site_name: "main",
+	search_query: "About Us",
 });
 // Returns: { itemId: "b1bbf454-6060-4596-9d2c-0ea4aa414a9d" }
 ```
 
 **Step 2:** Format the link XML with ID:
+
 ```xml
 <link text='About Us' linktype='internal' url='' anchor='' target='' id='{B1BBF454-6060-4596-9D2C-0EA4AA414A9D}' />
 ```
 
-**Note:** 
+**Note:**
+
 - GUID must be UPPERCASE
 - GUID must be wrapped in braces: `'{GUID}'`
 - `url` attribute should be empty string when using `id`
@@ -493,6 +522,7 @@ await marketer_search_site({
 ## Integration Notes
 
 This skill works alongside:
+
 - `/sitecore-author-image` - For updating image fields
 - `/sitecore-upload-media` - For uploading assets
 - `/sitecore-author` - For orchestrating page creation and component authoring
